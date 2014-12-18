@@ -32,4 +32,5 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.4.+'
     compile 'com.octo.android.robospice:robospice:1.4.14'
     compile 'com.octo.android.robospice:robospice-retrofit:+'
+    compile 'com.jakewharton:butterknife:6.0.0'
 }
