@@ -5,6 +5,7 @@ import com.binaryfork.onmap.instagram.model.Media;
 
 import retrofit.Callback;
 import retrofit.http.GET;
+import retrofit.http.Headers;
 import retrofit.http.Path;
 import retrofit.http.Query;
 
@@ -16,8 +17,9 @@ public interface MediaService {
             Callback<Media.MediaResponse> cb);
 
     @GET("/media/search")
-    public Media.MediaResponse mediaSearch(
+    public void mediaSearch(
             @Query("lat") double latitude,
-            @Query("lng") double longitude);
+            @Query("lng") double longitude,
+            Callback<Media.MediaResponse> cb);
 
 }

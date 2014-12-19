@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
-import com.binaryfork.onmap.instagram.InstagramRequest;
+import com.binaryfork.onmap.instagram.Instagram;
 import com.binaryfork.onmap.instagram.model.Media;
 import com.binaryfork.onmap.widget.SquareImageView;
 import com.google.android.gms.maps.CameraUpdate;
@@ -27,9 +27,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.octo.android.robospice.persistence.DurationInMillis;
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -38,12 +35,15 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class MapsActivity extends LocationActivity implements GoogleMap.OnMarkerClickListener {
 
     private GoogleMap map;
     private android.location.Location location;
-    private HashMap<String, MarkerTarget> targets = new HashMap<>();
+    private HashMap<String, MarkerTarget> targets;
     private int markerPhotoSize;
 
     @InjectView(R.id.expanded_image) SquareImageView expandedImage;
@@ -59,7 +59,7 @@ public class MapsActivity extends LocationActivity implements GoogleMap.OnMarker
         ButterKnife.inject(this);
         setUpMapIfNeeded();
         if (location != null) {
-            loadInstagramMedia();
+            getMediaLocations();
         }
     }
 
@@ -77,32 +77,26 @@ public class MapsActivity extends LocationActivity implements GoogleMap.OnMarker
         this.location = location;
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13);
         map.animateCamera(cameraUpdate);
-        loadInstagramMedia();
+        getMediaLocations();
     }
 
-    private void loadInstagramMedia() {
-        setProgressBarIndeterminateVisibility(true);
-        InstagramRequest instagramRequest = new InstagramRequest(location.getLatitude(), location.getLongitude());
-        getSpiceManager().execute(instagramRequest,
-                instagramRequest.getRequestCacheKey(),
-                DurationInMillis.ONE_HOUR,
-                new InstagramRequestListener());
-    }
+    private void getMediaLocations() {
+        Instagram.getInstance()
+                .cache(getApplicationContext())
+                .mediaService()
+                .mediaSearch(location.getLatitude(), location.getLongitude(), new Callback<Media.MediaResponse>() {
+            @Override
+            public void success(Media.MediaResponse mediaResponse, Response response) {
+                Log.i("mapp", "WWW " + response.getUrl());
+                setupMarkers(mediaResponse.data);
+            }
 
-    private class InstagramRequestListener implements RequestListener<Media.MediaResponse> {
-
-        @Override
-        public void onRequestFailure(SpiceException e) {
-            e.printStackTrace();
-            Log.e("Instagram", "Failure " + e.getMessage());
-
-        }
-
-        @Override
-        public void onRequestSuccess(Media.MediaResponse mediaResponse) {
-            Log.e("Instagram", "Success ");
-            setupMarkers(mediaResponse.data);
-        }
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e("", "WWW " + error.toString());
+                Log.e("", "WWW " + error.getUrl());
+            }
+        });
     }
 
     private void setupMarkers(List<Media> list) {
