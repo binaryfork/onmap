@@ -1,4 +1,4 @@
-package com.binaryfork.onmap;
+package com.binaryfork.onmap.activities;
 
 import android.location.Location;
 import android.os.Bundle;
@@ -10,7 +10,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-public abstract class LocationActivity extends BaseActivity implements
+public abstract class LocationActivity extends InstagramActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
@@ -18,6 +18,7 @@ public abstract class LocationActivity extends BaseActivity implements
     private final String TAG = "LocationActivity";
 
     private GoogleApiClient googleApiClient;
+    protected Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,6 @@ public abstract class LocationActivity extends BaseActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.e(TAG, "wow " + location.toString());
+        this.location = location;
     }
 }

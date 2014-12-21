@@ -1,4 +1,4 @@
-package com.binaryfork.onmap;
+package com.binaryfork.onmap.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -10,12 +10,11 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
-import com.binaryfork.onmap.instagram.InstagramRequest;
+import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.instagram.model.Media;
 import com.binaryfork.onmap.widget.SquareImageView;
 import com.google.android.gms.maps.CameraUpdate;
@@ -27,9 +26,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.octo.android.robospice.persistence.DurationInMillis;
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -39,10 +35,9 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class MapsActivity extends LocationActivity implements GoogleMap.OnMarkerClickListener {
+public class MapActivity extends LocationActivity implements GoogleMap.OnMarkerClickListener {
 
     private GoogleMap map;
-    private android.location.Location location;
     private HashMap<String, MarkerTarget> targets = new HashMap<>();
     private int markerPhotoSize;
 
@@ -59,7 +54,7 @@ public class MapsActivity extends LocationActivity implements GoogleMap.OnMarker
         ButterKnife.inject(this);
         setUpMapIfNeeded();
         if (location != null) {
-            loadInstagramMedia();
+            loadInstagramMedia(location);
         }
     }
 
@@ -74,38 +69,12 @@ public class MapsActivity extends LocationActivity implements GoogleMap.OnMarker
     @Override
     public void onLocationChanged(android.location.Location location) {
         super.onLocationChanged(location);
-        this.location = location;
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13);
         map.animateCamera(cameraUpdate);
-        loadInstagramMedia();
+        loadInstagramMedia(location);
     }
 
-    private void loadInstagramMedia() {
-        setProgressBarIndeterminateVisibility(true);
-        InstagramRequest instagramRequest = new InstagramRequest(location.getLatitude(), location.getLongitude());
-        getSpiceManager().execute(instagramRequest,
-                instagramRequest.getRequestCacheKey(),
-                DurationInMillis.ONE_HOUR,
-                new InstagramRequestListener());
-    }
-
-    private class InstagramRequestListener implements RequestListener<Media.MediaResponse> {
-
-        @Override
-        public void onRequestFailure(SpiceException e) {
-            e.printStackTrace();
-            Log.e("Instagram", "Failure " + e.getMessage());
-
-        }
-
-        @Override
-        public void onRequestSuccess(Media.MediaResponse mediaResponse) {
-            Log.e("Instagram", "Success ");
-            setupMarkers(mediaResponse.data);
-        }
-    }
-
-    private void setupMarkers(List<Media> list) {
+    protected void instagramMediaLoaded(List<Media> list) {
         targets = new HashMap<>();
         for (final Media media : list) {
             Marker marker = map.addMarker(new MarkerOptions()
