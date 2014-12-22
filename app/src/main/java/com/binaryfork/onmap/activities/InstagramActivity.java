@@ -1,6 +1,5 @@
 package com.binaryfork.onmap.activities;
 
-import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
@@ -16,11 +15,8 @@ import java.util.List;
 
 public abstract class InstagramActivity extends FragmentActivity {
 
-    private SpiceManager spiceManager = new SpiceManager(InstagramService.class);
-
-    private SpiceManager getSpiceManager() {
-        return spiceManager;
-    }
+    protected SpiceManager spiceManager = new SpiceManager(InstagramService.class);
+    private InstagramRequest instagramRequest;
 
     abstract void instagramMediaLoaded(List<Media> list);
 
@@ -36,9 +32,12 @@ public abstract class InstagramActivity extends FragmentActivity {
         super.onStop();
     }
 
-    protected void loadInstagramMedia(Location location) {
-        InstagramRequest instagramRequest = new InstagramRequest(location.getLatitude(), location.getLongitude());
-        getSpiceManager().execute(instagramRequest,
+    protected void loadInstagramMedia(double lat, double lon) {
+        if (instagramRequest != null) {
+            spiceManager.cancel(instagramRequest);
+        }
+        instagramRequest = new InstagramRequest(lat, lon);
+        spiceManager.execute(instagramRequest,
                 instagramRequest.getRequestCacheKey(),
                 DurationInMillis.ONE_HOUR,
                 new InstagramRequestListener());
@@ -48,13 +47,14 @@ public abstract class InstagramActivity extends FragmentActivity {
 
         @Override
         public void onRequestFailure(SpiceException e) {
+            instagramRequest = null;
             e.printStackTrace();
             Log.e("Instagram", "Failure " + e.getMessage());
-
         }
 
         @Override
         public void onRequestSuccess(Media.MediaResponse mediaResponse) {
+            instagramRequest = null;
             Log.e("Instagram", "Success ");
             instagramMediaLoaded(mediaResponse.data);
         }

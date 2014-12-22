@@ -14,6 +14,8 @@ public class Media {
     public String id;
     public Location location;
     public User user;
+    public Caption caption;
+    public Comments comments;
 
     public class Location {
         public String id;
@@ -27,7 +29,13 @@ public class Media {
         public String profile_picture;
     }
 
+    public class Caption {
+        public String text;
+        public User from;
+    }
+
     public class Comments {
+        public int count;
         public List<Comment> data;
 
         public class Comment {

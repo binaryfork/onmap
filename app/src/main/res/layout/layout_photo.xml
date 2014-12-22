@@ -1,32 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/info_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:visibility="invisible">
 
-    <com.binaryfork.onmap.widget.SquareImageView
-        android:id="@+id/expanded_image"
-        android:layout_alignParentTop="true"
-        android:layout_height="match_parent"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:visibility="invisible" />
+        android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:id="@+id/info_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/expanded_image"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:visibility="gone"
-        android:background="#fff" >
-        <TextView
+        <com.binaryfork.onmap.widget.ImageTextView
             android:id="@+id/username"
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:textAppearance="@android:style/TextAppearance.Medium"/>
-        <TextView
-            android:id="@+id/tags"
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#fff"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_launcher"
+            android:drawableRight="@drawable/abc_ab_share_pack_holo_dark"
+            android:paddingLeft="16dp"
             android:textAppearance="@android:style/TextAppearance.Medium"/>
 
-        </LinearLayout>
-</merge>
+        <TextView
+            android:id="@+id/comments"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/expanded_image"
+            android:layout_alignParentBottom="true"
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            android:background="#fff"
+            android:orientation="vertical"
+            android:layout_marginTop="48dp"
+            android:padding="16dp" />
+
+        <com.binaryfork.onmap.widget.SquareImageView
+            android:id="@+id/expanded_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:visibility="invisible" />
+    </RelativeLayout>
+</ScrollView>

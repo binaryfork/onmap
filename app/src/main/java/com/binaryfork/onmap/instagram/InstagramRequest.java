@@ -17,7 +17,7 @@ public class InstagramRequest extends RetrofitSpiceRequest<Media.MediaResponse, 
 
     @Override
     public Media.MediaResponse loadDataFromNetwork() {
-        return getService().mediaSearch(latitude, longitude);
+        return getService().mediaSearch(latitude, longitude, 5000);
     }
 
     public String getRequestCacheKey() {

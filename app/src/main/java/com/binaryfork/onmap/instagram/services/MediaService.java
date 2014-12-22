@@ -18,6 +18,14 @@ public interface MediaService {
     @GET("/media/search")
     public Media.MediaResponse mediaSearch(
             @Query("lat") double latitude,
-            @Query("lng") double longitude);
+            @Query("lng") double longitude,
+            @Query("DISTANCE") int distance);
+
+    @GET("/media/search")
+    public Media.MediaResponse mediaSearch(
+            @Query("lat") double latitude,
+            @Query("lng") double longitude,
+            @Query("MIN_TIMESTAMP") double minTimestamp,
+            @Query("MAX_TIMESTAMP") double maxTimestamp);
 
 }
