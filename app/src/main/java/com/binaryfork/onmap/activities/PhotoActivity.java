@@ -8,7 +8,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -18,7 +17,7 @@ import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.instagram.model.Media;
-import com.binaryfork.onmap.widget.ImageTextView;
+import com.binaryfork.onmap.ui.CircleTransform;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -32,15 +31,11 @@ public class PhotoActivity extends MapActivity {
     private Rect startBounds;
     private float startScaleFinal;
 
-    @InjectView(R.id.expanded_image)
-    ImageView expandedImage;
-    @InjectView(R.id.info_layout)
-    View infoLayout;
-    // @InjectView(R.id.comments_layout)  View commentsLayout;
-    @InjectView(R.id.username)
-    ImageTextView usernameTxt;
-    @InjectView(R.id.comments)
-    TextView commentsTxt;
+    @InjectView(R.id.expanded_image) ImageView expandedImage;
+    @InjectView(R.id.info_layout) View infoLayout;
+    @InjectView(R.id.username) TextView usernameTxt;
+    @InjectView(R.id.comments) TextView commentsTxt;
+    @InjectView(R.id.user_photo) ImageView userPhoto;
 
     @Override
     public void onBackPressed() {
@@ -65,7 +60,7 @@ public class PhotoActivity extends MapActivity {
             Picasso.with(getApplicationContext())
                     .load(markerTarget.media.images.standard_resolution.url)
                     .placeholder(d)
-                            //      .transform(new CircleTransform())
+                    //.transform(new CircleTransform())
                     .into(expandedImage);
             zoomImageFromThumb(markerPosition, markerTarget);
         }
@@ -81,9 +76,8 @@ public class PhotoActivity extends MapActivity {
         usernameTxt.setVisibility(View.VISIBLE);
         usernameTxt.setText(markerTarget.media.user.username);
         Picasso.with(getApplicationContext()).load(markerTarget.media.user.profile_picture)
-                .resize(getMarkerPhotoSize(),getMarkerPhotoSize())
-                .into(usernameTxt);
-        Log.w("", "pp " + markerTarget.media.user.profile_picture);
+                .transform(new CircleTransform())
+                .into(userPhoto);
         if (markerTarget.media.caption != null)
             commentsTxt.setText(markerTarget.media.caption.from.username + " " + markerTarget.media.caption.text);
         if (markerTarget.media.comments.count > 0)
