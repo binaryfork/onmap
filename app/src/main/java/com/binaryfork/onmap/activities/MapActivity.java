@@ -22,8 +22,6 @@ import com.squareup.picasso.Target;
 import java.util.HashMap;
 import java.util.List;
 
-import butterknife.ButterKnife;
-
 public abstract class MapActivity extends LocationActivity implements GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 
     protected GoogleMap map;
@@ -36,7 +34,6 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        ButterKnife.inject(this);
         setUpMapIfNeeded();
         if (location != null) {
             loadInstagramMedia(location.getLatitude(), location.getLongitude());
@@ -67,7 +64,7 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
             mapCircle.remove();
         mapCircle = map.addCircle(new CircleOptions()
                 .center(latLng)
-                .radius(2500)
+                .radius(1000)
                 .strokeWidth(getResources().getDimension(R.dimen.map_circle_stroke))
                 .strokeColor(0x663333ff)
                 .fillColor(0x113333ff));

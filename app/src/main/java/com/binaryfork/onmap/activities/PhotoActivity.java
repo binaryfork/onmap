@@ -8,21 +8,27 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.instagram.model.Media;
+import com.binaryfork.onmap.ui.Animations;
 import com.binaryfork.onmap.ui.CircleTransform;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.squareup.picasso.Picasso;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class PhotoActivity extends MapActivity {
@@ -38,9 +44,15 @@ public class PhotoActivity extends MapActivity {
     @InjectView(R.id.user_photo) ImageView userPhoto;
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ButterKnife.inject(this);
+    }
+
+    @Override
     public void onBackPressed() {
         if (infoLayout.isShown()) {
-            zoomOutImage();
+            hideMediaInfo();
         } else {
             super.onBackPressed();
         }
@@ -68,10 +80,8 @@ public class PhotoActivity extends MapActivity {
     }
 
     private void showMediaInfo(MarkerTarget markerTarget) {
-        TranslateAnimation animation = new TranslateAnimation(0, 0, commentsTxt.getHeight() * -1, 0);
-        animation.setDuration(500);
-        animation.setInterpolator(new DecelerateInterpolator(5));
-        commentsTxt.startAnimation(animation);
+        Animations.moveFromTop(commentsTxt);
+        Animations.moveFromBottom(usernameTxt);
         commentsTxt.setVisibility(View.VISIBLE);
         usernameTxt.setVisibility(View.VISIBLE);
         usernameTxt.setText(markerTarget.media.user.username);
@@ -79,11 +89,22 @@ public class PhotoActivity extends MapActivity {
                 .transform(new CircleTransform())
                 .into(userPhoto);
         if (markerTarget.media.caption != null)
-            commentsTxt.setText(markerTarget.media.caption.from.username + " " + markerTarget.media.caption.text);
+            commentsTxt.setText(
+                    spannableComment(markerTarget.media.caption.from.username, markerTarget.media.caption.text));
         if (markerTarget.media.comments.count > 0)
             for (Media.Comments.Comment comment : markerTarget.media.comments.data) {
-                commentsTxt.append("\n" + comment.from.username + " " + comment.text);
+                commentsTxt.append(
+                        spannableComment("\n" + comment.from.username, comment.text));
             }
+    }
+
+    private Spannable spannableComment(String username, String comment) {
+        Spannable wordtoSpan =
+                new SpannableString(username + " " + comment);
+        wordtoSpan.setSpan(
+                new ForegroundColorSpan(getResources().getColor(R.color.accent)),
+                0, username.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return wordtoSpan;
     }
 
     private void zoomImageFromThumb(Point startPoint, final MarkerTarget markerTarget) {
@@ -184,7 +205,31 @@ public class PhotoActivity extends MapActivity {
         expandedImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                hideMediaInfo();
+            }
+        });
+    }
+
+    private void hideMediaInfo() {
+        Animations.moveTo(commentsTxt, true);
+        Animations.moveTo(userPhoto, false);
+        Animations.moveTo(usernameTxt, false, new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                userPhoto.setImageDrawable(null);
+                usernameTxt.setVisibility(View.GONE);
+                commentsTxt.setVisibility(View.GONE);
                 zoomOutImage();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
             }
         });
     }
@@ -208,29 +253,26 @@ public class PhotoActivity extends MapActivity {
                 .with(ObjectAnimator
                         .ofFloat(expandedImage,
                                 View.SCALE_Y, startScaleFinal));
-        set.setDuration(300);
+        set.setDuration(200);
         set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                //          thumbView.setAlpha(1f);
-                commentsTxt.setVisibility(View.GONE);
-                infoLayout.setVisibility(View.GONE);
-                expandedImage.setVisibility(View.GONE);
+                //          thumbView.setAlph
+                infoLayout.setVisibility(View.INVISIBLE);
+                expandedImage.setVisibility(View.INVISIBLE);
                 mCurrentAnimator = null;
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
-                //           thumbView.setAlpha(1f);
-                commentsTxt.setVisibility(View.GONE);
-                infoLayout.setVisibility(View.GONE);
-                expandedImage.setVisibility(View.GONE);
+                //           thumbView.setAlph
+                infoLayout.setVisibility(View.INVISIBLE);
+                expandedImage.setVisibility(View.INVISIBLE);
                 mCurrentAnimator = null;
             }
         });
         set.start();
         mCurrentAnimator = set;
-        //  Animations.fillScreenWithView(false, whiteCircle);
     }
 }
