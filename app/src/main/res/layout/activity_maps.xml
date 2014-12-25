@@ -12,6 +12,14 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
-    <include layout="@layout/layout_photo"/>
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fff"
+        android:gravity="center"
+        android:textAppearance="@android:style/TextAppearance.Medium"/>
 
+    <include layout="@layout/layout_photo"/>
 </RelativeLayout>

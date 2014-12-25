@@ -3,9 +3,12 @@ package com.binaryfork.onmap.activities;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.instagram.model.Media;
+import com.binaryfork.onmap.ui.DateUtils;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -19,8 +22,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 public abstract class MapActivity extends LocationActivity implements GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 
@@ -30,6 +37,9 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
 
     private Circle mapCircle;
 
+    DateUtils dateUtils;
+
+    @InjectView(R.id.date) TextView dateTxt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +48,20 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
         if (location != null) {
             loadInstagramMedia(location.getLatitude(), location.getLongitude());
         }
+        ButterKnife.inject(this);
+
+        Calendar calendar = Calendar.getInstance();
+        dateUtils = new DateUtils(calendar);
+        dateTxt.setText(dateUtils.getWeekInterval());
+        dateTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dateUtils.previousWeek();
+                dateTxt.setText(dateUtils.getWeekInterval());
+                loadInstagramMediaByTime(location.getLatitude(), location.getLongitude(),
+                        dateUtils.weekAgoTime(), dateUtils.currentTime());
+            }
+        });
     }
 
     private void setUpMapIfNeeded() {
@@ -53,7 +77,7 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
     public void onLocationChanged(android.location.Location location) {
         super.onLocationChanged(location);
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
-                new LatLng(location.getLatitude(), location.getLongitude()), 12);
+                new LatLng(location.getLatitude(), location.getLongitude()), 14);
         map.animateCamera(cameraUpdate);
         loadInstagramMedia(location.getLatitude(), location.getLongitude());
     }

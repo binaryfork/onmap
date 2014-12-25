@@ -25,7 +25,7 @@ public interface MediaService {
     public Media.MediaResponse mediaSearch(
             @Query("lat") double latitude,
             @Query("lng") double longitude,
-            @Query("MIN_TIMESTAMP") double minTimestamp,
-            @Query("MAX_TIMESTAMP") double maxTimestamp);
+            @Query("min_timestamp") long minTimestamp,
+            @Query("max_timestamp") long maxTimestamp);
 
 }

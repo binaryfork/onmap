@@ -3,9 +3,11 @@ package com.binaryfork.onmap.instagram;
 import com.binaryfork.onmap.Constants;
 import com.binaryfork.onmap.R;
 import com.octo.android.robospice.retrofit.RetrofitGsonSpiceService;
+import com.squareup.okhttp.OkHttpClient;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.client.OkClient;
 
 public class InstagramService extends RetrofitGsonSpiceService {
 
@@ -26,6 +28,7 @@ public class InstagramService extends RetrofitGsonSpiceService {
         if (Constants.DEBUG) {
             builder.setLogLevel(RestAdapter.LogLevel.FULL);
         }
+        builder.setClient(new OkClient(new OkHttpClient()));
         return builder;
     }
 

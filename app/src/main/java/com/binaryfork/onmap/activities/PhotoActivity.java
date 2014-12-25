@@ -8,7 +8,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -28,7 +27,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.squareup.picasso.Picasso;
 
-import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class PhotoActivity extends MapActivity {
@@ -42,12 +40,6 @@ public class PhotoActivity extends MapActivity {
     @InjectView(R.id.username) TextView usernameTxt;
     @InjectView(R.id.comments) TextView commentsTxt;
     @InjectView(R.id.user_photo) ImageView userPhoto;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ButterKnife.inject(this);
-    }
 
     @Override
     public void onBackPressed() {
@@ -82,6 +74,7 @@ public class PhotoActivity extends MapActivity {
     private void showMediaInfo(MarkerTarget markerTarget) {
         Animations.moveFromTop(commentsTxt);
         Animations.moveFromBottom(usernameTxt);
+        Animations.moveFromBottom(userPhoto);
         commentsTxt.setVisibility(View.VISIBLE);
         usernameTxt.setVisibility(View.VISIBLE);
         usernameTxt.setText(markerTarget.media.user.username);
