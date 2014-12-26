@@ -101,6 +101,7 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
         targets = new HashMap<>();
         for (final Media media : list) {
             Marker marker = map.addMarker(new MarkerOptions()
+                    .draggable(true)
                     .anchor(.5f, 1.25f)
                     .position(new LatLng(media.location.latitude, media.location.longitude)));
             MarkerTarget markerTarget = new MarkerTarget(media, marker);

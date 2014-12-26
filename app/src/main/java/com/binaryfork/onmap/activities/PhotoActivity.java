@@ -18,6 +18,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.instagram.model.Media;
 import com.binaryfork.onmap.ui.Animations;
@@ -34,6 +35,7 @@ public class PhotoActivity extends MapActivity {
     private AnimatorSet mCurrentAnimator;
     private Rect startBounds;
     private float startScaleFinal;
+    private MarkerTarget markerTarget;
 
     @InjectView(R.id.expanded_image) ImageView expandedImage;
     @InjectView(R.id.info_layout) View infoLayout;
@@ -50,9 +52,13 @@ public class PhotoActivity extends MapActivity {
         }
     }
 
+    public void onClickUsername(View view) {
+        Intents.openLink(this, markerTarget.media.link);
+    }
+
     @Override
     public boolean onMarkerClick(Marker marker) {
-        MarkerTarget markerTarget = targets.get(marker.getId());
+        markerTarget = targets.get(marker.getId());
 
         Projection projection = map.getProjection();
         LatLng markerLocation = marker.getPosition();

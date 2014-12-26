@@ -29,6 +29,8 @@
             android:background="#fff"
             android:gravity="center_vertical"
             android:paddingLeft="@dimen/username_bar_size"
+            android:onClick="onClickUsername"
+            android:clickable="true"
             android:textAppearance="@android:style/TextAppearance.Medium"/>
 
         <ImageView
@@ -36,6 +38,8 @@
             android:layout_width="@dimen/username_bar_size"
             android:layout_height="@dimen/username_bar_size"
             android:padding="8dp"
+            android:onClick="onClickUsername"
+            android:clickable="true"
             android:adjustViewBounds="true"/>
 
         <com.binaryfork.onmap.widget.SquareImageView
