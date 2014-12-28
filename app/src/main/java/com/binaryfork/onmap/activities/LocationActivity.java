@@ -17,7 +17,7 @@ public abstract class LocationActivity extends InstagramActivity implements
 
     private final String TAG = "LocationActivity";
 
-    private GoogleApiClient googleApiClient;
+    protected GoogleApiClient googleApiClient;
     protected Location location;
 
     @Override
@@ -29,7 +29,9 @@ public abstract class LocationActivity extends InstagramActivity implements
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .build();
+            Log.i(TAG, "GoogleApiClient "+googleApiClient.isConnected());
         }
+        Log.i(TAG, "GoogleApiClient "+googleApiClient);
     }
 
     @Override

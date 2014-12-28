@@ -3,7 +3,9 @@ package com.binaryfork.onmap.activities;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
@@ -40,6 +42,7 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
     DateUtils dateUtils;
 
     @InjectView(R.id.date) TextView dateTxt;
+    @InjectView(R.id.seek_bar_radius) SeekBar seekBarRaidus;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,14 +65,30 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
                         dateUtils.weekAgoTime(), dateUtils.currentTime());
             }
         });
-    }
+        seekBarRaidus.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mapCircle.setRadius(150 + (24 * progress));
+            }
 
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
     private void setUpMapIfNeeded() {
         if (map == null) {
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
             map.setOnMarkerClickListener(this);
             map.setOnMapClickListener(this);
+            map.setMyLocationEnabled(true);
         }
     }
 
@@ -124,6 +143,11 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
     public void onMapClick(LatLng latLng) {
         map.addMarker(new MarkerOptions()
                 .position(latLng));
+        if (location == null) {
+            Log.i("", "GoogleApiClient " + googleApiClient.isConnected());
+            googleApiClient.connect();
+            return;
+        }
         location.setLatitude(latLng.latitude);
         location.setLongitude(latLng.longitude);
         loadInstagramMedia(latLng.latitude, latLng.longitude);
