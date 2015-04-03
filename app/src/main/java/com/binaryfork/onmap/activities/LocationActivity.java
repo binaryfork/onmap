@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.activities;
+package com.binaryfork.onmap;
 
 import android.location.Location;
 import android.os.Bundle;
@@ -6,32 +6,31 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-public abstract class LocationActivity extends InstagramActivity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+public abstract class LocationActivity extends BaseActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final String TAG = "LocationActivity";
 
-    protected GoogleApiClient googleApiClient;
-    protected Location location;
+    private GoogleApiClient googleApiClient;
+
+    protected abstract void onLocationReceived(Location location);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        buildGoogleApiClient();
+    }
+
+    protected synchronized void buildGoogleApiClient() {
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(LocationServices.API)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
                     .build();
-            Log.i(TAG, "GoogleApiClient "+googleApiClient.isConnected());
         }
-        Log.i(TAG, "GoogleApiClient "+googleApiClient);
     }
 
     @Override
@@ -48,10 +47,10 @@ public abstract class LocationActivity extends InstagramActivity implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                googleApiClient, locationRequest, this);
+        Log.e(TAG, "wow onConnected");
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                googleApiClient);
+        onLocationReceived(lastLocation);
     }
 
     @Override
@@ -62,10 +61,5 @@ public abstract class LocationActivity extends InstagramActivity implements
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e(TAG, "Connection fail " + connectionResult.toString());
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        this.location = location;
     }
 }
