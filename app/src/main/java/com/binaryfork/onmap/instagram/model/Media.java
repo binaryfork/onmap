@@ -36,8 +36,4 @@ public class Media {
             public User from;
         }
     }
-
-    public class MediaResponse {
-        public List<Media> data;
-    }
 }
