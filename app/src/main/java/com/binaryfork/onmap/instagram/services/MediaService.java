@@ -30,4 +30,9 @@ public interface MediaService {
     MediaResponse mediaSearch(
             @Query("lat") double latitude,
             @Query("lng") double longitude);
+
+    @GET("/media/search")
+    rx.Observable<MediaResponse> mediaSearchRx(
+            @Query("lat") double latitude,
+            @Query("lng") double longitude);
 }

@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.instagram.model.Media;
+import com.binaryfork.onmap.mvp.ViewImplementation;
 import com.binaryfork.onmap.ui.Animations;
 import com.binaryfork.onmap.ui.CircleTransform;
 import com.google.android.gms.maps.Projection;
@@ -35,7 +36,7 @@ public class PhotoActivity extends MapActivity {
     private AnimatorSet mCurrentAnimator;
     private Rect startBounds;
     private float startScaleFinal;
-    private MarkerTarget markerTarget;
+    private ViewImplementation.MarkerTarget markerTarget;
 
     @InjectView(R.id.expanded_image) ImageView expandedImage;
     @InjectView(R.id.info_layout) View infoLayout;
@@ -58,7 +59,7 @@ public class PhotoActivity extends MapActivity {
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        markerTarget = targets.get(marker.getId());
+        markerTarget = view.targets.get(marker.getId());
 
         Projection projection = map.getProjection();
         LatLng markerLocation = marker.getPosition();
@@ -77,7 +78,7 @@ public class PhotoActivity extends MapActivity {
         return true;
     }
 
-    private void showMediaInfo(MarkerTarget markerTarget) {
+    private void showMediaInfo(ViewImplementation.MarkerTarget markerTarget) {
         Animations.moveFromTop(commentsTxt);
         Animations.moveFromBottom(usernameTxt);
         Animations.moveFromBottom(userPhoto);
@@ -106,7 +107,7 @@ public class PhotoActivity extends MapActivity {
         return wordtoSpan;
     }
 
-    private void zoomImageFromThumb(Point startPoint, final MarkerTarget markerTarget) {
+    private void zoomImageFromThumb(Point startPoint, final ViewImplementation.MarkerTarget markerTarget) {
         // If there's an animation in progress, cancel it
         // immediately and proceed with this one.
         if (mCurrentAnimator != null) {
