@@ -9,5 +9,6 @@ import rx.Observable;
 
 public interface Model {
 
-    Observable<MediaResponse> loadMedia(Context context, Location location);
+    Observable<MediaResponse> loadMediaByLocation(Context context, Location location);
+    Observable<MediaResponse> loadMediaByLocationAndDate(Context context, Location location, long from, long to);
 }

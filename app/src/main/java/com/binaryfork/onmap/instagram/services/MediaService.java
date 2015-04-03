@@ -20,19 +20,14 @@ public interface MediaService {
             @Query("DISTANCE") int distance);
 
     @GET("/media/search")
-    MediaResponse mediaSearch(
+    rx.Observable<MediaResponse> mediaSearch(
             @Query("lat") double latitude,
             @Query("lng") double longitude,
             @Query("min_timestamp") long minTimestamp,
             @Query("max_timestamp") long maxTimestamp);
 
     @GET("/media/search")
-    MediaResponse mediaSearch(
-            @Query("lat") double latitude,
-            @Query("lng") double longitude);
-
-    @GET("/media/search")
-    rx.Observable<MediaResponse> mediaSearchRx(
+    rx.Observable<MediaResponse> mediaSearch(
             @Query("lat") double latitude,
             @Query("lng") double longitude);
 }

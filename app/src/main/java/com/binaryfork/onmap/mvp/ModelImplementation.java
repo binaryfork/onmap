@@ -11,9 +11,16 @@ import rx.Observable;
 public class ModelImplementation implements Model {
 
     @Override
-    public Observable<MediaResponse> loadMedia(Context context, Location location) {
+    public Observable<MediaResponse> loadMediaByLocation(Context context, Location location) {
         return Instagram.getInstance(context)
                 .mediaService()
-                .mediaSearchRx(location.getLatitude(), location.getLongitude());
+                .mediaSearch(location.getLatitude(), location.getLongitude());
+    }
+
+    @Override
+    public Observable<MediaResponse> loadMediaByLocationAndDate(Context context, Location location, long from, long to) {
+        return Instagram.getInstance(context)
+                .mediaService()
+                .mediaSearch(location.getLatitude(), location.getLongitude(), from, to);
     }
 }

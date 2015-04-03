@@ -21,7 +21,7 @@ import android.widget.TextView;
 import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.instagram.model.Media;
-import com.binaryfork.onmap.mvp.ViewImplementation;
+import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.ui.Animations;
 import com.binaryfork.onmap.ui.CircleTransform;
 import com.google.android.gms.maps.Projection;
@@ -31,12 +31,12 @@ import com.squareup.picasso.Picasso;
 
 import butterknife.InjectView;
 
-public class PhotoActivity extends MapActivity {
+public class PhotoActivity extends AbstractMapActivity {
 
     private AnimatorSet mCurrentAnimator;
     private Rect startBounds;
     private float startScaleFinal;
-    private ViewImplementation.MarkerTarget markerTarget;
+    private MarkersViewImplementation.MarkerTarget markerTarget;
 
     @InjectView(R.id.expanded_image) ImageView expandedImage;
     @InjectView(R.id.info_layout) View infoLayout;
@@ -60,7 +60,6 @@ public class PhotoActivity extends MapActivity {
     @Override
     public boolean onMarkerClick(Marker marker) {
         markerTarget = view.targets.get(marker.getId());
-
         Projection projection = map.getProjection();
         LatLng markerLocation = marker.getPosition();
         Point markerPosition = projection.toScreenLocation(markerLocation);
@@ -71,14 +70,13 @@ public class PhotoActivity extends MapActivity {
             Picasso.with(getApplicationContext())
                     .load(markerTarget.media.images.standard_resolution.url)
                     .placeholder(d)
-                    //.transform(new CircleTransform())
                     .into(expandedImage);
             zoomImageFromThumb(markerPosition, markerTarget);
         }
         return true;
     }
 
-    private void showMediaInfo(ViewImplementation.MarkerTarget markerTarget) {
+    private void showMediaInfo(MarkersViewImplementation.MarkerTarget markerTarget) {
         Animations.moveFromTop(commentsTxt);
         Animations.moveFromBottom(usernameTxt);
         Animations.moveFromBottom(userPhoto);
@@ -107,7 +105,7 @@ public class PhotoActivity extends MapActivity {
         return wordtoSpan;
     }
 
-    private void zoomImageFromThumb(Point startPoint, final ViewImplementation.MarkerTarget markerTarget) {
+    private void zoomImageFromThumb(Point startPoint, final MarkersViewImplementation.MarkerTarget markerTarget) {
         // If there's an animation in progress, cancel it
         // immediately and proceed with this one.
         if (mCurrentAnimator != null) {

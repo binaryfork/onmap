@@ -17,20 +17,19 @@ import com.squareup.picasso.Target;
 
 import java.util.HashMap;
 
-public class ViewImplementation implements View {
+public class MarkersViewImplementation implements MarkersView {
 
     private final Context context;
     private final GoogleMap map;
     public HashMap<String, MarkerTarget> targets;
 
-    public ViewImplementation(GoogleMap map, Context context) {
+    public MarkersViewImplementation(GoogleMap map, Context context) {
         this.map = map;
         this.context = context;
     }
 
     @Override
     public void showMarkers(MediaResponse mediaResponse) {
-        map.clear();
         targets = new HashMap<>();
         for (final Media media : mediaResponse.data) {
             Marker marker = map.addMarker(new MarkerOptions()

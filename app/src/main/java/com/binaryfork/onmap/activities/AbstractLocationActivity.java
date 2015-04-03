@@ -8,7 +8,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
-public abstract class LocationActivity extends BaseActivity implements
+public abstract class AbstractLocationActivity extends BaseActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final String TAG = "LocationActivity";

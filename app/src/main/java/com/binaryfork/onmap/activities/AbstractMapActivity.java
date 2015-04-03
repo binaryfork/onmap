@@ -3,15 +3,15 @@ package com.binaryfork.onmap.activities;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.SeekBar;
+import android.view.View;
 import android.widget.TextView;
 
-import com.binaryfork.onmap.LocationActivity;
+import com.binaryfork.onmap.AbstractLocationActivity;
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.Model;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
-import com.binaryfork.onmap.mvp.ViewImplementation;
 import com.binaryfork.onmap.ui.DateUtils;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,7 +27,7 @@ import java.util.Calendar;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public abstract class MapActivity extends LocationActivity implements GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
+public abstract class AbstractMapActivity extends AbstractLocationActivity implements GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 
     protected GoogleMap map;
     private int markerPhotoSize;
@@ -38,11 +38,9 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
 
     @InjectView(R.id.date)
     TextView dateTxt;
-    @InjectView(R.id.seek_bar_radius)
-    SeekBar seekBarRaidus;
 
     protected PresenterImplementation presenter;
-    protected ViewImplementation view;
+    protected MarkersViewImplementation view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,45 +48,34 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
         if (location != null && presenter != null) {
-            updateRx();
+            setupPhotosOnMap();
         }
         ButterKnife.inject(this);
 
         Model model = new ModelImplementation();
-        view = new ViewImplementation(map, getApplicationContext());
+        view = new MarkersViewImplementation(map, getApplicationContext());
         presenter = new PresenterImplementation(model, view, getApplicationContext());
 
         Calendar calendar = Calendar.getInstance();
         dateUtils = new DateUtils(calendar);
         dateTxt.setText(dateUtils.getWeekInterval());
-/*        dateTxt.setOnClickListener(new View.OnClickListener() {
+        dateTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dateUtils.previousWeek();
                 dateTxt.setText(dateUtils.getWeekInterval());
-                loadInstagramMediaByTime(location.getLatitude(), location.getLongitude(),
-                        dateUtils.weekAgoTime(), dateUtils.currentTime());
-            }
-        });*/
-        seekBarRaidus.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mapCircle.setRadius(150 + (24 * progress));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
+                presenter.onDateChange(location, dateUtils.weekAgoTime(), dateUtils.currentTime());
             }
         });
     }
 
-    private void updateRx() {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
+    private void setupPhotosOnMap() {
         presenter.onLocationUpdate(location);
     }
 
@@ -108,7 +95,7 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
                 new LatLng(location.getLatitude(), location.getLongitude()), 14);
         map.animateCamera(cameraUpdate);
-        updateRx();
+        setupPhotosOnMap();
     }
 
     private void showCenterMarker() {
@@ -142,7 +129,8 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
         }
         location.setLatitude(latLng.latitude);
         location.setLongitude(latLng.longitude);
-        updateRx();
+        setupPhotosOnMap();
+        showCenterMarker();
     }
 
 }
