@@ -1,4 +1,4 @@
-package com.binaryfork.onmap;
+package com.binaryfork.onmap.rx;
 
 import android.content.Context;
 import android.location.Location;

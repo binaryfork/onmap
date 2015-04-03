@@ -2,14 +2,17 @@ package com.binaryfork.onmap.activities;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.binaryfork.onmap.LocationActivity;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.instagram.model.Media;
+import com.binaryfork.onmap.instagram.model.MediaResponse;
+import com.binaryfork.onmap.rx.MediaHelper;
 import com.binaryfork.onmap.ui.DateUtils;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,6 +33,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import rx.Subscriber;
 
 public abstract class MapActivity extends LocationActivity implements GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 
@@ -41,22 +45,25 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
 
     DateUtils dateUtils;
 
-    @InjectView(R.id.date) TextView dateTxt;
-    @InjectView(R.id.seek_bar_radius) SeekBar seekBarRaidus;
+    @InjectView(R.id.date)
+    TextView dateTxt;
+    @InjectView(R.id.seek_bar_radius)
+    SeekBar seekBarRaidus;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
         if (location != null) {
-            loadInstagramMedia(location.getLatitude(), location.getLongitude());
+            getMediaLocationsRx();
         }
         ButterKnife.inject(this);
 
         Calendar calendar = Calendar.getInstance();
         dateUtils = new DateUtils(calendar);
         dateTxt.setText(dateUtils.getWeekInterval());
-        dateTxt.setOnClickListener(new View.OnClickListener() {
+/*        dateTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dateUtils.previousWeek();
@@ -64,7 +71,7 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
                 loadInstagramMediaByTime(location.getLatitude(), location.getLongitude(),
                         dateUtils.weekAgoTime(), dateUtils.currentTime());
             }
-        });
+        });*/
         seekBarRaidus.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -82,6 +89,7 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
             }
         });
     }
+
     private void setUpMapIfNeeded() {
         if (map == null) {
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
@@ -93,12 +101,33 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
     }
 
     @Override
-    public void onLocationChanged(android.location.Location location) {
-        super.onLocationChanged(location);
+    protected void onLocationReceived(Location location) {
+        Log.i("location", "location " + location);
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
                 new LatLng(location.getLatitude(), location.getLongitude()), 14);
         map.animateCamera(cameraUpdate);
-        loadInstagramMedia(location.getLatitude(), location.getLongitude());
+        getMediaLocationsRx();
+    }
+
+    private void getMediaLocationsRx() {
+        Log.i("mapp", "WWW start");
+        Subscriber<MediaResponse> subscriber = new Subscriber<MediaResponse>() {
+            @Override
+            public void onNext(MediaResponse mediaResponse) {
+                Log.i("mapp", "WWW " + mediaResponse.data);
+                setupMarkers(mediaResponse.data);
+            }
+
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+            }
+        };
+        MediaHelper.getInstagramMedia(getApplicationContext(), location, subscriber);
     }
 
     private void showCenterMarker() {
@@ -115,7 +144,7 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
                 .position(latLng));
     }
 
-    protected void instagramMediaLoaded(List<Media> list) {
+    protected void setupMarkers(List<Media> list) {
         map.clear();
         targets = new HashMap<>();
         for (final Media media : list) {
@@ -127,7 +156,7 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
             targets.put(marker.getId(), markerTarget);
             Picasso.with(getApplicationContext())
                     .load(media.images.thumbnail.url)
-                //    .transform(new CircleTransform())
+                            //    .transform(new CircleTransform())
                     .into(markerTarget);
         }
         showCenterMarker();
@@ -141,16 +170,16 @@ public abstract class MapActivity extends LocationActivity implements GoogleMap.
 
     @Override
     public void onMapClick(LatLng latLng) {
+        map.clear();
         map.addMarker(new MarkerOptions()
                 .position(latLng));
+        Log.i("", "GoogleApiClient " + location);
         if (location == null) {
-            Log.i("", "GoogleApiClient " + googleApiClient.isConnected());
-            googleApiClient.connect();
             return;
         }
         location.setLatitude(latLng.latitude);
         location.setLongitude(latLng.longitude);
-        loadInstagramMedia(latLng.latitude, latLng.longitude);
+        getMediaLocationsRx();
     }
 
     protected class MarkerTarget implements Target {

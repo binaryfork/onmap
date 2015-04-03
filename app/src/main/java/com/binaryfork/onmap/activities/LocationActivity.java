@@ -14,6 +14,7 @@ public abstract class LocationActivity extends BaseActivity implements
     private final String TAG = "LocationActivity";
 
     private GoogleApiClient googleApiClient;
+    protected Location location;
 
     protected abstract void onLocationReceived(Location location);
 
@@ -48,9 +49,9 @@ public abstract class LocationActivity extends BaseActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         Log.e(TAG, "wow onConnected");
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+        location = LocationServices.FusedLocationApi.getLastLocation(
                 googleApiClient);
-        onLocationReceived(lastLocation);
+        onLocationReceived(location);
     }
 
     @Override

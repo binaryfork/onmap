@@ -32,7 +32,7 @@ public class ExpandingImage extends SquareImageView {
 
     private int getMarkerPhotoSize() {
         if (markerPhotoSize == 0)
-            markerPhotoSize = (int) getResources().getDimension(R.dimen.markerPhotoSize);
+            markerPhotoSize = (int) getResources().getDimension(R.dimen.map_marker_photo);
         return markerPhotoSize;
     }
     
