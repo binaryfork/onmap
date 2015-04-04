@@ -3,9 +3,7 @@ package com.binaryfork.onmap.network;
 import android.content.Context;
 
 import com.binaryfork.onmap.Constants;
-import com.binaryfork.onmap.network.services.MediaService;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.OkHttpClient;
+import com.binaryfork.onmap.network.services.InstagramMediaService;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -19,7 +17,6 @@ public class Instagram {
     private Context context;
 
     private RestAdapter restAdapter;
-    private OkHttpClient okHttpClient;
 
     public Instagram(Context context) {
         this.context = context;
@@ -34,14 +31,10 @@ public class Instagram {
 
     private RestAdapter getRestAdapter() {
         if (restAdapter == null) {
-            int cacheSize = 10 * 1024 * 1024; // 10 MiB
-            Cache cache = new Cache(context.getCacheDir(), cacheSize);
-            OkHttpClient client = new OkHttpClient();
-            client.setCache(cache);
 
             RestAdapter.Builder builder = new RestAdapter.Builder();
             builder
-                    .setClient(new OkClient(client))
+                    .setClient(new OkClient(OkHttpInstance.getOkHttpClient(context)))
                     .setEndpoint(API_URL)
                     .setRequestInterceptor(new RequestInterceptor() {
                 @Override
@@ -54,16 +47,13 @@ public class Instagram {
                 builder.setLogLevel(RestAdapter.LogLevel.FULL);
             }
 
-            if (okHttpClient != null)
-                builder.setClient(new OkClient(okHttpClient));
-
             restAdapter = builder.build();
         }
 
         return restAdapter;
     }
 
-    public MediaService mediaService() {
-        return getRestAdapter().create(MediaService.class);
+    public InstagramMediaService mediaService() {
+        return getRestAdapter().create(InstagramMediaService.class);
     }
 }

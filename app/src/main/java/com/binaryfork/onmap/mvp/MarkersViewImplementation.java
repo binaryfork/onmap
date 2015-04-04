@@ -3,8 +3,11 @@ package com.binaryfork.onmap.mvp;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
+import android.widget.EditText;
 
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.network.model.GeocodeResults;
 import com.binaryfork.onmap.network.model.Media;
 import com.binaryfork.onmap.network.model.MediaResponse;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,6 +24,7 @@ public class MarkersViewImplementation implements MarkersView {
 
     private final Context context;
     private final GoogleMap map;
+    public EditText searchBox;
     public HashMap<String, MarkerTarget> targets;
 
     public MarkersViewImplementation(GoogleMap map, Context context) {
@@ -42,6 +46,17 @@ public class MarkersViewImplementation implements MarkersView {
                     .load(media.images.thumbnail.url)
                             //    .transform(new CircleTransform())
                     .into(markerTarget);
+        }
+    }
+
+    @Override
+    public void showSearchSuggestions(GeocodeResults results) {
+        if (results != null) {
+            if (results.results != null && results.results.size() > 0)
+                Log.i("", "geo " + results.results.get(0).formatted_address);
+            else
+                Log.i("", "geo NOOO");
+
         }
     }
 

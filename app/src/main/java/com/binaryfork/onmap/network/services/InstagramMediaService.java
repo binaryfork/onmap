@@ -7,7 +7,7 @@ import retrofit.http.GET;
 import retrofit.http.Path;
 import retrofit.http.Query;
 
-public interface MediaService {
+public interface InstagramMediaService {
 
     @GET("/media/{media_id}")
     MediaResponse media(

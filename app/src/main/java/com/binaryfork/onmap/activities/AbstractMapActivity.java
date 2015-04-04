@@ -8,7 +8,6 @@ import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
-import com.binaryfork.onmap.mvp.Model;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
 import com.binaryfork.onmap.ui.DateUtils;
@@ -55,9 +54,12 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         }
         ButterKnife.inject(this);
 
-        Model model = new ModelImplementation();
+        ModelImplementation model = new ModelImplementation();
+        model.searchBox = searchBox.getEditText();
+
         view = new MarkersViewImplementation(map, getApplicationContext());
         presenter = new PresenterImplementation(model, view, getApplicationContext());
+        presenter.onCreate();
 
         Calendar calendar = Calendar.getInstance();
         dateUtils = new DateUtils(calendar);
@@ -70,6 +72,10 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
                 presenter.onDateChange(location, dateUtils.weekAgoTime(), dateUtils.currentTime());
             }
         });
+    }
+
+    private void setupSearchBox() {
+        searchBox.setLogoText("Search location");
     }
 
     @Override
@@ -96,6 +102,11 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     @Override
     protected void onLocationReceived(Location location) {
         Log.i("location", "location " + location);
+        if (location == null) {
+            location = new Location("local");
+            location.setLatitude(55.75389017);
+            location.setLongitude(37.62066364);
+        }
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
                 new LatLng(location.getLatitude(), location.getLongitude()), 14);
         map.animateCamera(cameraUpdate);

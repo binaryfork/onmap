@@ -2,7 +2,6 @@ package com.binaryfork.onmap.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.Toast;
 
 import com.quinny898.library.persistentsearch.SearchBox;
 
@@ -19,6 +18,9 @@ public class LocationSearchBox extends SearchBox {
         super(context, attrs, defStyle);
     }
 
+    private void search() {
+    }
+
     private void setup() {
         setLogoText("My App");
         setMenuListener(new MenuListener(){
@@ -29,7 +31,7 @@ public class LocationSearchBox extends SearchBox {
             }
 
         });
-        setSearchListener(new SearchListener(){
+        setSearchListener(new SearchListener() {
 
             @Override
             public void onSearchOpened() {

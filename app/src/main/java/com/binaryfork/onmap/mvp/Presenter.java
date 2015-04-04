@@ -6,6 +6,7 @@ public interface Presenter {
 
     void onLocationUpdate(Location location);
     void onDateChange(Location location, long from, long to);
+    void onCreate();
     void onDestroy();
 
 }
