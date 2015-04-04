@@ -1,7 +1,9 @@
 package com.binaryfork.onmap.activities;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.quinny898.library.persistentsearch.SearchBox;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import butterknife.ButterKnife;
@@ -55,11 +58,9 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         ButterKnife.inject(this);
 
         ModelImplementation model = new ModelImplementation();
-        model.searchBox = searchBox.getEditText();
 
         view = new MarkersViewImplementation(map, getApplicationContext());
         presenter = new PresenterImplementation(model, view, getApplicationContext());
-        presenter.onCreate();
 
         Calendar calendar = Calendar.getInstance();
         dateUtils = new DateUtils(calendar);
@@ -74,10 +75,22 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         });
     }
 
-    private void setupSearchBox() {
-        searchBox.setLogoText("Search location");
+    // Required by SearchBox.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1234 && resultCode == RESULT_OK) {
+            ArrayList<String> matches = data
+                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            searchBox.populateEditText(matches);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
+    public void mic(View v) {
+        searchBox.micClick(this);
+    }
+
+    // Required by SearchBox.
     @Override
     protected void onDestroy() {
         super.onDestroy();

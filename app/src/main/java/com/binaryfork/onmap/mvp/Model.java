@@ -12,6 +12,4 @@ public interface Model {
 
     Observable<MediaResponse> loadMediaByLocation(Context context, Location location);
     Observable<MediaResponse> loadMediaByLocationAndDate(Context context, Location location, long from, long to);
-    Observable<String> onSearchTextChanged();
-    Observable<GeocodeResults> suggestLocations(Context context, String query);
 }

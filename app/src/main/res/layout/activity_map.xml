@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.quinny898.library.persistentsearch.SearchBox
+    <com.binaryfork.onmap.widget.LocationSearchBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/searchbox"
