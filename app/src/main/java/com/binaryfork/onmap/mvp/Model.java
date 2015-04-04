@@ -3,7 +3,7 @@ package com.binaryfork.onmap.mvp;
 import android.content.Context;
 import android.location.Location;
 
-import com.binaryfork.onmap.instagram.model.MediaResponse;
+import com.binaryfork.onmap.network.model.MediaResponse;
 
 import rx.Observable;
 

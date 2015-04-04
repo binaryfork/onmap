@@ -5,8 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.instagram.model.Media;
-import com.binaryfork.onmap.instagram.model.MediaResponse;
+import com.binaryfork.onmap.network.model.Media;
+import com.binaryfork.onmap.network.model.MediaResponse;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;

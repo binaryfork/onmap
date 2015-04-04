@@ -28,5 +28,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <com.quinny898.library.persistentsearch.SearchBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchbox"
+        />
+
     <include layout="@layout/layout_photo"/>
 </RelativeLayout>

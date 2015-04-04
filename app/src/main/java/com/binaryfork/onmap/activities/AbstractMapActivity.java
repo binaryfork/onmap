@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.binaryfork.onmap.AbstractLocationActivity;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.Model;
@@ -21,6 +20,7 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.quinny898.library.persistentsearch.SearchBox;
 
 import java.util.Calendar;
 
@@ -39,13 +39,16 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     @InjectView(R.id.date)
     TextView dateTxt;
 
+    @InjectView(R.id.searchbox)
+    SearchBox searchBox;
+
     protected PresenterImplementation presenter;
     protected MarkersViewImplementation view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_map);
         setUpMapIfNeeded();
         if (location != null && presenter != null) {
             setupPhotosOnMap();
@@ -86,6 +89,7 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
             map.setOnMarkerClickListener(this);
             map.setOnMapClickListener(this);
             map.setMyLocationEnabled(true);
+            map.getUiSettings().setZoomControlsEnabled(true);
         }
     }
 

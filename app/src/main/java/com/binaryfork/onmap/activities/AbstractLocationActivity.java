@@ -1,14 +1,15 @@
-package com.binaryfork.onmap;
+package com.binaryfork.onmap.activities;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
-public abstract class AbstractLocationActivity extends BaseActivity implements
+public abstract class AbstractLocationActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final String TAG = "LocationActivity";

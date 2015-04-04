@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.instagram.model.Media;
+import com.binaryfork.onmap.network.model.Media;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.ui.Animations;
 import com.binaryfork.onmap.ui.CircleTransform;

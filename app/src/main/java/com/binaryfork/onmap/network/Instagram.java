@@ -1,9 +1,9 @@
-package com.binaryfork.onmap.instagram;
+package com.binaryfork.onmap.network;
 
 import android.content.Context;
 
 import com.binaryfork.onmap.Constants;
-import com.binaryfork.onmap.instagram.services.MediaService;
+import com.binaryfork.onmap.network.services.MediaService;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 

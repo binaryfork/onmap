@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.instagram.model;
+package com.binaryfork.onmap.network.model;
 
 public class Image {
     public String url;
