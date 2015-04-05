@@ -39,7 +39,7 @@ public class LocationSearchBox extends SearchBox {
     public void init() {
         setLogoText("Search location");
         onSearchTextChanged()
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(200, TimeUnit.MILLISECONDS)
                 .switchMap(new Func1<String, Observable<GeocodeResults>>() {
                     @Override
                     public Observable<GeocodeResults> call(String query) {
@@ -68,10 +68,13 @@ public class LocationSearchBox extends SearchBox {
     public void showSearchSuggestions(GeocodeResults results) {
         if (results != null) {
             if (results.results != null && results.results.size() > 0) {
+                clearSearchable();
                 for(GeocodeItem item : results.results) {
                     SearchResult option = new SearchResult(
                             item.formatted_address,
-                            getResources().getDrawable(android.R.drawable.ic_menu_recent_history));
+                            getResources().getDrawable(android.R.drawable.ic_menu_recent_history),
+                            item.geometry.location.lat,
+                            item.geometry.location.lng);
                     addSearchable(option);
                 }
                 updateResults();

@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.quinny898.library.persistentsearch.SearchBox;
+import com.quinny898.library.persistentsearch.SearchResult;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -58,9 +59,10 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         ButterKnife.inject(this);
 
         ModelImplementation model = new ModelImplementation();
-
         view = new MarkersViewImplementation(map, getApplicationContext());
         presenter = new PresenterImplementation(model, view, getApplicationContext());
+
+        searchBox.setOnSuggestionClickListener(onSearchSuggestionClick());
 
         Calendar calendar = Calendar.getInstance();
         dateUtils = new DateUtils(calendar);
@@ -73,6 +75,15 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
                 presenter.onDateChange(location, dateUtils.weekAgoTime(), dateUtils.currentTime());
             }
         });
+    }
+
+    private SearchBox.OnSuggestionClick onSearchSuggestionClick() {
+        return new SearchBox.OnSuggestionClick() {
+            @Override
+            public void onSuggestionClick(SearchResult searchResult) {
+                goToLocation(new LatLng(searchResult.lat, searchResult.lng));
+            }
+        };
     }
 
     // Required by SearchBox.
@@ -115,11 +126,6 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     @Override
     protected void onLocationReceived(Location location) {
         Log.i("location", "location " + location);
-        if (location == null) {
-            location = new Location("local");
-            location.setLatitude(55.75389017);
-            location.setLongitude(37.62066364);
-        }
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
                 new LatLng(location.getLatitude(), location.getLongitude()), 14);
         map.animateCamera(cameraUpdate);
@@ -148,6 +154,10 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
 
     @Override
     public void onMapClick(LatLng latLng) {
+        goToLocation(latLng);
+    }
+
+    private void goToLocation(LatLng latLng) {
         map.clear();
         map.addMarker(new MarkerOptions()
                 .position(latLng));
@@ -159,6 +169,9 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         location.setLongitude(latLng.longitude);
         setupPhotosOnMap();
         showCenterMarker();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+                new LatLng(location.getLatitude(), location.getLongitude()), 14);
+        map.animateCamera(cameraUpdate);
     }
 
 }
