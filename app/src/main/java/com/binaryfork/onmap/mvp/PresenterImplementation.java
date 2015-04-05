@@ -1,9 +1,9 @@
 package com.binaryfork.onmap.mvp;
 
 import android.content.Context;
-import android.location.Location;
 
 import com.binaryfork.onmap.network.model.MediaResponse;
+import com.google.android.gms.maps.model.LatLng;
 
 import rx.Observable;
 import rx.Subscription;
@@ -36,12 +36,12 @@ public class PresenterImplementation implements
     }
 
     @Override
-    public void onLocationUpdate(Location location) {
+    public void onLocationUpdate(LatLng location) {
         mapSubscribe(model.loadMediaByLocation(context, location));
     }
 
     @Override
-    public void onDateChange(Location location, long from, long to) {
+    public void onDateChange(LatLng location, long from, long to) {
         mapSubscribe(model.loadMediaByLocationAndDate(context, location, from, to));
     }
 

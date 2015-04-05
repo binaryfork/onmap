@@ -1,15 +1,14 @@
 package com.binaryfork.onmap.mvp;
 
 import android.content.Context;
-import android.location.Location;
 
-import com.binaryfork.onmap.network.model.GeocodeResults;
 import com.binaryfork.onmap.network.model.MediaResponse;
+import com.google.android.gms.maps.model.LatLng;
 
 import rx.Observable;
 
 public interface Model {
 
-    Observable<MediaResponse> loadMediaByLocation(Context context, Location location);
-    Observable<MediaResponse> loadMediaByLocationAndDate(Context context, Location location, long from, long to);
+    Observable<MediaResponse> loadMediaByLocation(Context context, LatLng location);
+    Observable<MediaResponse> loadMediaByLocationAndDate(Context context, LatLng location, long from, long to);
 }

@@ -1,7 +1,6 @@
 package com.binaryfork.onmap.activities;
 
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
@@ -124,26 +123,24 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     }
 
     @Override
-    protected void onLocationReceived(Location location) {
+    protected void onLocationReceived(LatLng location) {
         Log.i("location", "location " + location);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
-                new LatLng(location.getLatitude(), location.getLongitude()), 14);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
         map.animateCamera(cameraUpdate);
         setupPhotosOnMap();
     }
 
     private void showCenterMarker() {
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         if (mapCircle != null)
             mapCircle.remove();
         mapCircle = map.addCircle(new CircleOptions()
-                .center(latLng)
+                .center(location)
                 .radius(1000)
                 .strokeWidth(getResources().getDimension(R.dimen.map_circle_stroke))
                 .strokeColor(0x663333ff)
                 .fillColor(0x113333ff));
         map.addMarker(new MarkerOptions()
-                .position(latLng));
+                .position(location));
     }
 
     protected int getMarkerPhotoSize() {
@@ -165,12 +162,10 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         if (location == null) {
             return;
         }
-        location.setLatitude(latLng.latitude);
-        location.setLongitude(latLng.longitude);
+        location = latLng;
         setupPhotosOnMap();
         showCenterMarker();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
-                new LatLng(location.getLatitude(), location.getLongitude()), 14);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
         map.animateCamera(cameraUpdate);
     }
 

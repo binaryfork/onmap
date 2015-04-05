@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 public abstract class AbstractLocationActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -15,9 +16,9 @@ public abstract class AbstractLocationActivity extends FragmentActivity implemen
     private final String TAG = "LocationActivity";
 
     private GoogleApiClient googleApiClient;
-    protected Location location;
+    protected LatLng location;
 
-    protected abstract void onLocationReceived(Location location);
+    protected abstract void onLocationReceived(LatLng location);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +51,8 @@ public abstract class AbstractLocationActivity extends FragmentActivity implemen
     @Override
     public void onConnected(Bundle bundle) {
         Log.e(TAG, "wow onConnected");
-        location = LocationServices.FusedLocationApi.getLastLocation(
-                googleApiClient);
+        Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        location = new LatLng(loc.getLatitude(), loc.getLongitude());
         onLocationReceived(location);
     }
 
