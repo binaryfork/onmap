@@ -8,6 +8,9 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -17,11 +20,13 @@ import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.network.model.Media;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
+import com.binaryfork.onmap.network.MediaTypes;
+import com.binaryfork.onmap.network.model.MediaItem;
 import com.binaryfork.onmap.ui.Animations;
 import com.binaryfork.onmap.ui.CircleTransform;
 import com.google.android.gms.maps.Projection;
@@ -43,6 +48,8 @@ public class PhotoActivity extends AbstractMapActivity {
     @InjectView(R.id.username) TextView usernameTxt;
     @InjectView(R.id.comments) TextView commentsTxt;
     @InjectView(R.id.user_photo) ImageView userPhoto;
+    @InjectView(R.id.videoView)
+    VideoView videoView;
 
     @Override
     public void onBackPressed() {
@@ -55,6 +62,11 @@ public class PhotoActivity extends AbstractMapActivity {
 
     public void onClickUsername(View view) {
         Intents.openLink(this, markerTarget.media.link);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -83,17 +95,66 @@ public class PhotoActivity extends AbstractMapActivity {
         commentsTxt.setVisibility(View.VISIBLE);
         usernameTxt.setVisibility(View.VISIBLE);
         usernameTxt.setText(markerTarget.media.user.username);
-        Picasso.with(getApplicationContext()).load(markerTarget.media.user.profile_picture)
-                .transform(new CircleTransform())
-                .into(userPhoto);
+
         if (markerTarget.media.caption != null)
             commentsTxt.setText(
                     spannableComment(markerTarget.media.caption.from.username, markerTarget.media.caption.text));
         if (markerTarget.media.comments.count > 0)
-            for (Media.Comments.Comment comment : markerTarget.media.comments.data) {
+            for (MediaItem.Comments.Comment comment : markerTarget.media.comments.data) {
                 commentsTxt.append(
                         spannableComment("\n" + comment.from.username, comment.text));
             }
+        if (markerTarget.media.type.equals(MediaTypes.IMAGE)) {
+            loadPhoto();
+        } else {
+            loadVideo();
+        }
+    }
+
+    private void loadVideo() {
+        Uri uri = Uri.parse(markerTarget.media.videos.standard_resolution.url);
+        videoView.setVisibility(View.VISIBLE);
+        videoView.setVideoURI(uri);
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                expandedImage.setVisibility(View.INVISIBLE);
+                videoView.start();
+            }
+        });
+    }
+
+    private void loadPhoto() {
+        Picasso.with(getApplicationContext()).load(markerTarget.media.user.profile_picture)
+                .transform(new CircleTransform())
+                .into(userPhoto);
+    }
+
+    private void hideMediaInfo() {
+        Animations.moveTo(commentsTxt, true);
+        Animations.moveTo(userPhoto, false);
+        Animations.moveTo(usernameTxt, false, new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                userPhoto.setImageDrawable(null);
+                usernameTxt.setVisibility(View.GONE);
+                commentsTxt.setVisibility(View.GONE);
+                zoomOutImage();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        expandedImage.setVisibility(View.VISIBLE);
+        videoView.setVisibility(View.GONE);
+        videoView.stopPlayback();
     }
 
     private Spannable spannableComment(String username, String comment) {
@@ -204,30 +265,6 @@ public class PhotoActivity extends AbstractMapActivity {
             @Override
             public void onClick(View view) {
                 hideMediaInfo();
-            }
-        });
-    }
-
-    private void hideMediaInfo() {
-        Animations.moveTo(commentsTxt, true);
-        Animations.moveTo(userPhoto, false);
-        Animations.moveTo(usernameTxt, false, new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                userPhoto.setImageDrawable(null);
-                usernameTxt.setVisibility(View.GONE);
-                commentsTxt.setVisibility(View.GONE);
-                zoomOutImage();
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
             }
         });
     }

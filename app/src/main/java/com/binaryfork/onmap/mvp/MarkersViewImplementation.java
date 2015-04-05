@@ -5,7 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.network.model.Media;
+import com.binaryfork.onmap.network.MediaTypes;
+import com.binaryfork.onmap.network.model.MediaItem;
 import com.binaryfork.onmap.network.model.MediaResponse;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -31,7 +32,9 @@ public class MarkersViewImplementation implements MarkersView {
     @Override
     public void showMarkers(MediaResponse mediaResponse) {
         targets = new HashMap<>();
-        for (final Media media : mediaResponse.data) {
+        for (final MediaItem media : mediaResponse.data) {
+            if (media.type.equals(MediaTypes.IMAGE))
+                continue;
             Marker marker = map.addMarker(new MarkerOptions()
                     .draggable(true)
                     .anchor(.5f, 1.25f)
@@ -47,12 +50,12 @@ public class MarkersViewImplementation implements MarkersView {
 
     public static class MarkerTarget implements Target {
 
-        public Media media;
+        public MediaItem media;
         public Marker marker;
         public Bitmap thumbBitmap;
         private int markerPhotoSize;
 
-        public MarkerTarget(Media media, Marker marker, Context context) {
+        public MarkerTarget(MediaItem media, Marker marker, Context context) {
             this.media = media;
             this.marker = marker;
             markerPhotoSize = (int) context.getResources().getDimension(R.dimen.map_marker_photo);

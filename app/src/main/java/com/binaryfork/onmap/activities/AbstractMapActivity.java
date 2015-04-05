@@ -96,11 +96,11 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    // Required by SearchBox.
     public void mic(View v) {
         searchBox.micClick(this);
     }
 
-    // Required by SearchBox.
     @Override
     protected void onDestroy() {
         super.onDestroy();

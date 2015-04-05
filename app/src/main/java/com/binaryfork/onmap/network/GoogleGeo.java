@@ -36,10 +36,8 @@ public class GoogleGeo {
             if (Constants.DEBUG) {
                 builder.setLogLevel(RestAdapter.LogLevel.FULL);
             }
-
             restAdapter = builder.build();
         }
-
         return restAdapter;
     }
 

@@ -3,5 +3,5 @@ package com.binaryfork.onmap.network.model;
 import java.util.List;
 
 public class MediaResponse {
-    public List<Media> data;
+    public List<MediaItem> data;
 }

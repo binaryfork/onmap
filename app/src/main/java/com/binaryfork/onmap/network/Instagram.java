@@ -31,7 +31,6 @@ public class Instagram {
 
     private RestAdapter getRestAdapter() {
         if (restAdapter == null) {
-
             RestAdapter.Builder builder = new RestAdapter.Builder();
             builder
                     .setClient(new OkClient(OkHttpInstance.getOkHttpClient(context)))
@@ -46,10 +45,8 @@ public class Instagram {
             if (Constants.DEBUG) {
                 builder.setLogLevel(RestAdapter.LogLevel.FULL);
             }
-
             restAdapter = builder.build();
         }
-
         return restAdapter;
     }
 

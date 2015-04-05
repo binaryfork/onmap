@@ -29,10 +29,10 @@ public class DateUtils {
     }
 
     public long weekAgoTime() {
-        return calendar.getTimeInMillis() - 1000 * 60 * 60 * 24 * 7;
+        return (calendar.getTimeInMillis() - 1000 * 60 * 60 * 24 * 7) / 1000;
     }
 
     public long currentTime() {
-        return calendar.getTimeInMillis();
+        return calendar.getTimeInMillis() / 1000;
     }
 }
