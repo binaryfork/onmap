@@ -104,9 +104,11 @@ public class PhotoActivity extends AbstractMapActivity {
                 commentsTxt.append(
                         spannableComment("\n" + comment.from.username, comment.text));
             }
-        if (markerTarget.media.type.equals(MediaTypes.IMAGE)) {
-            loadPhoto();
-        } else {
+
+        Picasso.with(getApplicationContext()).load(markerTarget.media.user.profile_picture)
+                .transform(new CircleTransform())
+                .into(userPhoto);
+        if (markerTarget.media.type.equals(MediaTypes.VIDEO)) {
             loadVideo();
         }
     }
@@ -122,12 +124,6 @@ public class PhotoActivity extends AbstractMapActivity {
                 videoView.start();
             }
         });
-    }
-
-    private void loadPhoto() {
-        Picasso.with(getApplicationContext()).load(markerTarget.media.user.profile_picture)
-                .transform(new CircleTransform())
-                .into(userPhoto);
     }
 
     private void hideMediaInfo() {

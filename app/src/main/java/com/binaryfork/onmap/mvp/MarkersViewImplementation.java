@@ -2,6 +2,7 @@ package com.binaryfork.onmap.mvp;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 
 import com.binaryfork.onmap.R;
@@ -53,11 +54,13 @@ public class MarkersViewImplementation implements MarkersView {
         public MediaItem media;
         public Marker marker;
         public Bitmap thumbBitmap;
+        public Context context;
         private int markerPhotoSize;
 
         public MarkerTarget(MediaItem media, Marker marker, Context context) {
             this.media = media;
             this.marker = marker;
+            this.context = context;
             markerPhotoSize = (int) context.getResources().getDimension(R.dimen.map_marker_photo);
         }
 
@@ -65,6 +68,9 @@ public class MarkersViewImplementation implements MarkersView {
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
             if (bitmap != null) {
                 bitmap = Bitmap.createScaledBitmap(bitmap, markerPhotoSize, markerPhotoSize, true);
+                if (media.type.equals(MediaTypes.VIDEO)) {
+                    bitmap = drawVideoIcon(bitmap);
+                }
                 marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
                 thumbBitmap = bitmap;
             }
@@ -76,6 +82,15 @@ public class MarkersViewImplementation implements MarkersView {
 
         @Override
         public void onPrepareLoad(Drawable placeHolderDrawable) {
+        }
+
+        private Bitmap drawVideoIcon(Bitmap bitmap) {
+            Canvas canvas = new Canvas(bitmap);
+            Drawable d = context.getResources().getDrawable(android.R.drawable.ic_media_play);
+            d.setBounds(canvas.getClipBounds());
+            d.draw(canvas);
+            canvas.drawBitmap(bitmap, 0, 0, null);
+            return bitmap;
         }
     }
 }

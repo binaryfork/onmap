@@ -41,7 +41,6 @@
             android:onClick="onClickUsername"
             android:clickable="true"
             android:adjustViewBounds="true"/>
-
         <com.binaryfork.onmap.widget.SquareVideoView
             android:id="@+id/videoView"
             android:visibility="gone"

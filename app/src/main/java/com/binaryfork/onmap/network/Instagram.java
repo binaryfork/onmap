@@ -43,7 +43,7 @@ public class Instagram {
             });
 
             if (Constants.DEBUG) {
-                builder.setLogLevel(RestAdapter.LogLevel.FULL);
+                builder.setLogLevel(RestAdapter.LogLevel.BASIC);
             }
             restAdapter = builder.build();
         }

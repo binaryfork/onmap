@@ -3,7 +3,6 @@ package com.binaryfork.onmap.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -28,6 +27,7 @@ import java.util.Calendar;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import timber.log.Timber;
 
 public abstract class AbstractMapActivity extends AbstractLocationActivity implements GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 
@@ -71,6 +71,8 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
             public void onClick(View v) {
                 dateUtils.previousWeek();
                 dateTxt.setText(dateUtils.getWeekInterval());
+                Timber.i("ago %s", dateUtils.weekAgoTime());
+                Timber.i("end %s", dateUtils.currentTime());
                 presenter.onDateChange(location, dateUtils.weekAgoTime(), dateUtils.currentTime());
             }
         });
@@ -124,7 +126,7 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
 
     @Override
     protected void onLocationReceived(LatLng location) {
-        Log.i("location", "location " + location);
+        Timber.i("location %s", location);
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
         map.animateCamera(cameraUpdate);
         setupPhotosOnMap();
@@ -158,7 +160,6 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         map.clear();
         map.addMarker(new MarkerOptions()
                 .position(latLng));
-        Log.i("", "GoogleApiClient " + location);
         if (location == null) {
             return;
         }

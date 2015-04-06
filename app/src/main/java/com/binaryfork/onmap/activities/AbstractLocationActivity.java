@@ -50,9 +50,11 @@ public abstract class AbstractLocationActivity extends FragmentActivity implemen
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.e(TAG, "wow onConnected");
         Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        location = new LatLng(loc.getLatitude(), loc.getLongitude());
+        if (loc != null)
+            location = new LatLng(loc.getLatitude(), loc.getLongitude());
+        else
+            location = new LatLng(55.755826, 37.6173); // Moscow Red Square
         onLocationReceived(location);
     }
 
