@@ -32,11 +32,8 @@ import timber.log.Timber;
 public abstract class AbstractMapActivity extends AbstractLocationActivity implements GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 
     protected GoogleMap map;
-    private int markerPhotoSize;
 
     private Circle mapCircle;
-
-    DateUtils dateUtils;
 
     @InjectView(R.id.date)
     TextView dateTxt;
@@ -46,6 +43,8 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
 
     protected PresenterImplementation presenter;
     protected MarkersViewImplementation view;
+
+    private long maxTimestamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,19 +62,27 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
 
         searchBox.setOnSuggestionClickListener(onSearchSuggestionClick());
 
-        Calendar calendar = Calendar.getInstance();
-        dateUtils = new DateUtils(calendar);
-        dateTxt.setText(dateUtils.getWeekInterval());
         dateTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dateUtils.previousWeek();
-                dateTxt.setText(dateUtils.getWeekInterval());
-                Timber.i("ago %s", dateUtils.weekAgoTime());
-                Timber.i("end %s", dateUtils.currentTime());
-                presenter.onDateChange(location, dateUtils.weekAgoTime(), dateUtils.currentTime());
+                maxTimestamp = DateUtils.weekAgoTime(maxTimestamp);
+                dateTxt.setText(DateUtils.getWeekInterval(maxTimestamp));
+                setupPhotosOnMap();
             }
         });
+
+        setInstagramIntervalToCurrentTime();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
+    private void setInstagramIntervalToCurrentTime() {
+        maxTimestamp = Calendar.getInstance().getTimeInMillis();
+        dateTxt.setText(DateUtils.getWeekInterval(maxTimestamp));
     }
 
     private SearchBox.OnSuggestionClick onSearchSuggestionClick() {
@@ -103,16 +110,6 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         searchBox.micClick(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        presenter.onDestroy();
-    }
-
-    private void setupPhotosOnMap() {
-        presenter.onLocationUpdate(location);
-    }
-
     private void setUpMapIfNeeded() {
         if (map == null) {
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
@@ -127,9 +124,29 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     @Override
     protected void onLocationReceived(LatLng location) {
         Timber.i("location %s", location);
+        goToLocation(location);
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        goToLocation(latLng);
+    }
+
+    private void goToLocation(LatLng latLng) {
+        if (latLng == null) {
+            return;
+        }
+        location = latLng;
+        setupPhotosOnMap();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
         map.animateCamera(cameraUpdate);
-        setupPhotosOnMap();
+        setInstagramIntervalToCurrentTime();
+    }
+
+    private void setupPhotosOnMap() {
+        map.clear();
+        showCenterMarker();
+        presenter.getMediaByLocationAndDate(location, DateUtils.weekAgoTime(maxTimestamp) / 1000, maxTimestamp / 1000);
     }
 
     private void showCenterMarker() {
@@ -143,31 +160,6 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
                 .fillColor(0x113333ff));
         map.addMarker(new MarkerOptions()
                 .position(location));
-    }
-
-    protected int getMarkerPhotoSize() {
-        if (markerPhotoSize == 0)
-            markerPhotoSize = (int) getResources().getDimension(R.dimen.map_marker_photo);
-        return markerPhotoSize;
-    }
-
-    @Override
-    public void onMapClick(LatLng latLng) {
-        goToLocation(latLng);
-    }
-
-    private void goToLocation(LatLng latLng) {
-        map.clear();
-        map.addMarker(new MarkerOptions()
-                .position(latLng));
-        if (location == null) {
-            return;
-        }
-        location = latLng;
-        setupPhotosOnMap();
-        showCenterMarker();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
-        map.animateCamera(cameraUpdate);
     }
 
 }

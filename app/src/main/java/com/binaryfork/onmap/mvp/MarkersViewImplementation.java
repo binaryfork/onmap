@@ -34,8 +34,6 @@ public class MarkersViewImplementation implements MarkersView {
     public void showMarkers(MediaResponse mediaResponse) {
         targets = new HashMap<>();
         for (final MediaItem media : mediaResponse.data) {
-            if (media.type.equals(MediaTypes.IMAGE))
-                continue;
             Marker marker = map.addMarker(new MarkerOptions()
                     .draggable(true)
                     .anchor(.5f, 1.25f)

@@ -36,12 +36,12 @@ public class PresenterImplementation implements
     }
 
     @Override
-    public void onLocationUpdate(LatLng location) {
+    public void getMediaByLocation(LatLng location) {
         mapSubscribe(model.loadMediaByLocation(context, location));
     }
 
     @Override
-    public void onDateChange(LatLng location, long from, long to) {
+    public void getMediaByLocationAndDate(LatLng location, long from, long to) {
         mapSubscribe(model.loadMediaByLocationAndDate(context, location, from, to));
     }
 

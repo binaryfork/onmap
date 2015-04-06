@@ -1,38 +1,20 @@
 package com.binaryfork.onmap.ui;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.Locale;
 
 public class DateUtils {
 
-    private Calendar calendar;
-
-    public DateUtils(Calendar calendar) {
-        this.calendar = calendar;
+    public static String getWeekInterval(long maxTimestamp) {
+        return formatDate(weekAgoTime(maxTimestamp)) + " - " + formatDate(maxTimestamp);
     }
 
-    public String getWeekInterval() {
-        return formatDate(weekAgoTime()) + " - " + formatDate(calendar.getTimeInMillis());
-    }
-
-    public void previousWeek() {
-        calendar.add(Calendar.DAY_OF_WEEK, -7);
-    }
-
-    public void nextWeek() {
-        calendar.add(Calendar.DAY_OF_WEEK, 7);
-    }
-
-    public String formatDate(long millis) {
-        SimpleDateFormat serverFormat = new SimpleDateFormat("dd MMM");
+    public static String formatDate(long millis) {
+        SimpleDateFormat serverFormat = new SimpleDateFormat("dd MMM", Locale.getDefault());
         return serverFormat.format(millis);
     }
 
-    public long weekAgoTime() {
-        return (calendar.getTimeInMillis() - 1000 * 60 * 60 * 24 * 7) / 1000;
-    }
-
-    public long currentTime() {
-        return calendar.getTimeInMillis() / 1000;
+    public static long weekAgoTime(long timestamp) {
+        return timestamp - 1000 * 60 * 60 * 24 * 7;
     }
 }

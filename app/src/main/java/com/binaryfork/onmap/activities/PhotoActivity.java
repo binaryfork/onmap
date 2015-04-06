@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.squareup.picasso.Picasso;
 
 import butterknife.InjectView;
+import timber.log.Timber;
 
 public class PhotoActivity extends AbstractMapActivity {
 
@@ -42,6 +43,7 @@ public class PhotoActivity extends AbstractMapActivity {
     private Rect startBounds;
     private float startScaleFinal;
     private MarkersViewImplementation.MarkerTarget markerTarget;
+    private int markerPhotoSize;
 
     @InjectView(R.id.expanded_image) ImageView expandedImage;
     @InjectView(R.id.info_layout) View infoLayout;
@@ -96,6 +98,7 @@ public class PhotoActivity extends AbstractMapActivity {
         usernameTxt.setVisibility(View.VISIBLE);
         usernameTxt.setText(markerTarget.media.user.username);
 
+        commentsTxt.setText("");
         if (markerTarget.media.caption != null)
             commentsTxt.setText(
                     spannableComment(markerTarget.media.caption.from.username, markerTarget.media.caption.text));
@@ -115,12 +118,13 @@ public class PhotoActivity extends AbstractMapActivity {
 
     private void loadVideo() {
         Uri uri = Uri.parse(markerTarget.media.videos.standard_resolution.url);
+        Timber.i("video url %s", uri);
         videoView.setVisibility(View.VISIBLE);
+        expandedImage.setVisibility(View.GONE);
         videoView.setVideoURI(uri);
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                expandedImage.setVisibility(View.INVISIBLE);
                 videoView.start();
             }
         });
@@ -160,6 +164,12 @@ public class PhotoActivity extends AbstractMapActivity {
                 new ForegroundColorSpan(getResources().getColor(R.color.accent)),
                 0, username.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return wordtoSpan;
+    }
+
+    protected int getMarkerPhotoSize() {
+        if (markerPhotoSize == 0)
+            markerPhotoSize = (int) getResources().getDimension(R.dimen.map_marker_photo);
+        return markerPhotoSize;
     }
 
     private void zoomImageFromThumb(Point startPoint, final MarkersViewImplementation.MarkerTarget markerTarget) {

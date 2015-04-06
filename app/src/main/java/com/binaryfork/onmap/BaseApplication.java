@@ -10,9 +10,18 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
         if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
+            Timber.plant(new LineNumberTree());
         } else {
             Timber.plant(new CrashReportingTree());
+        }
+    }
+
+    private static class LineNumberTree extends Timber.DebugTree {
+        @Override
+        protected String createTag() {
+            StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+            String lineNumber = ":" + stackTrace[5].getLineNumber();
+            return super.createTag() + lineNumber;
         }
     }
 
