@@ -27,8 +27,9 @@ import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.network.MediaTypes;
 import com.binaryfork.onmap.network.model.MediaItem;
-import com.binaryfork.onmap.ui.Animations;
-import com.binaryfork.onmap.ui.CircleTransform;
+import com.binaryfork.onmap.util.Animations;
+import com.binaryfork.onmap.util.CircleTransform;
+import com.binaryfork.onmap.util.DateUtils;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -50,8 +51,7 @@ public class PhotoActivity extends AbstractMapActivity {
     @InjectView(R.id.username) TextView usernameTxt;
     @InjectView(R.id.comments) TextView commentsTxt;
     @InjectView(R.id.user_photo) ImageView userPhoto;
-    @InjectView(R.id.videoView)
-    VideoView videoView;
+    @InjectView(R.id.videoView) VideoView videoView;
 
     @Override
     public void onBackPressed() {
@@ -96,7 +96,7 @@ public class PhotoActivity extends AbstractMapActivity {
         Animations.moveFromBottom(userPhoto);
         commentsTxt.setVisibility(View.VISIBLE);
         usernameTxt.setVisibility(View.VISIBLE);
-        usernameTxt.setText(markerTarget.media.user.username);
+        usernameTxt.setText(markerTarget.media.user.username + " " + DateUtils.formatDate(markerTarget.media.created_time));
 
         commentsTxt.setText("");
         if (markerTarget.media.caption != null)
@@ -120,12 +120,12 @@ public class PhotoActivity extends AbstractMapActivity {
         Uri uri = Uri.parse(markerTarget.media.videos.standard_resolution.url);
         Timber.i("video url %s", uri);
         videoView.setVisibility(View.VISIBLE);
-        expandedImage.setVisibility(View.GONE);
         videoView.setVideoURI(uri);
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 videoView.start();
+                expandedImage.setVisibility(View.INVISIBLE);
             }
         });
     }

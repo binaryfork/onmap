@@ -2,6 +2,9 @@ package com.binaryfork.onmap;
 
 import android.app.Application;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import timber.log.Timber;
 
 public class BaseApplication extends Application {
@@ -17,11 +20,29 @@ public class BaseApplication extends Application {
     }
 
     private static class LineNumberTree extends Timber.DebugTree {
+        private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
         @Override
         protected String createTag() {
+            String tag = nextTag();
+            if (tag != null) {
+                return tag;
+            }
+
+            // DO NOT switch this to Thread.getCurrentThread().getStackTrace(). The test will pass
+            // because Robolectric runs them on the JVM but on Android the elements are different.
             StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-            String lineNumber = ":" + stackTrace[5].getLineNumber();
-            return super.createTag() + lineNumber;
+            if (stackTrace.length < 6) {
+                throw new IllegalStateException(
+                        "Synthetic stacktrace didn't have enough elements: are you using proguard?");
+            }
+            tag = stackTrace[5].getClassName();
+            String lineNumber = " > " + stackTrace[5].getLineNumber();
+
+            Matcher m = ANONYMOUS_CLASS.matcher(tag);
+            if (m.find()) {
+                tag = m.replaceAll("");
+            }
+            return tag.substring(tag.lastIndexOf('.') + 1) + lineNumber;
         }
     }
 

@@ -10,7 +10,7 @@ import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
-import com.binaryfork.onmap.ui.DateUtils;
+import com.binaryfork.onmap.util.DateUtils;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,7 +44,7 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     protected PresenterImplementation presenter;
     protected MarkersViewImplementation view;
 
-    private long maxTimestamp;
+    private long maxTimestampSeconds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +65,8 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         dateTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                maxTimestamp = DateUtils.weekAgoTime(maxTimestamp);
-                dateTxt.setText(DateUtils.getWeekInterval(maxTimestamp));
+                maxTimestampSeconds = DateUtils.weekAgoTime(maxTimestampSeconds);
+                dateTxt.setText(DateUtils.getWeekInterval(maxTimestampSeconds));
                 setupPhotosOnMap();
             }
         });
@@ -81,8 +81,8 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     }
 
     private void setInstagramIntervalToCurrentTime() {
-        maxTimestamp = Calendar.getInstance().getTimeInMillis();
-        dateTxt.setText(DateUtils.getWeekInterval(maxTimestamp));
+        maxTimestampSeconds = Calendar.getInstance().getTimeInMillis() / 1000;
+        dateTxt.setText(DateUtils.getWeekInterval(maxTimestampSeconds));
     }
 
     private SearchBox.OnSuggestionClick onSearchSuggestionClick() {
@@ -146,7 +146,7 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     private void setupPhotosOnMap() {
         map.clear();
         showCenterMarker();
-        presenter.getMediaByLocationAndDate(location, DateUtils.weekAgoTime(maxTimestamp) / 1000, maxTimestamp / 1000);
+        presenter.getMediaByLocationAndDate(location, DateUtils.weekAgoTime(maxTimestampSeconds), maxTimestampSeconds);
     }
 
     private void showCenterMarker() {

@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.ui;
+package com.binaryfork.onmap.util;
 
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;

@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.ui;
+package com.binaryfork.onmap.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;

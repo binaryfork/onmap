@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.ui;
+package com.binaryfork.onmap.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -9,12 +9,12 @@ public class DateUtils {
         return formatDate(weekAgoTime(maxTimestamp)) + " - " + formatDate(maxTimestamp);
     }
 
-    public static String formatDate(long millis) {
+    public static String formatDate(long seconds) {
         SimpleDateFormat serverFormat = new SimpleDateFormat("dd MMM", Locale.getDefault());
-        return serverFormat.format(millis);
+        return serverFormat.format(seconds * 1000);
     }
 
     public static long weekAgoTime(long timestamp) {
-        return timestamp - 1000 * 60 * 60 * 24 * 7;
+        return timestamp - 60 * 60 * 24 * 1;
     }
 }

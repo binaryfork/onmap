@@ -29,9 +29,11 @@
             android:background="#fff"
             android:gravity="center_vertical"
             android:paddingLeft="@dimen/username_bar_size"
+            android:paddingRight="8dp"
             android:onClick="onClickUsername"
             android:clickable="true"
             android:textAppearance="@android:style/TextAppearance.Medium"/>
+
 
         <ImageView
             android:id="@+id/user_photo"
@@ -41,9 +43,11 @@
             android:onClick="onClickUsername"
             android:clickable="true"
             android:adjustViewBounds="true"/>
+
         <com.binaryfork.onmap.widget.SquareVideoView
             android:id="@+id/videoView"
             android:visibility="gone"
+            android:background="#fff"
             android:layout_below="@+id/user_photo"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
