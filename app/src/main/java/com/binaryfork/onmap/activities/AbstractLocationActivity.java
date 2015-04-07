@@ -10,20 +10,30 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
+import icepick.Icepick;
+import icepick.Icicle;
+
 public abstract class AbstractLocationActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final String TAG = "LocationActivity";
 
     private GoogleApiClient googleApiClient;
-    protected LatLng location;
+
+    @Icicle protected LatLng location;
 
     protected abstract void onLocationReceived(LatLng location);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Icepick.restoreInstanceState(this, savedInstanceState);
         buildGoogleApiClient();
+    }
+
+    @Override public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -50,6 +60,8 @@ public abstract class AbstractLocationActivity extends FragmentActivity implemen
 
     @Override
     public void onConnected(Bundle bundle) {
+        if (location != null)
+            return;
         Location loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         if (loc != null)
             location = new LatLng(loc.getLatitude(), loc.getLongitude());

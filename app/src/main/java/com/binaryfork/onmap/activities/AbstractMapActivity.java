@@ -51,9 +51,6 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         setUpMapIfNeeded();
-        if (location != null && presenter != null) {
-            setupPhotosOnMap();
-        }
         ButterKnife.inject(this);
 
         ModelImplementation model = new ModelImplementation();
@@ -72,6 +69,10 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         });
 
         setInstagramIntervalToCurrentTime();
+
+        if (location != null) {
+            goToLocation(location);
+        }
     }
 
     @Override
