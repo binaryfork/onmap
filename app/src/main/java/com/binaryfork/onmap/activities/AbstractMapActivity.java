@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.mvp.MarkersView;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
@@ -21,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -145,6 +147,8 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     }
 
     private void setupPhotosOnMap() {
+        // Cancel all loading map photos because all markers will be cleared.
+        Picasso.with(getApplicationContext()).cancelTag(MarkersView.PICASSO_MAP_MARKER_TAG);
         map.clear();
         showCenterMarker();
         presenter.getMediaByLocationAndDate(location, DateUtils.weekAgoTime(maxTimestampSeconds), maxTimestampSeconds);

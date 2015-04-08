@@ -42,6 +42,7 @@ public class MarkersViewImplementation implements MarkersView {
             targets.put(marker.getId(), markerTarget);
             Picasso.with(context)
                     .load(media.images.thumbnail.url)
+                    .tag(PICASSO_MAP_MARKER_TAG)
                             //    .transform(new CircleTransform())
                     .into(markerTarget);
         }
