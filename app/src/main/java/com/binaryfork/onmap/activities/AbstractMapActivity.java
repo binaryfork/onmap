@@ -1,13 +1,14 @@
 package com.binaryfork.onmap.activities;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.mvp.MarkersView;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
@@ -16,26 +17,21 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import timber.log.Timber;
 
 public abstract class AbstractMapActivity extends AbstractLocationActivity implements GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 
     protected GoogleMap map;
-
-    private Circle mapCircle;
 
     @InjectView(R.id.date)
     TextView dateTxt;
@@ -81,6 +77,24 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     protected void onDestroy() {
         super.onDestroy();
         presenter.onDestroy();
+    }
+
+    @OnClick(R.id.calendar) void datePicker() {
+        final Calendar calendar = Calendar.getInstance();
+        new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, monthOfYear);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                calendar.set(Calendar.HOUR_OF_DAY, 23);
+                calendar.set(Calendar.MINUTE, 59);
+                calendar.set(Calendar.SECOND, 59);
+                maxTimestampSeconds = calendar.getTimeInMillis() / 1000;
+                dateTxt.setText(DateUtils.getWeekInterval(maxTimestampSeconds));
+                setupPhotosOnMap();
+            }
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
     private void setInstagramIntervalToCurrentTime() {
@@ -139,32 +153,17 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         if (latLng == null) {
             return;
         }
+        setInstagramIntervalToCurrentTime();
         location = latLng;
         setupPhotosOnMap();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
         map.animateCamera(cameraUpdate);
-        setInstagramIntervalToCurrentTime();
     }
 
     private void setupPhotosOnMap() {
-        // Cancel all loading map photos because all markers will be cleared.
-        Picasso.with(getApplicationContext()).cancelTag(MarkersView.PICASSO_MAP_MARKER_TAG);
-        map.clear();
-        showCenterMarker();
+        view.location = location;
+        view.showCenterMarker();
         presenter.getMediaByLocationAndDate(location, DateUtils.weekAgoTime(maxTimestampSeconds), maxTimestampSeconds);
-    }
-
-    private void showCenterMarker() {
-        if (mapCircle != null)
-            mapCircle.remove();
-        mapCircle = map.addCircle(new CircleOptions()
-                .center(location)
-                .radius(1000)
-                .strokeWidth(getResources().getDimension(R.dimen.map_circle_stroke))
-                .strokeColor(0x663333ff)
-                .fillColor(0x113333ff));
-        map.addMarker(new MarkerOptions()
-                .position(location));
     }
 
 }

@@ -10,8 +10,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
-public class PresenterImplementation implements
-        Presenter {
+public class PresenterImplementation implements Presenter {
 
     private final Model model;
     private final MarkersView view;

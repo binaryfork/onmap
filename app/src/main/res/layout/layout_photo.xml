@@ -34,7 +34,6 @@
             android:clickable="true"
             android:textAppearance="@android:style/TextAppearance.Medium"/>
 
-
         <ImageView
             android:id="@+id/user_photo"
             android:layout_width="@dimen/username_bar_size"
@@ -47,7 +46,6 @@
         <com.binaryfork.onmap.widget.SquareVideoView
             android:id="@+id/videoView"
             android:visibility="gone"
-            android:background="#fff"
             android:layout_below="@+id/user_photo"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

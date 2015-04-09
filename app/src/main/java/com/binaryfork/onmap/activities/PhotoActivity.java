@@ -24,7 +24,6 @@ import android.widget.VideoView;
 
 import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.network.MediaTypes;
 import com.binaryfork.onmap.network.model.MediaItem;
 import com.binaryfork.onmap.util.Animations;
@@ -43,7 +42,7 @@ public class PhotoActivity extends AbstractMapActivity {
     private AnimatorSet mCurrentAnimator;
     private Rect startBounds;
     private float startScaleFinal;
-    private MarkersViewImplementation.MarkerTarget markerTarget;
+    private MediaItem instagramMedia;
     private int markerPhotoSize;
 
     @InjectView(R.id.expanded_image) ImageView expandedImage;
@@ -63,7 +62,7 @@ public class PhotoActivity extends AbstractMapActivity {
     }
 
     public void onClickUsername(View view) {
-        Intents.openLink(this, markerTarget.media.link);
+        Intents.openLink(this, instagramMedia.link);
     }
 
     @Override
@@ -73,51 +72,51 @@ public class PhotoActivity extends AbstractMapActivity {
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        markerTarget = view.targets.get(marker.getId());
+        instagramMedia = view.getInstagramMediaItem(marker.getId());
         Projection projection = map.getProjection();
         LatLng markerLocation = marker.getPosition();
         Point markerPosition = projection.toScreenLocation(markerLocation);
 
-        if (markerTarget != null) {
+        if (instagramMedia != null) {
             infoLayout.setVisibility(View.VISIBLE);
-            Drawable d = new BitmapDrawable(getResources(), markerTarget.thumbBitmap);
+            Drawable d = new BitmapDrawable(getResources(), view.getMarkerPhoto(marker.getId()));
             Picasso.with(getApplicationContext())
-                    .load(markerTarget.media.images.standard_resolution.url)
+                    .load(instagramMedia.images.standard_resolution.url)
                     .placeholder(d)
                     .into(expandedImage);
-            zoomImageFromThumb(markerPosition, markerTarget);
+            zoomImageFromThumb(markerPosition);
         }
         return true;
     }
 
-    private void showMediaInfo(MarkersViewImplementation.MarkerTarget markerTarget) {
+    private void showMediaInfo() {
         Animations.moveFromTop(commentsTxt);
         Animations.moveFromBottom(usernameTxt);
         Animations.moveFromBottom(userPhoto);
         commentsTxt.setVisibility(View.VISIBLE);
         usernameTxt.setVisibility(View.VISIBLE);
-        usernameTxt.setText(markerTarget.media.user.username + " " + DateUtils.formatDate(markerTarget.media.created_time));
+        usernameTxt.setText(instagramMedia.user.username + " " + DateUtils.formatDate(instagramMedia.created_time));
 
         commentsTxt.setText("");
-        if (markerTarget.media.caption != null)
+        if (instagramMedia.caption != null)
             commentsTxt.setText(
-                    spannableComment(markerTarget.media.caption.from.username, markerTarget.media.caption.text));
-        if (markerTarget.media.comments.count > 0)
-            for (MediaItem.Comments.Comment comment : markerTarget.media.comments.data) {
+                    spannableComment(instagramMedia.caption.from.username, instagramMedia.caption.text));
+        if (instagramMedia.comments.count > 0)
+            for (MediaItem.Comments.Comment comment : instagramMedia.comments.data) {
                 commentsTxt.append(
                         spannableComment("\n" + comment.from.username, comment.text));
             }
 
-        Picasso.with(getApplicationContext()).load(markerTarget.media.user.profile_picture)
+        Picasso.with(getApplicationContext()).load(instagramMedia.user.profile_picture)
                 .transform(new CircleTransform())
                 .into(userPhoto);
-        if (markerTarget.media.type.equals(MediaTypes.VIDEO)) {
+        if (instagramMedia.type.equals(MediaTypes.VIDEO)) {
             loadVideo();
         }
     }
 
     private void loadVideo() {
-        Uri uri = Uri.parse(markerTarget.media.videos.standard_resolution.url);
+        Uri uri = Uri.parse(instagramMedia.videos.standard_resolution.url);
         Timber.i("video url %s", uri);
         videoView.setVisibility(View.VISIBLE);
         videoView.setVideoURI(uri);
@@ -172,7 +171,7 @@ public class PhotoActivity extends AbstractMapActivity {
         return markerPhotoSize;
     }
 
-    private void zoomImageFromThumb(Point startPoint, final MarkersViewImplementation.MarkerTarget markerTarget) {
+    private void zoomImageFromThumb(Point startPoint) {
         // If there's an animation in progress, cancel it
         // immediately and proceed with this one.
         if (mCurrentAnimator != null) {
@@ -252,7 +251,7 @@ public class PhotoActivity extends AbstractMapActivity {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mCurrentAnimator = null;
-                showMediaInfo(markerTarget);
+                showMediaInfo();
             }
 
             @Override

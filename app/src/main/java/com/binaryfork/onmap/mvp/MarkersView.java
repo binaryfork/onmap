@@ -4,7 +4,6 @@ import com.binaryfork.onmap.network.model.MediaResponse;
 
 public interface MarkersView {
 
-    public final static String PICASSO_MAP_MARKER_TAG = "marker";
-
+    void showCenterMarker();
     void showMarkers(MediaResponse mediaResponse);
 }

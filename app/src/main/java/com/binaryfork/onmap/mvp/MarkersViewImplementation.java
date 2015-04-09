@@ -11,6 +11,8 @@ import com.binaryfork.onmap.network.model.MediaItem;
 import com.binaryfork.onmap.network.model.MediaResponse;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -21,19 +23,51 @@ import java.util.HashMap;
 
 public class MarkersViewImplementation implements MarkersView {
 
+    private final static String PICASSO_MAP_MARKER_TAG = "marker";
+
     private final Context context;
     private final GoogleMap map;
-    public HashMap<String, MarkerTarget> targets;
+    private Circle mapCircle;
+    private HashMap<String, MarkerTarget> targets;
+    public LatLng location;
 
     public MarkersViewImplementation(GoogleMap map, Context context) {
         this.map = map;
         this.context = context;
     }
 
+    public MediaItem getInstagramMediaItem(String markerId) {
+        return targets.get(markerId).media;
+    }
+
+    public Bitmap getMarkerPhoto(String markerId) {
+        return targets.get(markerId).thumbBitmap;
+    }
+
+    @Override
+    public void showCenterMarker() {
+        if (mapCircle != null)
+            mapCircle.remove();
+        mapCircle = map.addCircle(new CircleOptions()
+                .center(location)
+                .radius(1000)
+                .strokeWidth(context.getResources().getDimension(R.dimen.map_circle_stroke))
+                .strokeColor(0x663333ff)
+                .fillColor(0x113333ff));
+        map.addMarker(new MarkerOptions()
+                .position(location));
+    }
+
     @Override
     public void showMarkers(MediaResponse mediaResponse) {
+        // Cancel all loading map photos because all markers will be cleared.
+        Picasso.with(context).cancelTag(PICASSO_MAP_MARKER_TAG);
+        map.clear();
+        showCenterMarker();
         targets = new HashMap<>();
         for (final MediaItem media : mediaResponse.data) {
+         //   if (media.type.equals(MediaTypes.IMAGE))
+         //       continue;
             Marker marker = map.addMarker(new MarkerOptions()
                     .draggable(true)
                     .anchor(.5f, 1.25f)
@@ -48,7 +82,7 @@ public class MarkersViewImplementation implements MarkersView {
         }
     }
 
-    public static class MarkerTarget implements Target {
+    private static class MarkerTarget implements Target {
 
         public MediaItem media;
         public Marker marker;
