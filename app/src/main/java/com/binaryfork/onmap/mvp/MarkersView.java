@@ -1,6 +1,6 @@
 package com.binaryfork.onmap.mvp;
 
-import com.binaryfork.onmap.network.model.MediaResponse;
+import com.binaryfork.onmap.network.instagram.model.MediaResponse;
 
 public interface MarkersView {
 

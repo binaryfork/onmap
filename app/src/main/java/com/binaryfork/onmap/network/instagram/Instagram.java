@@ -1,9 +1,9 @@
-package com.binaryfork.onmap.network;
+package com.binaryfork.onmap.network.instagram;
 
 import android.content.Context;
 
 import com.binaryfork.onmap.Constants;
-import com.binaryfork.onmap.network.services.InstagramMediaService;
+import com.binaryfork.onmap.network.OkHttpInstance;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;

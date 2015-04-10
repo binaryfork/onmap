@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.network.model;
+package com.binaryfork.onmap.network.google.model;
 
 public class GeocodeItem {
     public String formatted_address;

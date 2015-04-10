@@ -1,9 +1,9 @@
-package com.binaryfork.onmap.network;
+package com.binaryfork.onmap.network.google;
 
 import android.content.Context;
 
 import com.binaryfork.onmap.Constants;
-import com.binaryfork.onmap.network.services.GoogleGeocoding;
+import com.binaryfork.onmap.network.OkHttpInstance;
 
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
@@ -41,7 +41,7 @@ public class GoogleGeo {
         return restAdapter;
     }
 
-    public GoogleGeocoding geo() {
-        return getRestAdapter().create(GoogleGeocoding.class);
+    public GoogleGeoService geo() {
+        return getRestAdapter().create(GoogleGeoService.class);
     }
 }

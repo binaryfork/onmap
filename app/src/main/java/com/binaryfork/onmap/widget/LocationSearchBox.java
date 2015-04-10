@@ -4,9 +4,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import com.binaryfork.onmap.network.GoogleGeo;
-import com.binaryfork.onmap.network.model.GeocodeItem;
-import com.binaryfork.onmap.network.model.GeocodeResults;
+import com.binaryfork.onmap.network.google.GoogleGeo;
+import com.binaryfork.onmap.network.google.model.GeocodeItem;
+import com.binaryfork.onmap.network.google.model.GeocodeResults;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 

@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.network.model;
+package com.binaryfork.onmap.network.instagram.model;
 
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.network;
+package com.binaryfork.onmap.network.instagram;
 
 public class MediaTypes {
 

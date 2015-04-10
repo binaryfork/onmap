@@ -24,8 +24,8 @@ import android.widget.VideoView;
 
 import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.network.MediaTypes;
-import com.binaryfork.onmap.network.model.MediaItem;
+import com.binaryfork.onmap.network.instagram.MediaTypes;
+import com.binaryfork.onmap.network.instagram.model.MediaItem;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.util.CircleTransform;
 import com.binaryfork.onmap.util.DateUtils;

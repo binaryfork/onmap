@@ -1,7 +1,7 @@
-package com.binaryfork.onmap.network.services;
+package com.binaryfork.onmap.network.instagram;
 
 
-import com.binaryfork.onmap.network.model.MediaResponse;
+import com.binaryfork.onmap.network.instagram.model.MediaResponse;
 
 import retrofit.http.GET;
 import retrofit.http.Path;

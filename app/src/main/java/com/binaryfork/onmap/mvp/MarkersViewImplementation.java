@@ -6,9 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.network.MediaTypes;
-import com.binaryfork.onmap.network.model.MediaItem;
-import com.binaryfork.onmap.network.model.MediaResponse;
+import com.binaryfork.onmap.network.instagram.MediaTypes;
+import com.binaryfork.onmap.network.instagram.model.MediaItem;
+import com.binaryfork.onmap.network.instagram.model.MediaResponse;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
