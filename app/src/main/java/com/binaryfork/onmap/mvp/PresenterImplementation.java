@@ -2,7 +2,7 @@ package com.binaryfork.onmap.mvp;
 
 import android.content.Context;
 
-import com.binaryfork.onmap.network.instagram.model.MediaResponse;
+import com.binaryfork.onmap.network.instagram.model.InstagramItems;
 import com.google.android.gms.maps.model.LatLng;
 
 import rx.Observable;
@@ -23,12 +23,12 @@ public class PresenterImplementation implements Presenter {
         this.context = context;
     }
 
-    private void mapSubscribe(Observable<MediaResponse> observable) {
+    private void mapSubscribe(Observable<InstagramItems> observable) {
         subscription = observable
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<MediaResponse>() {
+                .subscribe(new Action1<InstagramItems>() {
                     @Override
-                    public void call(MediaResponse mediaResponse) {
+                    public void call(InstagramItems mediaResponse) {
                         view.showMarkers(mediaResponse);
                     }
                 });

@@ -6,9 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.network.instagram.MediaTypes;
-import com.binaryfork.onmap.network.instagram.model.MediaItem;
-import com.binaryfork.onmap.network.instagram.model.MediaResponse;
+import com.binaryfork.onmap.network.Media;
+import com.binaryfork.onmap.network.instagram.model.InstagramItems;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
@@ -36,7 +35,7 @@ public class MarkersViewImplementation implements MarkersView {
         this.context = context;
     }
 
-    public MediaItem getInstagramMediaItem(String markerId) {
+    public Media getMedia(String markerId) {
         return targets.get(markerId).media;
     }
 
@@ -59,23 +58,23 @@ public class MarkersViewImplementation implements MarkersView {
     }
 
     @Override
-    public void showMarkers(MediaResponse mediaResponse) {
+    public void showMarkers(InstagramItems mediaResponse) {
         // Cancel all loading map photos because all markers will be cleared.
         Picasso.with(context).cancelTag(PICASSO_MAP_MARKER_TAG);
         map.clear();
         showCenterMarker();
         targets = new HashMap<>();
-        for (final MediaItem media : mediaResponse.data) {
+        for (final Media media : mediaResponse.data) {
          //   if (media.type.equals(MediaTypes.IMAGE))
          //       continue;
             Marker marker = map.addMarker(new MarkerOptions()
                     .draggable(true)
                     .anchor(.5f, 1.25f)
-                    .position(new LatLng(media.location.latitude, media.location.longitude)));
+                    .position(new LatLng(media.getLatitude(), media.getLongitude())));
             MarkerTarget markerTarget = new MarkerTarget(media, marker, context);
             targets.put(marker.getId(), markerTarget);
             Picasso.with(context)
-                    .load(media.images.thumbnail.url)
+                    .load(media.getThumbnail())
                     .tag(PICASSO_MAP_MARKER_TAG)
                             //    .transform(new CircleTransform())
                     .into(markerTarget);
@@ -84,13 +83,13 @@ public class MarkersViewImplementation implements MarkersView {
 
     private static class MarkerTarget implements Target {
 
-        public MediaItem media;
+        public Media media;
         public Marker marker;
         public Bitmap thumbBitmap;
         public Context context;
         private int markerPhotoSize;
 
-        public MarkerTarget(MediaItem media, Marker marker, Context context) {
+        public MarkerTarget(Media media, Marker marker, Context context) {
             this.media = media;
             this.marker = marker;
             this.context = context;
@@ -101,7 +100,7 @@ public class MarkersViewImplementation implements MarkersView {
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
             if (bitmap != null) {
                 bitmap = Bitmap.createScaledBitmap(bitmap, markerPhotoSize, markerPhotoSize, true);
-                if (media.type.equals(MediaTypes.VIDEO)) {
+                if (media.isVideo()) {
                     bitmap = drawVideoIcon(bitmap);
                 }
                 marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));

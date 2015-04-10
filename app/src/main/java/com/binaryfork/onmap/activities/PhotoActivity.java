@@ -11,9 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
@@ -24,8 +21,7 @@ import android.widget.VideoView;
 
 import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.network.instagram.MediaTypes;
-import com.binaryfork.onmap.network.instagram.model.MediaItem;
+import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.util.CircleTransform;
 import com.binaryfork.onmap.util.DateUtils;
@@ -42,7 +38,7 @@ public class PhotoActivity extends AbstractMapActivity {
     private AnimatorSet mCurrentAnimator;
     private Rect startBounds;
     private float startScaleFinal;
-    private MediaItem instagramMedia;
+    private Media media;
     private int markerPhotoSize;
 
     @InjectView(R.id.expanded_image) ImageView expandedImage;
@@ -62,7 +58,7 @@ public class PhotoActivity extends AbstractMapActivity {
     }
 
     public void onClickUsername(View view) {
-        Intents.openLink(this, instagramMedia.link);
+        Intents.openLink(this, media.getSiteUrl());
     }
 
     @Override
@@ -72,16 +68,16 @@ public class PhotoActivity extends AbstractMapActivity {
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        instagramMedia = view.getInstagramMediaItem(marker.getId());
+        media = view.getMedia(marker.getId());
         Projection projection = map.getProjection();
         LatLng markerLocation = marker.getPosition();
         Point markerPosition = projection.toScreenLocation(markerLocation);
 
-        if (instagramMedia != null) {
+        if (media != null) {
             infoLayout.setVisibility(View.VISIBLE);
             Drawable d = new BitmapDrawable(getResources(), view.getMarkerPhoto(marker.getId()));
             Picasso.with(getApplicationContext())
-                    .load(instagramMedia.images.standard_resolution.url)
+                    .load(media.getPhotoUrl())
                     .placeholder(d)
                     .into(expandedImage);
             zoomImageFromThumb(markerPosition);
@@ -95,28 +91,20 @@ public class PhotoActivity extends AbstractMapActivity {
         Animations.moveFromBottom(userPhoto);
         commentsTxt.setVisibility(View.VISIBLE);
         usernameTxt.setVisibility(View.VISIBLE);
-        usernameTxt.setText(instagramMedia.user.username + " " + DateUtils.formatDate(instagramMedia.created_time));
+        usernameTxt.setText(media.getUsername() + " " + DateUtils.formatDate(media.getCreatedDate()));
 
-        commentsTxt.setText("");
-        if (instagramMedia.caption != null)
-            commentsTxt.setText(
-                    spannableComment(instagramMedia.caption.from.username, instagramMedia.caption.text));
-        if (instagramMedia.comments.count > 0)
-            for (MediaItem.Comments.Comment comment : instagramMedia.comments.data) {
-                commentsTxt.append(
-                        spannableComment("\n" + comment.from.username, comment.text));
-            }
+        commentsTxt.setText(media.getComments());
 
-        Picasso.with(getApplicationContext()).load(instagramMedia.user.profile_picture)
+        Picasso.with(getApplicationContext()).load(media.getUserpic())
                 .transform(new CircleTransform())
                 .into(userPhoto);
-        if (instagramMedia.type.equals(MediaTypes.VIDEO)) {
+        if (media.isVideo()) {
             loadVideo();
         }
     }
 
     private void loadVideo() {
-        Uri uri = Uri.parse(instagramMedia.videos.standard_resolution.url);
+        Uri uri = Uri.parse(media.getVideoUrl());
         Timber.i("video url %s", uri);
         videoView.setVisibility(View.VISIBLE);
         videoView.setVideoURI(uri);
@@ -154,15 +142,6 @@ public class PhotoActivity extends AbstractMapActivity {
         expandedImage.setVisibility(View.VISIBLE);
         videoView.setVisibility(View.GONE);
         videoView.stopPlayback();
-    }
-
-    private Spannable spannableComment(String username, String comment) {
-        Spannable wordtoSpan =
-                new SpannableString(username + " " + comment);
-        wordtoSpan.setSpan(
-                new ForegroundColorSpan(getResources().getColor(R.color.accent)),
-                0, username.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return wordtoSpan;
     }
 
     protected int getMarkerPhotoSize() {
