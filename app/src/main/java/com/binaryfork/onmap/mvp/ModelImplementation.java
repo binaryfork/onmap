@@ -28,7 +28,7 @@ public class ModelImplementation implements Model {
                 .mediaSearch(location.latitude, location.longitude, from, to, RESULTS_COUNT);
     }
 
-    public Observable<FlickrPhotos> flickr(Context context, LatLng location, long from, long to) {
+    public Observable<FlickrPhotos> flickr(Context context, LatLng location) {
         return Flickr.getInstance(context)
                 .photos()
                 .searchByLocation(location.latitude, location.longitude);

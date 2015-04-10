@@ -1,7 +1,14 @@
 package com.binaryfork.onmap.network.instagram.model;
 
-import java.util.List;
+import com.binaryfork.onmap.network.MediaList;
 
-public class InstagramItems {
-    public List<InstagramItem> data;
+import java.util.ArrayList;
+
+public class InstagramItems implements MediaList {
+    public ArrayList<InstagramItem> data;
+
+    @Override
+    public ArrayList getList() {
+        return data;
+    }
 }

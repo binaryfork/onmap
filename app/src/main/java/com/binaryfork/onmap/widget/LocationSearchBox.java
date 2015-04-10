@@ -44,7 +44,7 @@ public class LocationSearchBox extends SearchBox {
                     @Override
                     public Observable<GeocodeResults> call(String query) {
                         if (query == null || query.length() < 3) {
-                            return Observable.<GeocodeResults>empty();
+                            return Observable.empty();
                         }
                         return suggestLocations(getContext(), query);
                     }
@@ -89,7 +89,6 @@ public class LocationSearchBox extends SearchBox {
                 .map(new Func1<OnTextChangeEvent, String>() {
                     @Override
                     public String call(OnTextChangeEvent event) {
-                        Log.i("", "OnTextChangeEvent " + event.text().toString().trim());
                         return event.text().toString().trim();
                     }
                 });

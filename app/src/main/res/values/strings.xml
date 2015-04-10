@@ -4,4 +4,9 @@
     <string name="app_name">OnMap</string>
     <string name="title_activity_maps">OnMap</string>
 
+    <string-array name="api_sources">
+        <item name="instagram">Instagram</item>
+        <item name="flickr">Flickr</item>
+    </string-array>
+
 </resources>

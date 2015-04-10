@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.network.Media;
-import com.binaryfork.onmap.network.instagram.model.InstagramItems;
+import com.binaryfork.onmap.network.MediaList;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
@@ -19,6 +19,8 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.util.HashMap;
+
+import timber.log.Timber;
 
 public class MarkersViewImplementation implements MarkersView {
 
@@ -58,13 +60,14 @@ public class MarkersViewImplementation implements MarkersView {
     }
 
     @Override
-    public void showMarkers(InstagramItems mediaResponse) {
+    public void showMarkers(MediaList mediaResponse) {
         // Cancel all loading map photos because all markers will be cleared.
         Picasso.with(context).cancelTag(PICASSO_MAP_MARKER_TAG);
         map.clear();
         showCenterMarker();
         targets = new HashMap<>();
-        for (final Media media : mediaResponse.data) {
+        Timber.i("map %s", targets.size());
+        for (final Media media : mediaResponse.getList()) {
          //   if (media.type.equals(MediaTypes.IMAGE))
          //       continue;
             Marker marker = map.addMarker(new MarkerOptions()
@@ -73,6 +76,7 @@ public class MarkersViewImplementation implements MarkersView {
                     .position(new LatLng(media.getLatitude(), media.getLongitude())));
             MarkerTarget markerTarget = new MarkerTarget(media, marker, context);
             targets.put(marker.getId(), markerTarget);
+            Timber.i("map th %s", media.getThumbnail());
             Picasso.with(context)
                     .load(media.getThumbnail())
                     .tag(PICASSO_MAP_MARKER_TAG)
@@ -119,6 +123,8 @@ public class MarkersViewImplementation implements MarkersView {
         private Bitmap drawVideoIcon(Bitmap bitmap) {
             Canvas canvas = new Canvas(bitmap);
             Drawable d = context.getResources().getDrawable(android.R.drawable.ic_media_play);
+            if (d == null)
+                return null;
             d.setBounds(canvas.getClipBounds());
             d.draw(canvas);
             canvas.drawBitmap(bitmap, 0, 0, null);

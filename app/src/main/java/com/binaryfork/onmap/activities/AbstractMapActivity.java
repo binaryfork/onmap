@@ -4,15 +4,21 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
+import com.binaryfork.onmap.network.ApiSource;
 import com.binaryfork.onmap.util.DateUtils;
+import com.binaryfork.onmap.widget.LocationSearchBox;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,7 +43,13 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     TextView dateTxt;
 
     @InjectView(R.id.searchbox)
-    SearchBox searchBox;
+    LocationSearchBox searchBox;
+
+    @InjectView(R.id.drawer_layout)
+    DrawerLayout drawerLayout;
+
+    @InjectView(R.id.left_drawer)
+    ListView drawerList;
 
     protected PresenterImplementation presenter;
     protected MarkersViewImplementation view;
@@ -47,7 +59,7 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
+        setContentView(R.layout.activity_main);
         setUpMapIfNeeded();
         ButterKnife.inject(this);
 
@@ -56,6 +68,31 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         presenter = new PresenterImplementation(model, view, getApplicationContext());
 
         searchBox.setOnSuggestionClickListener(onSearchSuggestionClick());
+        searchBox.setMenuListener(new SearchBox.MenuListener() {
+            @Override
+            public void onMenuClick() {
+                if (drawerLayout.isDrawerOpen(drawerList))
+                    drawerLayout.closeDrawer(drawerList);
+                else
+                    drawerLayout.openDrawer(drawerList);
+            }
+        });
+
+        drawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
+                getResources().getStringArray(R.array.api_sources)));
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        presenter.apiSource = ApiSource.INSTAGRAM;
+                        break;
+                    case 1:
+                        presenter.apiSource = ApiSource.FLICKR;
+                        break;
+                }
+            }
+        });
 
         dateTxt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,7 +116,8 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         presenter.onDestroy();
     }
 
-    @OnClick(R.id.calendar) void datePicker() {
+    @OnClick(R.id.calendar)
+    void datePicker() {
         final Calendar calendar = Calendar.getInstance();
         new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override

@@ -12,18 +12,12 @@ import retrofit.client.OkClient;
 
 public class Flickr {
 
-
-    String url = "https://api.flickr.com/services/rest/?method=" +
-            "flickr.photos.search&extras=geo" +
-            "&api_key=7ed4ebe433643ff7fff5baab4ee75bb0" +
-            "&lat=40.6700&lon=73.9400&format=json&nojsoncallback=1";
-
     private static final String BASE_URL = "https://api.flickr.com/services";
 
     /**
      * Available image sizes are described here: https://www.flickr.com/services/api/misc.urls.html
      */
-    private final static String IMAGE_SIZE_PARAMTER = "url_m";
+    private final static String EXTRAS = "url_m,url_t,geo,date_taken,owner_name,date_upload";
 
     private static Flickr instance;
     private Context context;
@@ -54,7 +48,7 @@ public class Flickr {
                             request.addQueryParam("format", "json");
                             request.addQueryParam("nojsoncallback", "1");
                             request.addQueryParam("per_page", "50");
-                            request.addQueryParam("extras", IMAGE_SIZE_PARAMTER);
+                            request.addQueryParam("extras", EXTRAS);
                         }
                     });
 
