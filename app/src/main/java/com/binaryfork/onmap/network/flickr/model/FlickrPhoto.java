@@ -7,7 +7,7 @@ import com.binaryfork.onmap.network.Media;
 public class FlickrPhoto implements Media {
 
     public String url_m;
-    public String url_t;
+    public String url_q;
     public String ownername;
     public long dateupload;
     public float latitude;
@@ -20,7 +20,7 @@ public class FlickrPhoto implements Media {
 
     @Override
     public String getThumbnail() {
-        return url_t;
+        return url_q;
     }
 
     @Override

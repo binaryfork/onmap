@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="map_marker_photo">56dp</dimen>
+    <dimen name="map_marker_photo">64dp</dimen>
     <dimen name="map_circle_stroke">2dp</dimen>
     <dimen name="username_bar_size">56dp</dimen>
     <dimen name="video_icon_padding">16dp</dimen>

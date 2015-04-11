@@ -21,13 +21,13 @@ import android.widget.VideoView;
 
 import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.clustering.ClusterTargetItem;
 import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.util.CircleTransform;
 import com.binaryfork.onmap.util.DateUtils;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.squareup.picasso.Picasso;
 
 import butterknife.InjectView;
@@ -66,23 +66,21 @@ public class PhotoActivity extends AbstractMapActivity {
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        media = view.getMedia(marker.getId());
+    protected void onPhotoOpen(ClusterTargetItem clusterTargetItem) {
+        media = clusterTargetItem.media;
         Projection projection = map.getProjection();
-        LatLng markerLocation = marker.getPosition();
+        LatLng markerLocation = clusterTargetItem.getPosition();
         Point markerPosition = projection.toScreenLocation(markerLocation);
 
         if (media != null) {
             infoLayout.setVisibility(View.VISIBLE);
-            Drawable d = new BitmapDrawable(getResources(), view.getMarkerPhoto(marker.getId()));
+            Drawable d = new BitmapDrawable(getResources(), clusterTargetItem.thumbBitmap);
             Picasso.with(getApplicationContext())
                     .load(media.getPhotoUrl())
                     .placeholder(d)
                     .into(expandedImage);
             zoomImageFromThumb(markerPosition);
         }
-        return true;
     }
 
     private void showMediaInfo() {
@@ -277,7 +275,6 @@ public class PhotoActivity extends AbstractMapActivity {
         set.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                //          thumbView.setAlph
                 infoLayout.setVisibility(View.INVISIBLE);
                 expandedImage.setVisibility(View.INVISIBLE);
                 mCurrentAnimator = null;
@@ -285,7 +282,6 @@ public class PhotoActivity extends AbstractMapActivity {
 
             @Override
             public void onAnimationCancel(Animator animation) {
-                //           thumbView.setAlph
                 infoLayout.setVisibility(View.INVISIBLE);
                 expandedImage.setVisibility(View.INVISIBLE);
                 mCurrentAnimator = null;

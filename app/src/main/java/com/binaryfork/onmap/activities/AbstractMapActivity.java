@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.clustering.ClusterTargetItem;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterManager;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
@@ -35,9 +37,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public abstract class AbstractMapActivity extends AbstractLocationActivity implements GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
-
-    protected GoogleMap map;
+public abstract class AbstractMapActivity extends AbstractLocationActivity implements GoogleMap.OnMapClickListener {
 
     @InjectView(R.id.date)
     TextView dateTxt;
@@ -50,11 +50,13 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
 
     @InjectView(R.id.left_drawer)
     ListView drawerList;
+    private long maxTimestampSeconds;
 
+    protected GoogleMap map;
     protected PresenterImplementation presenter;
     protected MarkersViewImplementation view;
 
-    private long maxTimestampSeconds;
+    protected abstract void onPhotoOpen(ClusterTargetItem clusterTargetItem);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,14 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         ButterKnife.inject(this);
 
         ModelImplementation model = new ModelImplementation();
-        view = new MarkersViewImplementation(map, getApplicationContext());
+        view = new MarkersViewImplementation(map, this);
+        view.setupClusterer(new ClusterManager.OnClusterItemClickListener<ClusterTargetItem>() {
+            @Override
+            public boolean onClusterItemClick(ClusterTargetItem clusterTargetItem) {
+                onPhotoOpen(clusterTargetItem);
+                return true;
+            }
+        });
         presenter = new PresenterImplementation(model, view, getApplicationContext());
 
         searchBox.setOnSuggestionClickListener(onSearchSuggestionClick());
@@ -169,7 +178,6 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         if (map == null) {
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
-            map.setOnMarkerClickListener(this);
             map.setOnMapClickListener(this);
             map.setMyLocationEnabled(true);
             map.getUiSettings().setZoomControlsEnabled(true);

@@ -46,7 +46,7 @@ public class BaseApplication extends Application {
                         "Synthetic stacktrace didn't have enough elements: are you using proguard?");
             }
             tag = stackTrace[5].getClassName();
-            String lineNumber = " > " + stackTrace[5].getLineNumber();
+            String lineNumber = ":" + stackTrace[5].getLineNumber();
 
             Matcher m = ANONYMOUS_CLASS.matcher(tag);
             if (m.find()) {

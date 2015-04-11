@@ -17,7 +17,7 @@ public class Flickr {
     /**
      * Available image sizes are described here: https://www.flickr.com/services/api/misc.urls.html
      */
-    private final static String EXTRAS = "url_m,url_t,geo,date_taken,owner_name,date_upload";
+    private final static String EXTRAS = "url_m,url_q,geo,date_taken,owner_name,date_upload";
 
     private static Flickr instance;
     private Context context;
