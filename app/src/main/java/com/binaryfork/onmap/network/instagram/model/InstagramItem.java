@@ -2,14 +2,13 @@ package com.binaryfork.onmap.network.instagram.model;
 
 
 import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 
 import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.network.instagram.MediaTypes;
+import com.binaryfork.onmap.util.Spanny;
 
 import java.util.List;
 
@@ -80,23 +79,17 @@ public class InstagramItem implements Media {
 
     @Override
     public Spannable getComments() {
-        SpannableStringBuilder span = new SpannableStringBuilder();
+        int authorColor = BaseApplication.get().getResources().getColor(R.color.accent);
+        Spanny spanny = new Spanny();
         if (caption != null)
-            span.append(spannableComment(caption.from.username, caption.text));
+            spanny.append(caption.from.username, new ForegroundColorSpan(authorColor))
+                    .append(caption.text);
         if (comments.count > 0)
             for (InstagramItem.Comments.Comment comment : comments.data) {
-                span.append(spannableComment("\n" + comment.from.username, comment.text));
+                spanny.append("\n" + comment.from.username, new ForegroundColorSpan(authorColor))
+                        .append(comment.text);
             }
-        return span;
-    }
-
-    private Spannable spannableComment(String username, String comment) {
-        Spannable wordtoSpan =
-                new SpannableString(username + " " + comment);
-        wordtoSpan.setSpan(
-                new ForegroundColorSpan(BaseApplication.get().getResources().getColor(R.color.accent)),
-                0, username.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return wordtoSpan;
+        return spanny.getSpannable();
     }
 
     public class Location {

@@ -1,38 +1,73 @@
 package com.binaryfork.onmap.util;
 
-import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.style.AlignmentSpan;
-import android.text.style.ForegroundColorSpan;
 
+/**
+ * Spannable wrapper for simple creation of Spannable strings.
+ */
 public class Spanny {
 
     private SpannableStringBuilder spannable = new SpannableStringBuilder();
-    private String lastString;
 
-    public Spanny append(String text) {
-        lastString = text;
+    public Spanny() {}
+
+    public Spanny(String text) {
         spannable.append(text);
-        return this;
-    }
-
-    public Spanny setForegroundColor(int color) {
-        spannable.setSpan(
-                new ForegroundColorSpan(color),
-                spannable.length() - lastString.length(), spannable.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return this;
-    }
-
-    public Spanny setOppositeAlignment() {
-        spannable.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE),
-                spannable.length() - lastString.length(), spannable.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return this;
     }
 
     public SpannableStringBuilder getSpannable() {
         return spannable;
+    }
+
+    /**
+     * Sets a span to last appended string.
+     *
+     * @param spans Span or multiple spans.
+     * @return {@code Spanny}.
+     */
+    public Spanny append(String text, Object... spans) {
+        spannable.append(text);
+        for (Object span : spans) {
+            setSpan(span, spannable.length() - text.length(), spannable.length());
+        }
+        return this;
+    }
+
+    /**
+     * Sets a span to all appearances of specified text in the spannable.
+     * A new instance of a span must provided for each iteration
+     * because a span can't be reused.
+     *
+     * @param textToSpan Case-sensitive text to span in the current spannable.
+     * @param getSpan Interface to get a span for each spanned string.
+     * @return {@code Spanny}.
+     */
+    public Spanny findAll(String textToSpan, GetSpan getSpan) {
+        int lastIndex = 0;
+        while(lastIndex != -1) {
+            lastIndex = spannable.toString().indexOf(textToSpan, lastIndex);
+            if(lastIndex != -1) {
+                setSpan(getSpan.getSpan(), lastIndex, lastIndex + textToSpan.length());
+                lastIndex+=textToSpan.length();
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Interface to return a new span object when spanning multiple parts in the text.
+     */
+    public interface GetSpan {
+
+        /**
+         * @return A new span object. Never reuse a span object here, otherwise
+         * only the last text part will be spanned.
+         */
+        Object getSpan();
+    }
+
+    private void setSpan(Object span, int start, int end) {
+        spannable.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 }
