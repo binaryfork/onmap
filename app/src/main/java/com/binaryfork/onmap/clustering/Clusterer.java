@@ -42,14 +42,14 @@ public class Clusterer {
     }
 
     private void init(ClusterManager.OnClusterItemClickListener<MediaClusterItem> listener) {
+        markerDimension = (int) activity.getResources().getDimension(R.dimen.map_marker_photo);
+        videoIcon = activity.getResources().getDrawable(android.R.drawable.ic_media_play);
+
         clusterManager = new ClusterManager<MediaClusterItem>(activity, map);
         clusterManager.setRenderer(new MediaRenderer());
         clusterManager.setOnClusterItemClickListener(listener);
         map.setOnCameraChangeListener(clusterManager);
         map.setOnMarkerClickListener(clusterManager);
-
-        markerDimension = (int) activity.getResources().getDimension(R.dimen.map_marker_photo);
-        videoIcon = activity.getResources().getDrawable(android.R.drawable.ic_media_play);
     }
 
     public void clearItems() {
