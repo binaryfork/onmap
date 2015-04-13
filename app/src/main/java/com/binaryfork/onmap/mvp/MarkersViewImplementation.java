@@ -3,8 +3,8 @@ package com.binaryfork.onmap.mvp;
 import android.app.Activity;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.clustering.ClusterTargetItem;
 import com.binaryfork.onmap.clustering.Clusterer;
+import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.network.MediaList;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,7 +30,7 @@ public class MarkersViewImplementation implements MarkersView {
         this.activity = activity;
     }
 
-    public void setupClusterer(ClusterManager.OnClusterItemClickListener<ClusterTargetItem> listener) {
+    public void setupClusterer(ClusterManager.OnClusterItemClickListener<MediaClusterItem> listener) {
         clusterer = new Clusterer(activity, map, listener);
     }
 
@@ -49,22 +49,20 @@ public class MarkersViewImplementation implements MarkersView {
     }
 
     @Override
-    public void showMarkers(MediaList mediaResponse) {
+    public void showMarkers(final MediaList mediaResponse) {
         // Cancel all loading map photos because all markers will be cleared.
         Picasso.with(activity).cancelTag(PICASSO_MAP_MARKER_TAG);
         clusterer.clearItems();
         map.clear();
         showCenterMarker();
+
         for (final Media media : mediaResponse.getList()) {
-         //   if (media.type.equals(MediaTypes.IMAGE))
-         //       continue;
-            ClusterTargetItem cluster = new ClusterTargetItem(media, activity);
-            clusterer.addItem(cluster);
+            // Add a cluster item and run cluster manager each time when photo bitmap is loaded.
             Picasso.with(activity)
                     .load(media.getThumbnail())
                     .tag(PICASSO_MAP_MARKER_TAG)
-                            //    .transform(new CircleTransform())
-                    .into(cluster);
+                    .into(clusterer.getClusterItemTarget(media));
         }
+
     }
 }

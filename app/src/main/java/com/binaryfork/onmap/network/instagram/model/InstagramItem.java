@@ -83,11 +83,11 @@ public class InstagramItem implements Media {
         Spanny spanny = new Spanny();
         if (caption != null)
             spanny.append(caption.from.username, new ForegroundColorSpan(authorColor))
-                    .append(caption.text);
+                    .append(" " + caption.text);
         if (comments.count > 0)
             for (InstagramItem.Comments.Comment comment : comments.data) {
                 spanny.append("\n" + comment.from.username, new ForegroundColorSpan(authorColor))
-                        .append(comment.text);
+                        .append(" " + comment.text);
             }
         return spanny.getSpannable();
     }

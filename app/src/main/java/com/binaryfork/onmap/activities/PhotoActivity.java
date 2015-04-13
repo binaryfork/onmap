@@ -21,7 +21,7 @@ import android.widget.VideoView;
 
 import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.clustering.ClusterTargetItem;
+import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.util.CircleTransform;
@@ -66,7 +66,7 @@ public class PhotoActivity extends AbstractMapActivity {
         super.onCreate(savedInstanceState);
     }
 
-    protected void onPhotoOpen(ClusterTargetItem clusterTargetItem) {
+    protected void onPhotoOpen(MediaClusterItem clusterTargetItem) {
         media = clusterTargetItem.media;
         Projection projection = map.getProjection();
         LatLng markerLocation = clusterTargetItem.getPosition();
@@ -222,7 +222,7 @@ public class PhotoActivity extends AbstractMapActivity {
                 .with(ObjectAnimator.ofFloat(expandedImage, View.SCALE_X,
                         startScale, 1f)).with(ObjectAnimator.ofFloat(expandedImage,
                 View.SCALE_Y, startScale, 1f));
-        set.setDuration(300);
+        set.setDuration(200);
         set.setInterpolator(new AccelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
             @Override

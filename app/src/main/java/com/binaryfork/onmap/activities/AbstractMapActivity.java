@@ -13,7 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.clustering.ClusterTargetItem;
+import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
@@ -56,7 +56,7 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     protected PresenterImplementation presenter;
     protected MarkersViewImplementation view;
 
-    protected abstract void onPhotoOpen(ClusterTargetItem clusterTargetItem);
+    protected abstract void onPhotoOpen(MediaClusterItem clusterTargetItem);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +67,9 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
 
         ModelImplementation model = new ModelImplementation();
         view = new MarkersViewImplementation(map, this);
-        view.setupClusterer(new ClusterManager.OnClusterItemClickListener<ClusterTargetItem>() {
+        view.setupClusterer(new ClusterManager.OnClusterItemClickListener<MediaClusterItem>() {
             @Override
-            public boolean onClusterItemClick(ClusterTargetItem clusterTargetItem) {
+            public boolean onClusterItemClick(MediaClusterItem clusterTargetItem) {
                 onPhotoOpen(clusterTargetItem);
                 return true;
             }

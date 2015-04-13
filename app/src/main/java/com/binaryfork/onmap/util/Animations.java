@@ -10,14 +10,14 @@ public class Animations {
 
     public static void moveFromTop(View view) {
         TranslateAnimation animation = new TranslateAnimation(0, 0, view.getHeight() * -1, 0);
-        animation.setDuration(500);
+        animation.setDuration(300);
         animation.setInterpolator(new DecelerateInterpolator(5));
         view.startAnimation(animation);
     }
 
     public static void moveFromBottom(View view) {
         TranslateAnimation animation = new TranslateAnimation(0, 0, view.getHeight(), 0);
-        animation.setDuration(500);
+        animation.setDuration(300);
         animation.setInterpolator(new DecelerateInterpolator(5));
         view.startAnimation(animation);
     }
