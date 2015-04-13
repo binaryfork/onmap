@@ -10,11 +10,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.activities.AbstractMapActivity;
 import com.binaryfork.onmap.network.Media;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
@@ -34,20 +38,34 @@ public class Clusterer {
     private int markerDimension;
     private HashSet<Target> targets = new HashSet<>();
 
-    public Clusterer(Activity activity, GoogleMap map,
-                     ClusterManager.OnClusterItemClickListener<MediaClusterItem> listener) {
+    public Clusterer(Activity activity, GoogleMap googleMap,
+                     ClusterManager.OnClusterItemClickListener<MediaClusterItem> listener,
+                     final AbstractMapActivity.OnMulipleMediaClickListener onMulipleMediaClickListener) {
         this.activity = activity;
-        this.map = map;
-        init(listener);
-    }
+        this.map = googleMap;
 
-    private void init(ClusterManager.OnClusterItemClickListener<MediaClusterItem> listener) {
         markerDimension = (int) activity.getResources().getDimension(R.dimen.map_marker_photo);
         videoIcon = activity.getResources().getDrawable(android.R.drawable.ic_media_play);
 
-        clusterManager = new ClusterManager<MediaClusterItem>(activity, map);
+        clusterManager = new ClusterManager<>(activity, map);
         clusterManager.setRenderer(new MediaRenderer());
         clusterManager.setOnClusterItemClickListener(listener);
+        clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MediaClusterItem>() {
+            @Override
+            public boolean onClusterClick(Cluster<MediaClusterItem> cluster) {
+                LatLngBounds.Builder builder = LatLngBounds.builder();
+                for (ClusterItem item : cluster.getItems()) {
+                    builder.include(item.getPosition());
+                }
+                final LatLngBounds bounds = builder.build();
+                if (bounds.southwest.equals(bounds.northeast)) {
+                    onMulipleMediaClickListener.onMediaClick(cluster);
+                } else {
+                    map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 400));
+                }
+                return true;
+            }
+        });
         map.setOnCameraChangeListener(clusterManager);
         map.setOnMarkerClickListener(clusterManager);
     }

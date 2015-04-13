@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.widget;
+package com.binaryfork.onmap.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;

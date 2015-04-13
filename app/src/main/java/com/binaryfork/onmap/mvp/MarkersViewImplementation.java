@@ -3,6 +3,7 @@ package com.binaryfork.onmap.mvp;
 import android.app.Activity;
 
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.activities.AbstractMapActivity;
 import com.binaryfork.onmap.clustering.Clusterer;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.network.Media;
@@ -30,8 +31,9 @@ public class MarkersViewImplementation implements MarkersView {
         this.activity = activity;
     }
 
-    public void setupClusterer(ClusterManager.OnClusterItemClickListener<MediaClusterItem> listener) {
-        clusterer = new Clusterer(activity, map, listener);
+    public void setupClusterer(ClusterManager.OnClusterItemClickListener<MediaClusterItem> listener,
+                               AbstractMapActivity.OnMulipleMediaClickListener onMulipleMediaClickListener) {
+        clusterer = new Clusterer(activity, map, listener, onMulipleMediaClickListener);
     }
 
     @Override

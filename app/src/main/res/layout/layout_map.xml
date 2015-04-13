@@ -40,11 +40,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.binaryfork.onmap.widget.LocationSearchBox
+    <com.binaryfork.onmap.ui.LocationSearchBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/searchbox"
         />
+
+    <com.binaryfork.onmap.ui.ClusterGridView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#9000"
+        android:id="@+id/gridView" />
 
     <include layout="@layout/layout_photo"/>
 </RelativeLayout>

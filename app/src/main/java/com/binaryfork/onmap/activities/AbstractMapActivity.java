@@ -18,13 +18,15 @@ import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
 import com.binaryfork.onmap.network.ApiSource;
+import com.binaryfork.onmap.ui.ClusterGridView;
+import com.binaryfork.onmap.ui.LocationSearchBox;
 import com.binaryfork.onmap.util.DateUtils;
-import com.binaryfork.onmap.widget.LocationSearchBox;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
@@ -50,6 +52,10 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
 
     @InjectView(R.id.left_drawer)
     ListView drawerList;
+
+    @InjectView(R.id.gridView)
+    ClusterGridView gridView;
+
     private long maxTimestampSeconds;
 
     protected GoogleMap map;
@@ -57,6 +63,11 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     protected MarkersViewImplementation view;
 
     protected abstract void onPhotoOpen(MediaClusterItem clusterTargetItem);
+
+    public interface OnMulipleMediaClickListener {
+
+        void onMediaClick(Cluster<MediaClusterItem> cluster);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +84,20 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
                 onPhotoOpen(clusterTargetItem);
                 return true;
             }
+        }, new OnMulipleMediaClickListener() {
+            @Override
+            public void onMediaClick(Cluster<MediaClusterItem> cluster) {
+                showPhotoGrid(cluster);
+            }
         });
         presenter = new PresenterImplementation(model, view, getApplicationContext());
 
-        searchBox.setOnSuggestionClickListener(onSearchSuggestionClick());
+        searchBox.setOnSuggestionClickListener(new SearchBox.OnSuggestionClick() {
+            @Override
+            public void onSuggestionClick(SearchResult searchResult) {
+                goToLocation(new LatLng(searchResult.lat, searchResult.lng));
+            }
+        });
         searchBox.setMenuListener(new SearchBox.MenuListener() {
             @Override
             public void onMenuClick() {
@@ -119,59 +140,19 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         }
     }
 
+    private void showPhotoGrid(Cluster<MediaClusterItem> cluster) {
+        gridView.setVisibility(View.VISIBLE);
+        gridView.setupData(cluster);
+    }
+
+    private void hidePhotoGrid() {
+        gridView.setVisibility(View.GONE);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         presenter.onDestroy();
-    }
-
-    @OnClick(R.id.calendar)
-    void datePicker() {
-        final Calendar calendar = Calendar.getInstance();
-        new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                calendar.set(Calendar.YEAR, year);
-                calendar.set(Calendar.MONTH, monthOfYear);
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                calendar.set(Calendar.HOUR_OF_DAY, 23);
-                calendar.set(Calendar.MINUTE, 59);
-                calendar.set(Calendar.SECOND, 59);
-                maxTimestampSeconds = calendar.getTimeInMillis() / 1000;
-                dateTxt.setText(DateUtils.getWeekInterval(maxTimestampSeconds));
-                setupPhotosOnMap();
-            }
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
-    }
-
-    private void setInstagramIntervalToCurrentTime() {
-        maxTimestampSeconds = Calendar.getInstance().getTimeInMillis() / 1000;
-        dateTxt.setText(DateUtils.getWeekInterval(maxTimestampSeconds));
-    }
-
-    private SearchBox.OnSuggestionClick onSearchSuggestionClick() {
-        return new SearchBox.OnSuggestionClick() {
-            @Override
-            public void onSuggestionClick(SearchResult searchResult) {
-                goToLocation(new LatLng(searchResult.lat, searchResult.lng));
-            }
-        };
-    }
-
-    // Required by SearchBox.
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1234 && resultCode == RESULT_OK) {
-            ArrayList<String> matches = data
-                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            searchBox.populateEditText(matches);
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    // Required by SearchBox.
-    public void mic(View v) {
-        searchBox.micClick(this);
     }
 
     private void setUpMapIfNeeded() {
@@ -212,4 +193,53 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         presenter.getMediaByLocationAndDate(location, DateUtils.weekAgoTime(maxTimestampSeconds), maxTimestampSeconds);
     }
 
+    @OnClick(R.id.calendar)
+    void datePicker() {
+        final Calendar calendar = Calendar.getInstance();
+        new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, monthOfYear);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                calendar.set(Calendar.HOUR_OF_DAY, 23);
+                calendar.set(Calendar.MINUTE, 59);
+                calendar.set(Calendar.SECOND, 59);
+                maxTimestampSeconds = calendar.getTimeInMillis() / 1000;
+                dateTxt.setText(DateUtils.getWeekInterval(maxTimestampSeconds));
+                setupPhotosOnMap();
+            }
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private void setInstagramIntervalToCurrentTime() {
+        maxTimestampSeconds = Calendar.getInstance().getTimeInMillis() / 1000;
+        dateTxt.setText(DateUtils.getWeekInterval(maxTimestampSeconds));
+    }
+
+
+    // Required by SearchBox.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1234 && resultCode == RESULT_OK) {
+            ArrayList<String> matches = data
+                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            searchBox.populateEditText(matches);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    // Required by SearchBox.
+    public void mic(View v) {
+        searchBox.micClick(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (gridView.isShown()) {
+            hidePhotoGrid();
+        } else {
+            super.onBackPressed();
+        }
+    }
 }
