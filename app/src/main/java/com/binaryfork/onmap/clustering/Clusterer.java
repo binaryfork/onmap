@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.activities.AbstractMapActivity;
+import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.network.Media;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class Clusterer {
 
     private final Activity activity;
@@ -38,9 +40,7 @@ public class Clusterer {
     private int markerDimension;
     private HashSet<Target> targets = new HashSet<>();
 
-    public Clusterer(Activity activity, GoogleMap googleMap,
-                     ClusterManager.OnClusterItemClickListener<MediaClusterItem> listener,
-                     final AbstractMapActivity.OnMulipleMediaClickListener onMulipleMediaClickListener) {
+    public Clusterer(Activity activity, GoogleMap googleMap, final MapMediaView mapMediaView) {
         this.activity = activity;
         this.map = googleMap;
 
@@ -49,7 +49,13 @@ public class Clusterer {
 
         clusterManager = new ClusterManager<>(activity, map);
         clusterManager.setRenderer(new MediaRenderer());
-        clusterManager.setOnClusterItemClickListener(listener);
+        clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MediaClusterItem>() {
+            @Override
+            public boolean onClusterItemClick(MediaClusterItem mediaClusterItem) {
+                mapMediaView.openPhoto(mediaClusterItem);
+                return true;
+            }
+        });
         clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MediaClusterItem>() {
             @Override
             public boolean onClusterClick(Cluster<MediaClusterItem> cluster) {
@@ -58,8 +64,10 @@ public class Clusterer {
                     builder.include(item.getPosition());
                 }
                 final LatLngBounds bounds = builder.build();
+                Timber.i("Bounds %s", bounds.northeast);
+                Timber.i("Bounds %s", bounds.southwest);
                 if (bounds.southwest.equals(bounds.northeast)) {
-                    onMulipleMediaClickListener.onMediaClick(cluster);
+                    mapMediaView.clickPhotoCluster(cluster);
                 } else {
                     map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 400));
                 }

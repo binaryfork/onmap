@@ -4,7 +4,11 @@ import com.google.android.gms.maps.model.LatLng;
 
 public interface Presenter {
 
-    void getMediaByLocationAndDate(LatLng location, long from, long to);
+    void backInTime();
+    void forwardInTime();
+    void toCurrentTime();
+    void setTime(long time);
+    void getMedia(LatLng location);
     void onDestroy();
 
 }

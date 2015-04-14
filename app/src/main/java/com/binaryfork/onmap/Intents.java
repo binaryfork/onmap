@@ -1,15 +1,15 @@
 package com.binaryfork.onmap;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 
 public class Intents {
 
-    public static void openLink(Context context, String link) {
+    public static void openLink(Activity activity, String link) {
         Intent newIntent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse(link));
-        context.startActivity(newIntent);
+        activity.startActivity(newIntent);
     }
 
 }

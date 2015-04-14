@@ -3,9 +3,7 @@ package com.binaryfork.onmap.mvp;
 import android.app.Activity;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.activities.AbstractMapActivity;
 import com.binaryfork.onmap.clustering.Clusterer;
-import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.network.MediaList;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,7 +11,6 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.clustering.ClusterManager;
 import com.squareup.picasso.Picasso;
 
 public class MarkersViewImplementation implements MarkersView {
@@ -24,16 +21,17 @@ public class MarkersViewImplementation implements MarkersView {
     private final GoogleMap map;
     private Circle mapCircle;
     private Clusterer clusterer;
-    public LatLng location;
+    private LatLng location;
 
-    public MarkersViewImplementation(GoogleMap map, Activity activity) {
+    public MarkersViewImplementation(GoogleMap map, Activity activity, MapMediaView mapMediaView) {
         this.map = map;
         this.activity = activity;
+        clusterer = new Clusterer(activity, map, mapMediaView);
     }
 
-    public void setupClusterer(ClusterManager.OnClusterItemClickListener<MediaClusterItem> listener,
-                               AbstractMapActivity.OnMulipleMediaClickListener onMulipleMediaClickListener) {
-        clusterer = new Clusterer(activity, map, listener, onMulipleMediaClickListener);
+    @Override
+    public void setLocation(LatLng location) {
+        this.location = location;
     }
 
     @Override

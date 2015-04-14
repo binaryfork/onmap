@@ -1,16 +1,16 @@
-package com.binaryfork.onmap.activities;
+package com.binaryfork.onmap.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Bundle;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
@@ -26,56 +26,55 @@ import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.util.CircleTransform;
 import com.binaryfork.onmap.util.DateUtils;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import timber.log.Timber;
 
-public class PhotoActivity extends AbstractMapActivity {
+public class MediaContainerView {
 
+    private final Activity activity;
+    private final GoogleMap map;
     private AnimatorSet mCurrentAnimator;
     private Rect startBounds;
     private float startScaleFinal;
     private Media media;
     private int markerPhotoSize;
 
+    private final View container;
     @InjectView(R.id.expanded_image) ImageView expandedImage;
-    @InjectView(R.id.info_layout) View infoLayout;
     @InjectView(R.id.username) TextView usernameTxt;
     @InjectView(R.id.comments) TextView commentsTxt;
     @InjectView(R.id.user_photo) ImageView userPhoto;
     @InjectView(R.id.videoView) VideoView videoView;
 
-    @Override
-    public void onBackPressed() {
-        if (infoLayout.isShown()) {
-            hideMediaInfo();
-        } else {
-            super.onBackPressed();
-        }
+    public MediaContainerView(View container, GoogleMap map, Activity activity) {
+        ButterKnife.inject(this, container);
+        this.container = container;
+        this.map = map;
+        this.activity = activity;
     }
 
-    public void onClickUsername(View view) {
-        Intents.openLink(this, media.getSiteUrl());
+    @OnClick(R.id.username)
+    public void onClickUsername() {
+        Intents.openLink(activity, media.getSiteUrl());
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    protected void onPhotoOpen(MediaClusterItem clusterTargetItem) {
+    public void onPhotoOpen(MediaClusterItem clusterTargetItem) {
         media = clusterTargetItem.media;
         Projection projection = map.getProjection();
         LatLng markerLocation = clusterTargetItem.getPosition();
         Point markerPosition = projection.toScreenLocation(markerLocation);
 
         if (media != null) {
-            infoLayout.setVisibility(View.VISIBLE);
-            Drawable d = new BitmapDrawable(getResources(), clusterTargetItem.thumbBitmap);
-            Picasso.with(getApplicationContext())
+            container.setVisibility(View.VISIBLE);
+            Drawable d = new BitmapDrawable(activity.getResources(), clusterTargetItem.thumbBitmap);
+            Picasso.with(activity)
                     .load(media.getPhotoUrl())
                     .placeholder(d)
                     .into(expandedImage);
@@ -93,7 +92,7 @@ public class PhotoActivity extends AbstractMapActivity {
 
         commentsTxt.setText(media.getComments());
 
-        Picasso.with(getApplicationContext()).load(media.getUserpic())
+        Picasso.with(activity).load(media.getUserpic())
                 .transform(new CircleTransform())
                 .into(userPhoto);
         if (media.isVideo()) {
@@ -115,7 +114,7 @@ public class PhotoActivity extends AbstractMapActivity {
         });
     }
 
-    private void hideMediaInfo() {
+    public void hideMediaInfo() {
         Animations.moveTo(commentsTxt, true);
         Animations.moveTo(userPhoto, false);
         Animations.moveTo(usernameTxt, false, new Animation.AnimationListener() {
@@ -144,7 +143,7 @@ public class PhotoActivity extends AbstractMapActivity {
 
     protected int getMarkerPhotoSize() {
         if (markerPhotoSize == 0)
-            markerPhotoSize = (int) getResources().getDimension(R.dimen.map_marker_photo);
+            markerPhotoSize = (int) activity.getResources().getDimension(R.dimen.map_marker_photo);
         return markerPhotoSize;
     }
 
@@ -172,7 +171,7 @@ public class PhotoActivity extends AbstractMapActivity {
         startBounds.top = startPoint.y - getMarkerPhotoSize() / 2;
         startBounds.bottom = startPoint.y + getMarkerPhotoSize() / 2;
 
-        findViewById(R.id.container).getGlobalVisibleRect(finalBounds, globalOffset);
+        container.getGlobalVisibleRect(finalBounds, globalOffset);
         startBounds.offset(-globalOffset.x, -globalOffset.y);
         finalBounds.offset(-globalOffset.x, -globalOffset.y + usernameTxt.getHeight());
 
@@ -275,14 +274,14 @@ public class PhotoActivity extends AbstractMapActivity {
         set.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                infoLayout.setVisibility(View.INVISIBLE);
+                container.setVisibility(View.INVISIBLE);
                 expandedImage.setVisibility(View.INVISIBLE);
                 mCurrentAnimator = null;
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
-                infoLayout.setVisibility(View.INVISIBLE);
+                container.setVisibility(View.INVISIBLE);
                 expandedImage.setVisibility(View.INVISIBLE);
                 mCurrentAnimator = null;
             }

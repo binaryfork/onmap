@@ -4,9 +4,11 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.network.google.GoogleGeo;
 import com.binaryfork.onmap.network.google.model.GeocodeItem;
 import com.binaryfork.onmap.network.google.model.GeocodeResults;
+import com.google.android.gms.maps.model.LatLng;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 
@@ -36,7 +38,7 @@ public class LocationSearchBox extends SearchBox {
         init();
     }
 
-    public void init() {
+    private void init() {
         setLogoText("Search location");
         onSearchTextChanged()
                 .debounce(200, TimeUnit.MILLISECONDS)
@@ -56,6 +58,21 @@ public class LocationSearchBox extends SearchBox {
                         showSearchSuggestions(results);
                     }
                 });
+    }
+
+    public void setup(final MapMediaView mapMediaView) {
+        setOnSuggestionClickListener(new OnSuggestionClick() {
+            @Override
+            public void onSuggestionClick(SearchResult searchResult) {
+                mapMediaView.goToLocation(new LatLng(searchResult.lat, searchResult.lng));
+            }
+        });
+        setMenuListener(new MenuListener() {
+            @Override
+            public void onMenuClick() {
+                mapMediaView.onMenuClick();
+            }
+        });
     }
 
     public Observable<GeocodeResults> suggestLocations(Context context, String query) {

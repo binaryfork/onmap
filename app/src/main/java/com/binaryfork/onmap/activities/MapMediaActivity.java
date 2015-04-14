@@ -14,22 +14,20 @@ import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
+import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
 import com.binaryfork.onmap.network.ApiSource;
 import com.binaryfork.onmap.ui.ClusterGridView;
 import com.binaryfork.onmap.ui.LocationSearchBox;
-import com.binaryfork.onmap.util.DateUtils;
+import com.binaryfork.onmap.ui.MediaContainerView;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterManager;
-import com.quinny898.library.persistentsearch.SearchBox;
-import com.quinny898.library.persistentsearch.SearchResult;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,35 +37,21 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public abstract class AbstractMapActivity extends AbstractLocationActivity implements GoogleMap.OnMapClickListener {
+public class MapMediaActivity extends AbstractLocationActivity implements
+        GoogleMap.OnMapClickListener,
+        MapMediaView {
 
-    @InjectView(R.id.date)
-    TextView dateTxt;
+    @InjectView(R.id.date) TextView dateTxt;
+    @InjectView(R.id.searchbox) LocationSearchBox searchBox;
+    @InjectView(R.id.drawer_layout) DrawerLayout drawerLayout;
+    @InjectView(R.id.left_drawer) ListView drawerList;
+    @InjectView(R.id.info_layout) View mediaContainerLayout;
+    @InjectView(R.id.gridView) ClusterGridView gridView;
 
-    @InjectView(R.id.searchbox)
-    LocationSearchBox searchBox;
-
-    @InjectView(R.id.drawer_layout)
-    DrawerLayout drawerLayout;
-
-    @InjectView(R.id.left_drawer)
-    ListView drawerList;
-
-    @InjectView(R.id.gridView)
-    ClusterGridView gridView;
-
-    private long maxTimestampSeconds;
-
-    protected GoogleMap map;
-    protected PresenterImplementation presenter;
-    protected MarkersViewImplementation view;
-
-    protected abstract void onPhotoOpen(MediaClusterItem clusterTargetItem);
-
-    public interface OnMulipleMediaClickListener {
-
-        void onMediaClick(Cluster<MediaClusterItem> cluster);
-    }
+    private GoogleMap map;
+    private PresenterImplementation presenter;
+    private MarkersViewImplementation view;
+    private MediaContainerView mediaContainerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,39 +59,6 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         setContentView(R.layout.activity_main);
         setUpMapIfNeeded();
         ButterKnife.inject(this);
-
-        ModelImplementation model = new ModelImplementation();
-        view = new MarkersViewImplementation(map, this);
-        view.setupClusterer(new ClusterManager.OnClusterItemClickListener<MediaClusterItem>() {
-            @Override
-            public boolean onClusterItemClick(MediaClusterItem clusterTargetItem) {
-                onPhotoOpen(clusterTargetItem);
-                return true;
-            }
-        }, new OnMulipleMediaClickListener() {
-            @Override
-            public void onMediaClick(Cluster<MediaClusterItem> cluster) {
-                showPhotoGrid(cluster);
-            }
-        });
-        presenter = new PresenterImplementation(model, view, getApplicationContext());
-
-        searchBox.setOnSuggestionClickListener(new SearchBox.OnSuggestionClick() {
-            @Override
-            public void onSuggestionClick(SearchResult searchResult) {
-                goToLocation(new LatLng(searchResult.lat, searchResult.lng));
-            }
-        });
-        searchBox.setMenuListener(new SearchBox.MenuListener() {
-            @Override
-            public void onMenuClick() {
-                if (drawerLayout.isDrawerOpen(drawerList))
-                    drawerLayout.closeDrawer(drawerList);
-                else
-                    drawerLayout.openDrawer(drawerList);
-            }
-        });
-
         drawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
                 getResources().getStringArray(R.array.api_sources)));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -124,20 +75,39 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
             }
         });
 
+        ModelImplementation model = new ModelImplementation();
+        view = new MarkersViewImplementation(map, this, this);
+        presenter = new PresenterImplementation(model, view, this, getApplicationContext());
+        presenter.toCurrentTime();
+        searchBox.setup(this);
+
+        mediaContainerView = new MediaContainerView(mediaContainerLayout, map, this);
+
         dateTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                maxTimestampSeconds = DateUtils.weekAgoTime(maxTimestampSeconds);
-                dateTxt.setText(DateUtils.getWeekInterval(maxTimestampSeconds));
-                setupPhotosOnMap();
+                presenter.backInTime();
             }
         });
-
-        setInstagramIntervalToCurrentTime();
-
         if (location != null) {
             goToLocation(location);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
+    @Override
+    public void openPhoto(MediaClusterItem clusterTargetItem) {
+        mediaContainerView.onPhotoOpen(clusterTargetItem);
+    }
+
+    @Override
+    public void clickPhotoCluster(Cluster<MediaClusterItem> cluster) {
+        showPhotoGrid(cluster);
     }
 
     private void showPhotoGrid(Cluster<MediaClusterItem> cluster) {
@@ -150,9 +120,27 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        presenter.onDestroy();
+    public void onMenuClick() {
+        if (drawerLayout.isDrawerOpen(drawerList))
+            drawerLayout.closeDrawer(drawerList);
+        else
+            drawerLayout.openDrawer(drawerList);
+    }
+
+    @Override
+    public void showTime(String time) {
+        dateTxt.setText(time);
+    }
+
+    @Override
+    public void goToLocation(LatLng latLng) {
+        if (latLng == null)
+            return;
+        presenter.toCurrentTime();
+        location = latLng;
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
+        map.animateCamera(cameraUpdate);
+        presenter.getMedia(location);
     }
 
     private void setUpMapIfNeeded() {
@@ -176,23 +164,6 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
         goToLocation(latLng);
     }
 
-    private void goToLocation(LatLng latLng) {
-        if (latLng == null) {
-            return;
-        }
-        setInstagramIntervalToCurrentTime();
-        location = latLng;
-        setupPhotosOnMap();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
-        map.animateCamera(cameraUpdate);
-    }
-
-    private void setupPhotosOnMap() {
-        view.location = location;
-        view.showCenterMarker();
-        presenter.getMediaByLocationAndDate(location, DateUtils.weekAgoTime(maxTimestampSeconds), maxTimestampSeconds);
-    }
-
     @OnClick(R.id.calendar)
     void datePicker() {
         final Calendar calendar = Calendar.getInstance();
@@ -205,18 +176,10 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
                 calendar.set(Calendar.HOUR_OF_DAY, 23);
                 calendar.set(Calendar.MINUTE, 59);
                 calendar.set(Calendar.SECOND, 59);
-                maxTimestampSeconds = calendar.getTimeInMillis() / 1000;
-                dateTxt.setText(DateUtils.getWeekInterval(maxTimestampSeconds));
-                setupPhotosOnMap();
+                presenter.setTime(calendar.getTimeInMillis() / 1000);
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
-
-    private void setInstagramIntervalToCurrentTime() {
-        maxTimestampSeconds = Calendar.getInstance().getTimeInMillis() / 1000;
-        dateTxt.setText(DateUtils.getWeekInterval(maxTimestampSeconds));
-    }
-
 
     // Required by SearchBox.
     @Override
@@ -236,7 +199,9 @@ public abstract class AbstractMapActivity extends AbstractLocationActivity imple
 
     @Override
     public void onBackPressed() {
-        if (gridView.isShown()) {
+        if (mediaContainerLayout.isShown()) {
+            mediaContainerView.hideMediaInfo();
+        } else if (gridView.isShown()) {
             hidePhotoGrid();
         } else {
             super.onBackPressed();
