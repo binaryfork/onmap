@@ -40,11 +40,14 @@ public class MediaContainerView {
 
     private final Activity activity;
     private final GoogleMap map;
-    private AnimatorSet mCurrentAnimator;
-    private Rect startBounds;
-    private float startScaleFinal;
     private Media media;
+
+    private Rect startBounds;
+    private Point globalOffset;
+    private Rect finalBounds;
+    private float startScaleFinal;
     private int markerPhotoSize;
+    private AnimatorSet mCurrentAnimator;
 
     private final View container;
     @InjectView(R.id.expanded_image) ImageView expandedImage;
@@ -52,6 +55,7 @@ public class MediaContainerView {
     @InjectView(R.id.comments) TextView commentsTxt;
     @InjectView(R.id.user_photo) ImageView userPhoto;
     @InjectView(R.id.videoView) VideoView videoView;
+    private View gridItemView;
 
     public MediaContainerView(View container, GoogleMap map, Activity activity) {
         ButterKnife.inject(this, container);
@@ -65,12 +69,8 @@ public class MediaContainerView {
         Intents.openLink(activity, media.getSiteUrl());
     }
 
-    public void onPhotoOpen(MediaClusterItem clusterTargetItem) {
-        media = clusterTargetItem.media;
-        Projection projection = map.getProjection();
-        LatLng markerLocation = clusterTargetItem.getPosition();
-        Point markerPosition = projection.toScreenLocation(markerLocation);
-
+    public void openPhotoFromMap(MediaClusterItem clusterTargetItem) {
+        this.media = clusterTargetItem.media;
         if (media != null) {
             container.setVisibility(View.VISIBLE);
             Drawable d = new BitmapDrawable(activity.getResources(), clusterTargetItem.thumbBitmap);
@@ -78,8 +78,42 @@ public class MediaContainerView {
                     .load(media.getPhotoUrl())
                     .placeholder(d)
                     .into(expandedImage);
-            zoomImageFromThumb(markerPosition);
+            setupDimensions();
+            Projection projection = map.getProjection();
+            LatLng markerLocation = clusterTargetItem.getPosition();
+            Point markerPosition = projection.toScreenLocation(markerLocation);
+            Rect thumbBounds = new Rect();
+            thumbBounds.left = markerPosition.x - getMarkerPhotoSize() / 2;
+            thumbBounds.right = markerPosition.x + getMarkerPhotoSize() / 2;
+            thumbBounds.top = markerPosition.y - getMarkerPhotoSize() / 2;
+            thumbBounds.bottom = markerPosition.y + getMarkerPhotoSize() / 2;
+            thumbBounds.offset(-globalOffset.x, -globalOffset.y);
+            zoomImageFromThumb(thumbBounds);
         }
+    }
+
+    public void openPhotoFromGrid(Media media, View thumbView) {
+        this.media = media;
+        if (media != null) {
+            container.setVisibility(View.VISIBLE);
+            gridItemView = thumbView;
+            gridItemView.setVisibility(View.INVISIBLE);
+            Picasso.with(activity)
+                    .load(media.getPhotoUrl())
+                    .into(expandedImage);
+            setupDimensions();
+            Rect thumbBounds = new Rect();
+            thumbView.getGlobalVisibleRect(thumbBounds);
+            thumbBounds.offset(-globalOffset.x, -globalOffset.y + usernameTxt.getHeight());
+            zoomImageFromThumb(thumbBounds);
+        }
+    }
+
+    private void setupDimensions() {
+        finalBounds = new Rect();
+        globalOffset = new Point();
+        container.getGlobalVisibleRect(finalBounds, globalOffset);
+        finalBounds.offset(-globalOffset.x, -globalOffset.y + usernameTxt.getHeight());
     }
 
     private void showMediaInfo() {
@@ -147,7 +181,7 @@ public class MediaContainerView {
         return markerPhotoSize;
     }
 
-    private void zoomImageFromThumb(Point startPoint) {
+    private void zoomImageFromThumb(Rect thumbBounds) {
         // If there's an animation in progress, cancel it
         // immediately and proceed with this one.
         if (mCurrentAnimator != null) {
@@ -156,25 +190,13 @@ public class MediaContainerView {
 
         // Calculate the starting and ending bounds for the zoomed-in image.
         // This step involves lots of math. Yay, math.
-        startBounds = new Rect();
-        final Rect finalBounds = new Rect();
-        final Point globalOffset = new Point();
 
         // The start bounds are the global visible rectangle of the thumbnail,
         // and the final bounds are the global visible rectangle of the container
         // view. Also set the container view's offset as the origin for the
         // bounds, since that's the origin for the positioning animation
         // properties (X, Y).
-        //     thumbView.getGlobalVisibleRect(startBounds);
-        startBounds.left = startPoint.x - getMarkerPhotoSize() / 2;
-        startBounds.right = startPoint.x + getMarkerPhotoSize() / 2;
-        startBounds.top = startPoint.y - getMarkerPhotoSize() / 2;
-        startBounds.bottom = startPoint.y + getMarkerPhotoSize() / 2;
-
-        container.getGlobalVisibleRect(finalBounds, globalOffset);
-        startBounds.offset(-globalOffset.x, -globalOffset.y);
-        finalBounds.offset(-globalOffset.x, -globalOffset.y + usernameTxt.getHeight());
-
+        startBounds = thumbBounds;
 
         // Adjust the start bounds to be the same aspect ratio as the final
         // bounds using the "center crop" technique. This prevents undesirable
@@ -276,6 +298,8 @@ public class MediaContainerView {
             public void onAnimationEnd(Animator animation) {
                 container.setVisibility(View.INVISIBLE);
                 expandedImage.setVisibility(View.INVISIBLE);
+                if (gridItemView != null)
+                    gridItemView.setVisibility(View.VISIBLE);
                 mCurrentAnimator = null;
             }
 
@@ -283,6 +307,8 @@ public class MediaContainerView {
             public void onAnimationCancel(Animator animation) {
                 container.setVisibility(View.INVISIBLE);
                 expandedImage.setVisibility(View.INVISIBLE);
+                if (gridItemView != null)
+                    gridItemView.setVisibility(View.VISIBLE);
                 mCurrentAnimator = null;
             }
         });

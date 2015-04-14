@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import timber.log.Timber;
-
 public class Clusterer {
 
     private final Activity activity;
@@ -64,12 +62,13 @@ public class Clusterer {
                     builder.include(item.getPosition());
                 }
                 final LatLngBounds bounds = builder.build();
-                Timber.i("Bounds %s", bounds.northeast);
-                Timber.i("Bounds %s", bounds.southwest);
-                if (bounds.southwest.equals(bounds.northeast)) {
+                if (map.getMaxZoomLevel() == map.getCameraPosition().zoom
+                        || bounds.southwest.equals(bounds.northeast)) {
                     mapMediaView.clickPhotoCluster(cluster);
                 } else {
-                    map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 400));
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), map
+                            .getCameraPosition().zoom + 1));
+                   //map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
                 }
                 return true;
             }
@@ -98,9 +97,11 @@ public class Clusterer {
                     clusterManager.cluster();
                 }
             }
+
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
             }
+
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
             }

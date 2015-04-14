@@ -3,7 +3,7 @@ package com.binaryfork.onmap.activities;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -15,8 +15,6 @@ import icepick.Icicle;
 
 public abstract class AbstractLocationActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
-    private final String TAG = "LocationActivity";
 
     private GoogleApiClient googleApiClient;
 
@@ -72,11 +70,10 @@ public abstract class AbstractLocationActivity extends FragmentActivity implemen
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.i(TAG, "GoogleApiClient connection has been suspend");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.e(TAG, "Connection fail " + connectionResult.toString());
+        Toast.makeText(this, connectionResult.toString(), Toast.LENGTH_LONG).show();
     }
 }

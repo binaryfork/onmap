@@ -50,7 +50,6 @@ public class MapMediaActivity extends AbstractLocationActivity implements
 
     private GoogleMap map;
     private PresenterImplementation presenter;
-    private MarkersViewImplementation view;
     private MediaContainerView mediaContainerView;
 
     @Override
@@ -76,12 +75,12 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         });
 
         ModelImplementation model = new ModelImplementation();
-        view = new MarkersViewImplementation(map, this, this);
+        MarkersViewImplementation view = new MarkersViewImplementation(map, this, this);
         presenter = new PresenterImplementation(model, view, this, getApplicationContext());
-        presenter.toCurrentTime();
         searchBox.setup(this);
 
         mediaContainerView = new MediaContainerView(mediaContainerLayout, map, this);
+        gridView.mediaContainerView = mediaContainerView;
 
         dateTxt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +93,16 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         }
     }
 
+    private void setUpMapIfNeeded() {
+        if (map == null) {
+            map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                    .getMap();
+            map.setOnMapClickListener(this);
+            map.setMyLocationEnabled(true);
+            map.getUiSettings().setZoomControlsEnabled(true);
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -102,7 +111,7 @@ public class MapMediaActivity extends AbstractLocationActivity implements
 
     @Override
     public void openPhoto(MediaClusterItem clusterTargetItem) {
-        mediaContainerView.onPhotoOpen(clusterTargetItem);
+        mediaContainerView.openPhotoFromMap(clusterTargetItem);
     }
 
     @Override
@@ -141,16 +150,6 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
         map.animateCamera(cameraUpdate);
         presenter.getMedia(location);
-    }
-
-    private void setUpMapIfNeeded() {
-        if (map == null) {
-            map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            map.setOnMapClickListener(this);
-            map.setMyLocationEnabled(true);
-            map.getUiSettings().setZoomControlsEnabled(true);
-        }
     }
 
     @Override

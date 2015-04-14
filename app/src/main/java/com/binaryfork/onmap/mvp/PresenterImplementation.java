@@ -31,6 +31,7 @@ public class PresenterImplementation implements Presenter {
         this.markersView = view;
         this.mapMediaView = mapMediaView;
         this.context = context;
+        toCurrentTime();
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
+import com.binaryfork.onmap.network.Media;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -38,6 +39,10 @@ public class ClusterAdapter extends RecyclerView.Adapter<ClusterAdapter.ViewHold
     @Override
     public int getItemCount() {
         return data.size();
+    }
+
+    public Media getItem(int position) {
+        return data.get(position).media;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
