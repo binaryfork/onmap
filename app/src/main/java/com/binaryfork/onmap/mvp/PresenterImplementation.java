@@ -23,8 +23,9 @@ public class PresenterImplementation implements Presenter {
     private final MapMediaView mapMediaView;
     private final Context context;
     private Subscription subscription;
-    private long maxTimestampSeconds;
     private LatLng location;
+    public long interval = 60 * 60 * 24; // 1 day
+    private long maxTimestampSeconds;
 
     public PresenterImplementation(Model model, MarkersView view, MapMediaView mapMediaView, Context context) {
         this.model = model;
@@ -36,8 +37,8 @@ public class PresenterImplementation implements Presenter {
 
     @Override
     public void backInTime() {
-        maxTimestampSeconds = DateUtils.weekAgoTime(maxTimestampSeconds);
-        mapMediaView.showTime(DateUtils.getWeekInterval(maxTimestampSeconds));
+        maxTimestampSeconds = DateUtils.minTimestamp(maxTimestampSeconds, interval);
+        mapMediaView.showTime(DateUtils.getInterval(maxTimestampSeconds, interval));
         getMedia(location);
     }
 
@@ -48,14 +49,19 @@ public class PresenterImplementation implements Presenter {
     @Override
     public void toCurrentTime() {
         maxTimestampSeconds = Calendar.getInstance().getTimeInMillis() / 1000;
-        mapMediaView.showTime(DateUtils.getWeekInterval(maxTimestampSeconds));
+        mapMediaView.showTime(DateUtils.getInterval(maxTimestampSeconds, interval));
     }
 
     @Override
     public void setTime(long time) {
         maxTimestampSeconds = time;
-        mapMediaView.showTime(DateUtils.getWeekInterval(maxTimestampSeconds));
+        mapMediaView.showTime(DateUtils.getInterval(maxTimestampSeconds, interval));
         getMedia(location);
+    }
+
+    @Override
+    public void setDistance(int distance) {
+
     }
 
     @Override
@@ -63,7 +69,7 @@ public class PresenterImplementation implements Presenter {
         this.location = location;
         markersView.setLocation(location);
         markersView.showCenterMarker();
-        long from = DateUtils.weekAgoTime(maxTimestampSeconds);
+        long from = DateUtils.minTimestamp(maxTimestampSeconds, interval);
         long to = maxTimestampSeconds;
         switch (apiSource) {
             case INSTAGRAM:

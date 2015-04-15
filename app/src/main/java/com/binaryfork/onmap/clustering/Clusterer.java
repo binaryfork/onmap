@@ -130,7 +130,7 @@ public class Clusterer {
         public MediaRenderer() {
             super(activity, map, clusterManager);
 
-            View multiProfile = activity.getLayoutInflater().inflate(R.layout.multi_profile, null);
+            View multiProfile = activity.getLayoutInflater().inflate(R.layout.map_marker_cluster, null);
             mClusterIconGenerator.setContentView(multiProfile);
             mClusterImageView = (ImageView) multiProfile.findViewById(R.id.image);
 

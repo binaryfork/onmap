@@ -46,5 +46,6 @@ dependencies {
 
     // Ui
     compile 'com.jakewharton:butterknife:6.1.0'
+    compile 'com.squareup:android-times-square:1.5.0@aar'
     compile project(':PersistentSearch-master')
 }

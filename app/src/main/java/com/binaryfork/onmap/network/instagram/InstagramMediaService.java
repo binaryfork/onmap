@@ -19,6 +19,7 @@ public interface InstagramMediaService {
             @Query("lng") double longitude,
             @Query("min_timestamp") long minTimestamp,
             @Query("max_timestamp") long maxTimestamp,
+            @Query("distance") int distance,
             @Query("count") int count);
 
     @GET("/media/search")

@@ -1,6 +1,5 @@
 package com.binaryfork.onmap.activities;
 
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -8,7 +7,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,6 +17,7 @@ import com.binaryfork.onmap.mvp.MarkersViewImplementation;
 import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
 import com.binaryfork.onmap.network.ApiSource;
+import com.binaryfork.onmap.ui.CalendarDialog;
 import com.binaryfork.onmap.ui.ClusterGridView;
 import com.binaryfork.onmap.ui.LocationSearchBox;
 import com.binaryfork.onmap.ui.MediaContainerView;
@@ -30,7 +29,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.Cluster;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -165,19 +163,19 @@ public class MapMediaActivity extends AbstractLocationActivity implements
 
     @OnClick(R.id.calendar)
     void datePicker() {
-        final Calendar calendar = Calendar.getInstance();
-        new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+        CalendarDialog calendarDialog = new CalendarDialog();
+        calendarDialog.onDateChangeListener = new CalendarDialog.OnDateChangeListener() {
             @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                calendar.set(Calendar.YEAR, year);
-                calendar.set(Calendar.MONTH, monthOfYear);
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                calendar.set(Calendar.HOUR_OF_DAY, 23);
-                calendar.set(Calendar.MINUTE, 59);
-                calendar.set(Calendar.SECOND, 59);
-                presenter.setTime(calendar.getTimeInMillis() / 1000);
+            public void onDateChanged(long maximumTimestamp) {
+                presenter.setTime(maximumTimestamp);
             }
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+
+            @Override
+            public void onRangeChanged(long rangeInterval) {
+                presenter.interval = rangeInterval;
+            }
+        };
+        calendarDialog.show(getSupportFragmentManager(), "date");
     }
 
     // Required by SearchBox.

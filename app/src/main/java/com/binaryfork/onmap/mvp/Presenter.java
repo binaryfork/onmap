@@ -8,6 +8,9 @@ public interface Presenter {
     void forwardInTime();
     void toCurrentTime();
     void setTime(long time);
+
+    void setDistance(int distance);
+
     void getMedia(LatLng location);
     void onDestroy();
 

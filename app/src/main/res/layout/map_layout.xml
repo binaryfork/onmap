@@ -53,5 +53,5 @@
         android:background="#9000"
         android:id="@+id/gridView" />
 
-    <include layout="@layout/layout_photo"/>
+    <include layout="@layout/photo_layout"/>
 </RelativeLayout>

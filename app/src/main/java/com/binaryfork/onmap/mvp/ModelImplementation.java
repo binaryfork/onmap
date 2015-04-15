@@ -13,6 +13,7 @@ import rx.Observable;
 public class ModelImplementation implements Model {
 
     private final int RESULTS_COUNT = 50;
+    private final int DISTANCE = 1000; // meters
 
     @Override
     public Observable<InstagramItems> loadMediaByLocation(Context context, LatLng location) {
@@ -25,7 +26,7 @@ public class ModelImplementation implements Model {
     public Observable<InstagramItems> loadMediaByLocationAndDate(Context context, LatLng location, long from, long to) {
         return Instagram.getInstance(context)
                 .mediaService()
-                .mediaSearch(location.latitude, location.longitude, from, to, RESULTS_COUNT);
+                .mediaSearch(location.latitude, location.longitude, from, to, DISTANCE, RESULTS_COUNT);
     }
 
     public Observable<FlickrPhotos> flickr(Context context, LatLng location) {

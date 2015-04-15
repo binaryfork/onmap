@@ -5,8 +5,8 @@ import java.util.Locale;
 
 public class DateUtils {
 
-    public static String getWeekInterval(long maxTimestamp) {
-        return formatDate(weekAgoTime(maxTimestamp)) + " - " + formatDate(maxTimestamp);
+    public static String getInterval(long maxTimestamp, long interval) {
+        return formatDate(minTimestamp(maxTimestamp, interval)) + " - " + formatDate(maxTimestamp);
     }
 
     public static String formatDate(long seconds) {
@@ -14,7 +14,7 @@ public class DateUtils {
         return serverFormat.format(seconds * 1000);
     }
 
-    public static long weekAgoTime(long timestamp) {
-        return timestamp - 60 * 60 * 24 * 1;
+    public static long minTimestamp(long maxTimestamp, long interval) {
+        return maxTimestamp - interval;
     }
 }
