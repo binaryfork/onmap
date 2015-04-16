@@ -21,17 +21,15 @@ public class PresenterImplementation implements Presenter {
     private final Model model;
     private final MarkersView markersView;
     private final MapMediaView mapMediaView;
-    private final Context context;
     private Subscription subscription;
     private LatLng location;
     public long interval = 60 * 60 * 24; // 1 day
     private long maxTimestampSeconds;
 
-    public PresenterImplementation(Model model, MarkersView view, MapMediaView mapMediaView, Context context) {
+    public PresenterImplementation(Model model, MarkersView view, MapMediaView mapMediaView) {
         this.model = model;
         this.markersView = view;
         this.mapMediaView = mapMediaView;
-        this.context = context;
         toCurrentTime();
     }
 
@@ -73,7 +71,7 @@ public class PresenterImplementation implements Presenter {
         long to = maxTimestampSeconds;
         switch (apiSource) {
             case INSTAGRAM:
-                subscription = model.loadMediaByLocationAndDate(context, location, from, to)
+                subscription = model.loadMediaByLocationAndDate(location, from, to)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Action1<InstagramItems>() {
                             @Override
@@ -83,7 +81,7 @@ public class PresenterImplementation implements Presenter {
                         });
                 break;
             case FLICKR:
-                subscription = model.flickr(context, location)
+                subscription = model.flickr(location)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Action1<FlickrPhotos>() {
                             @Override

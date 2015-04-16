@@ -1,7 +1,6 @@
 package com.binaryfork.onmap.network.flickr;
 
-import android.content.Context;
-
+import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.Constants;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.network.OkHttpInstance;
@@ -20,17 +19,12 @@ public class Flickr {
     private final static String EXTRAS = "url_m,url_q,geo,date_taken,owner_name,date_upload";
 
     private static Flickr instance;
-    private Context context;
 
     private RestAdapter restAdapter;
 
-    public Flickr(Context context) {
-        this.context = context;
-    }
-
-    public static Flickr getInstance(Context context) {
+    public static Flickr getInstance() {
         if (instance == null) {
-            instance = new Flickr(context);
+            instance = new Flickr();
         }
         return instance;
     }
@@ -39,12 +33,12 @@ public class Flickr {
         if (restAdapter == null) {
             RestAdapter.Builder builder = new RestAdapter.Builder();
             builder
-                    .setClient(new OkClient(OkHttpInstance.getOkHttpClient(context)))
+                    .setClient(new OkClient(OkHttpInstance.getOkHttpClient()))
                     .setEndpoint(BASE_URL)
                     .setRequestInterceptor(new RequestInterceptor() {
                         @Override
                         public void intercept(RequestFacade request) {
-                            request.addQueryParam("api_key", context.getString(R.string.fl));
+                            request.addQueryParam("api_key", BaseApplication.get().getString(R.string.fl));
                             request.addQueryParam("format", "json");
                             request.addQueryParam("nojsoncallback", "1");
                             request.addQueryParam("per_page", "50");

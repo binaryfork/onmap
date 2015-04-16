@@ -25,15 +25,11 @@ public class CalendarDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_calendar, null);
         ButterKnife.inject(this, view);
-
         builder.setView(view);
-
-        builder
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         setDate();
                     }
@@ -43,7 +39,6 @@ public class CalendarDialog extends DialogFragment {
 
                     }
                 });
-        // Create the AlertDialog object and return it
         return builder.create();
     }
 

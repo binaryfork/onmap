@@ -123,9 +123,7 @@ public class MediaContainerView {
         commentsTxt.setVisibility(View.VISIBLE);
         usernameTxt.setVisibility(View.VISIBLE);
         usernameTxt.setText(media.getUsername() + " " + DateUtils.formatDate(media.getCreatedDate()));
-
         commentsTxt.setText(media.getComments());
-
         Picasso.with(activity).load(media.getUserpic())
                 .transform(new CircleTransform())
                 .into(userPhoto);
@@ -154,9 +152,7 @@ public class MediaContainerView {
         Animations.moveTo(usernameTxt, false, new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-
             }
-
             @Override
             public void onAnimationEnd(Animation animation) {
                 userPhoto.setImageDrawable(null);
@@ -164,10 +160,8 @@ public class MediaContainerView {
                 commentsTxt.setVisibility(View.GONE);
                 zoomOutImage();
             }
-
             @Override
             public void onAnimationRepeat(Animation animation) {
-
             }
         });
         expandedImage.setVisibility(View.VISIBLE);

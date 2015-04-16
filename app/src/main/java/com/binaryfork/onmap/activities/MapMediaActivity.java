@@ -74,7 +74,7 @@ public class MapMediaActivity extends AbstractLocationActivity implements
 
         ModelImplementation model = new ModelImplementation();
         MarkersViewImplementation view = new MarkersViewImplementation(map, this, this);
-        presenter = new PresenterImplementation(model, view, this, getApplicationContext());
+        presenter = new PresenterImplementation(model, view, this);
         searchBox.setup(this);
 
         mediaContainerView = new MediaContainerView(mediaContainerLayout, map, this);

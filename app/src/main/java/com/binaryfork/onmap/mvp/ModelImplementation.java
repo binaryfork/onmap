@@ -16,21 +16,21 @@ public class ModelImplementation implements Model {
     private final int DISTANCE = 1000; // meters
 
     @Override
-    public Observable<InstagramItems> loadMediaByLocation(Context context, LatLng location) {
-        return Instagram.getInstance(context)
+    public Observable<InstagramItems> loadMediaByLocation(LatLng location) {
+        return Instagram.getInstance()
                 .mediaService()
                 .mediaSearch(location.latitude, location.longitude, RESULTS_COUNT);
     }
 
     @Override
-    public Observable<InstagramItems> loadMediaByLocationAndDate(Context context, LatLng location, long from, long to) {
-        return Instagram.getInstance(context)
+    public Observable<InstagramItems> loadMediaByLocationAndDate(LatLng location, long from, long to) {
+        return Instagram.getInstance()
                 .mediaService()
                 .mediaSearch(location.latitude, location.longitude, from, to, DISTANCE, RESULTS_COUNT);
     }
 
-    public Observable<FlickrPhotos> flickr(Context context, LatLng location) {
-        return Flickr.getInstance(context)
+    public Observable<FlickrPhotos> flickr(LatLng location) {
+        return Flickr.getInstance()
                 .photos()
                 .searchByLocation(location.latitude, location.longitude);
     }

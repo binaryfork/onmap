@@ -11,17 +11,12 @@ import retrofit.client.OkClient;
 public class GoogleGeo {
     private static final String API_URL = "http://maps.google.com/maps/api/geocode/";
     private static GoogleGeo instance;
-    private Context context;
 
     private RestAdapter restAdapter;
 
-    public GoogleGeo(Context context) {
-        this.context = context;
-    }
-
-    public static GoogleGeo getInstance(Context context) {
+    public static GoogleGeo getInstance() {
         if (instance == null) {
-            instance = new GoogleGeo(context);
+            instance = new GoogleGeo();
         }
         return instance;
     }
@@ -30,7 +25,7 @@ public class GoogleGeo {
         if (restAdapter == null) {
             RestAdapter.Builder builder = new RestAdapter.Builder();
             builder
-                    .setClient(new OkClient(OkHttpInstance.getOkHttpClient(context)))
+                    .setClient(new OkClient(OkHttpInstance.getOkHttpClient()))
                     .setEndpoint(API_URL);
 
             if (Constants.DEBUG) {

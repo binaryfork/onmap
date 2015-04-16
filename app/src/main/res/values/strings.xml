@@ -3,6 +3,7 @@
 
     <string name="app_name">OnMap</string>
     <string name="title_activity_maps">OnMap</string>
+    <string name="search_location_hint">Search location</string>
 
     <string-array name="api_sources">
         <item name="instagram">Instagram</item>
