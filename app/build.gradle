@@ -40,7 +40,7 @@ dependencies {
     compile 'io.reactivex:rxandroid:0.24.0'
 
     // Utility
-    compile 'com.jakewharton.timber:timber:2.7.1'
+    compile 'com.jakewharton.timber:timber:3.0.+'
     compile 'frankiesardo:icepick:3.0.2'
     provided 'frankiesardo:icepick-processor:3.0.2'
 
