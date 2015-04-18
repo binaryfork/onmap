@@ -13,11 +13,9 @@ public class BaseApplication extends Application {
         return instance;
     }
 
-    @Override
-    public void onCreate() {
+    @Override public void onCreate() {
         super.onCreate();
         instance = getApplicationContext();
-
         if (BuildConfig.DEBUG) {
             Timber.plant(new LineNumberTree());
         } else {
@@ -31,7 +29,6 @@ public class BaseApplication extends Application {
         }
     }
 
-    /** A tree which logs important information for crash reporting. */
     private static class CrashReportingTree extends Timber.Tree {
         @Override protected void log(int priority, String tag, String message, Throwable t) {
             // Add Crashlytics reporting.

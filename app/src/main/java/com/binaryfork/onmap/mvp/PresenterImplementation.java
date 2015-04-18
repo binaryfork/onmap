@@ -1,14 +1,10 @@
 package com.binaryfork.onmap.mvp;
 
-import android.content.Context;
-
 import com.binaryfork.onmap.network.ApiSource;
 import com.binaryfork.onmap.network.flickr.model.FlickrPhotos;
 import com.binaryfork.onmap.network.instagram.model.InstagramItems;
 import com.binaryfork.onmap.util.DateUtils;
 import com.google.android.gms.maps.model.LatLng;
-
-import java.util.Calendar;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -23,37 +19,21 @@ public class PresenterImplementation implements Presenter {
     private final MapMediaView mapMediaView;
     private Subscription subscription;
     private LatLng location;
-    public long interval = 60 * 60 * 24; // 1 day
+    private long minTimestampSeconds;
     private long maxTimestampSeconds;
 
     public PresenterImplementation(Model model, MarkersView view, MapMediaView mapMediaView) {
         this.model = model;
         this.markersView = view;
         this.mapMediaView = mapMediaView;
-        toCurrentTime();
+        mapMediaView.showTime(DateUtils.getInterval(minTimestampSeconds, maxTimestampSeconds));
     }
 
     @Override
-    public void backInTime() {
-        maxTimestampSeconds = DateUtils.minTimestamp(maxTimestampSeconds, interval);
-        mapMediaView.showTime(DateUtils.getInterval(maxTimestampSeconds, interval));
-        getMedia(location);
-    }
-
-    @Override
-    public void forwardInTime() {
-    }
-
-    @Override
-    public void toCurrentTime() {
-        maxTimestampSeconds = Calendar.getInstance().getTimeInMillis() / 1000;
-        mapMediaView.showTime(DateUtils.getInterval(maxTimestampSeconds, interval));
-    }
-
-    @Override
-    public void setTime(long time) {
-        maxTimestampSeconds = time;
-        mapMediaView.showTime(DateUtils.getInterval(maxTimestampSeconds, interval));
+    public void setTime(long min, long max) {
+        minTimestampSeconds = min;
+        maxTimestampSeconds = max;
+        mapMediaView.showTime(DateUtils.getInterval(minTimestampSeconds, maxTimestampSeconds));
         getMedia(location);
     }
 
@@ -67,7 +47,7 @@ public class PresenterImplementation implements Presenter {
         this.location = location;
         markersView.setLocation(location);
         markersView.showCenterMarker();
-        long from = DateUtils.minTimestamp(maxTimestampSeconds, interval);
+        long from = minTimestampSeconds;
         long to = maxTimestampSeconds;
         switch (apiSource) {
             case INSTAGRAM:

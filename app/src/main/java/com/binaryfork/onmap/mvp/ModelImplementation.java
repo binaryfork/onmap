@@ -1,7 +1,5 @@
 package com.binaryfork.onmap.mvp;
 
-import android.content.Context;
-
 import com.binaryfork.onmap.network.flickr.Flickr;
 import com.binaryfork.onmap.network.flickr.model.FlickrPhotos;
 import com.binaryfork.onmap.network.instagram.Instagram;
@@ -24,9 +22,16 @@ public class ModelImplementation implements Model {
 
     @Override
     public Observable<InstagramItems> loadMediaByLocationAndDate(LatLng location, long from, long to) {
-        return Instagram.getInstance()
-                .mediaService()
-                .mediaSearch(location.latitude, location.longitude, from, to, DISTANCE, RESULTS_COUNT);
+        if (from == 0 || to == 0)
+            // Load most recent media.
+            return Instagram.getInstance()
+                    .mediaService()
+                    .mediaSearch(location.latitude, location.longitude, RESULTS_COUNT);
+        else
+            // Load media between two timestamps in seconds.
+            return Instagram.getInstance()
+                    .mediaService()
+                    .mediaSearch(location.latitude, location.longitude, from, to, DISTANCE, RESULTS_COUNT);
     }
 
     public Observable<FlickrPhotos> flickr(LatLng location) {

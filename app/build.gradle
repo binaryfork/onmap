@@ -46,6 +46,7 @@ dependencies {
 
     // Ui
     compile 'com.jakewharton:butterknife:6.1.0'
-    compile 'com.squareup:android-times-square:1.5.0@aar'
+    compile 'com.squareup:android-times-square:1.6.1@aar'
+    compile 'com.github.johnkil.android-robototextview:robototextview:2.3.0'
     compile project(':PersistentSearch-master')
 }

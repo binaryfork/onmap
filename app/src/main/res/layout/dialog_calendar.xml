@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <DatePicker
-        android:id="@+id/datePicker"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+    <com.squareup.timessquare.CalendarPickerView
+        android:id="@+id/calendar_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
+        android:layout_height="match_parent"
+        android:layout_marginBottom="0dp"
+        android:background="@android:color/transparent"
+        app:dividerColor="@android:color/transparent"
+        app:dayBackground="@drawable/calendar_selector"/>
+    <TextView
+        android:visibility="gone"
+        android:text="Most recent"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:id="@+id/recent"/>
     <LinearLayout
+        android:visibility="gone"
         android:id="@+id/range"
         android:layout_gravity="bottom"
         android:layout_width="match_parent"

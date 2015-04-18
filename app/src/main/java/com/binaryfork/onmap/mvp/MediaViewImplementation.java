@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.ui;
+package com.binaryfork.onmap.mvp;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -36,7 +36,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public class MediaContainerView {
+public class MediaViewImplementation implements MediaView {
 
     private final Activity activity;
     private final GoogleMap map;
@@ -57,7 +57,7 @@ public class MediaContainerView {
     @InjectView(R.id.videoView) VideoView videoView;
     private View gridItemView;
 
-    public MediaContainerView(View container, GoogleMap map, Activity activity) {
+    public MediaViewImplementation(View container, GoogleMap map, Activity activity) {
         ButterKnife.inject(this, container);
         this.container = container;
         this.map = map;
@@ -69,7 +69,8 @@ public class MediaContainerView {
         Intents.openLink(activity, media.getSiteUrl());
     }
 
-    public void openPhotoFromMap(MediaClusterItem clusterTargetItem) {
+    @Override
+    public void openFromMap(MediaClusterItem clusterTargetItem) {
         this.media = clusterTargetItem.media;
         if (media != null) {
             container.setVisibility(View.VISIBLE);
@@ -92,7 +93,8 @@ public class MediaContainerView {
         }
     }
 
-    public void openPhotoFromGrid(Media media, View thumbView) {
+    @Override
+    public void openFromGrid(Media media, View thumbView) {
         this.media = media;
         if (media != null) {
             container.setVisibility(View.VISIBLE);
@@ -146,13 +148,15 @@ public class MediaContainerView {
         });
     }
 
-    public void hideMediaInfo() {
+    @Override
+    public void hide() {
         Animations.moveTo(commentsTxt, true);
         Animations.moveTo(userPhoto, false);
         Animations.moveTo(usernameTxt, false, new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
             }
+
             @Override
             public void onAnimationEnd(Animation animation) {
                 userPhoto.setImageDrawable(null);
@@ -160,6 +164,7 @@ public class MediaContainerView {
                 commentsTxt.setVisibility(View.GONE);
                 zoomOutImage();
             }
+
             @Override
             public void onAnimationRepeat(Animation animation) {
             }
@@ -261,7 +266,7 @@ public class MediaContainerView {
         expandedImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                hideMediaInfo();
+                hide();
             }
         });
     }

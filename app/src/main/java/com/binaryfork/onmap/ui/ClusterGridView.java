@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.binaryfork.onmap.mvp.MediaView;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.widget.RecyclerItemClickListener;
 import com.google.maps.android.clustering.Cluster;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 
 public class ClusterGridView extends RecyclerView implements RecyclerItemClickListener.OnItemClickListener {
 
-    public MediaContainerView mediaContainerView;
+    public MediaView mediaView;
     private ClusterAdapter adapter;
 
     public ClusterGridView(Context context) {
@@ -46,7 +47,7 @@ public class ClusterGridView extends RecyclerView implements RecyclerItemClickLi
 
     @Override
     public void onItemClick(View childView, int position, MotionEvent event) {
-        mediaContainerView.openPhotoFromGrid(adapter.getItem(position), childView);
+        mediaView.openFromGrid(adapter.getItem(position), childView);
     }
 
     @Override

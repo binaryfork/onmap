@@ -29,13 +29,11 @@ public class MarkersViewImplementation implements MarkersView {
         clusterer = new Clusterer(activity, map, mapMediaView);
     }
 
-    @Override
-    public void setLocation(LatLng location) {
+    @Override public void setLocation(LatLng location) {
         this.location = location;
     }
 
-    @Override
-    public void showCenterMarker() {
+    @Override public void showCenterMarker() {
         if (mapCircle != null)
             mapCircle.remove();
         mapCircle = map.addCircle(new CircleOptions()
@@ -48,8 +46,7 @@ public class MarkersViewImplementation implements MarkersView {
                 .position(location));
     }
 
-    @Override
-    public void showMarkers(final MediaList mediaResponse) {
+    @Override public void showMarkers(final MediaList mediaResponse) {
         // Cancel all loading map photos because all markers will be cleared.
         Picasso.with(activity).cancelTag(PICASSO_MAP_MARKER_TAG);
         clusterer.clearItems();

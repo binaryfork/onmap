@@ -21,18 +21,6 @@
         android:gravity="center"
         android:textAppearance="@android:style/TextAppearance.Medium"/>
 
-    <TextView
-        android:id="@+id/calendar"
-        android:layout_marginLeft="8dp"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_toRightOf="@+id/date"
-        android:layout_alignParentBottom="true"
-        android:background="#9fff"
-        android:gravity="center"
-        android:text="C"
-        android:textAppearance="@android:style/TextAppearance.Medium"/>
-
     <SeekBar
         android:id="@+id/seek_bar_radius"
         android:max="100"
