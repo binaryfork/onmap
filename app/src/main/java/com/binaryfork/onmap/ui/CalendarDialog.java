@@ -36,8 +36,11 @@ public class CalendarDialog extends DialogFragment {
         Calendar nextYear = Calendar.getInstance();
         nextYear.add(Calendar.YEAR, -10);
 
-        Date today = new Date();
-        datePicker.init(nextYear.getTime(), today)
+        Calendar today = Calendar.getInstance();
+        today.add(Calendar.DAY_OF_YEAR, 1);
+
+        datePicker.init(nextYear.getTime(), today.getTime())
+                .withSelectedDate(new Date())
                 .inMode(CalendarPickerView.SelectionMode.RANGE);
         List<CalendarCellDecorator> decorators = new ArrayList<CalendarCellDecorator>();
         decorators.add(new CalendarDecorator());
