@@ -4,7 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
+import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -19,27 +19,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.util.CircleTransform;
 import com.binaryfork.onmap.util.DateUtils;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.Projection;
-import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 import timber.log.Timber;
 
 public class MediaViewImplementation implements MediaView {
 
-    private final Activity activity;
-    private final GoogleMap map;
+    private final Context context;
     private Media media;
 
     private Rect startBounds;
@@ -49,7 +43,7 @@ public class MediaViewImplementation implements MediaView {
     private int markerPhotoSize;
     private AnimatorSet mCurrentAnimator;
 
-    private final View container;
+    public View container;
     @InjectView(R.id.expanded_image) ImageView expandedImage;
     @InjectView(R.id.username) TextView usernameTxt;
     @InjectView(R.id.comments) TextView commentsTxt;
@@ -57,50 +51,43 @@ public class MediaViewImplementation implements MediaView {
     @InjectView(R.id.videoView) VideoView videoView;
     private View gridItemView;
 
-    public MediaViewImplementation(View container, GoogleMap map, Activity activity) {
+    public MediaViewImplementation(View container, Context context) {
         ButterKnife.inject(this, container);
         this.container = container;
-        this.map = map;
-        this.activity = activity;
+        this.context = context;
     }
 
-    @OnClick(R.id.username)
-    public void onClickUsername() {
-        Intents.openLink(activity, media.getSiteUrl());
+    @Override public Media getMedia() {
+        return media;
     }
 
-    @Override
-    public void openFromMap(MediaClusterItem clusterTargetItem) {
+    @Override public void openFromMap(MediaClusterItem clusterTargetItem, Point markerPoint) {
         this.media = clusterTargetItem.media;
         if (media != null) {
             container.setVisibility(View.VISIBLE);
-            Drawable d = new BitmapDrawable(activity.getResources(), clusterTargetItem.thumbBitmap);
-            Picasso.with(activity)
+            Drawable d = new BitmapDrawable(context.getResources(), clusterTargetItem.thumbBitmap);
+            Picasso.with(context)
                     .load(media.getPhotoUrl())
                     .placeholder(d)
                     .into(expandedImage);
             setupDimensions();
-            Projection projection = map.getProjection();
-            LatLng markerLocation = clusterTargetItem.getPosition();
-            Point markerPosition = projection.toScreenLocation(markerLocation);
             Rect thumbBounds = new Rect();
-            thumbBounds.left = markerPosition.x - getMarkerPhotoSize() / 2;
-            thumbBounds.right = markerPosition.x + getMarkerPhotoSize() / 2;
-            thumbBounds.top = markerPosition.y - getMarkerPhotoSize() / 2;
-            thumbBounds.bottom = markerPosition.y + getMarkerPhotoSize() / 2;
+            thumbBounds.left = markerPoint.x - getMarkerPhotoSize() / 2;
+            thumbBounds.right = markerPoint.x + getMarkerPhotoSize() / 2;
+            thumbBounds.top = markerPoint.y - getMarkerPhotoSize() / 2;
+            thumbBounds.bottom = markerPoint.y + getMarkerPhotoSize() / 2;
             thumbBounds.offset(-globalOffset.x, -globalOffset.y);
             zoomImageFromThumb(thumbBounds);
         }
     }
 
-    @Override
-    public void openFromGrid(Media media, View thumbView) {
+    @Override public void openFromGrid(Media media, View thumbView) {
         this.media = media;
         if (media != null) {
             container.setVisibility(View.VISIBLE);
             gridItemView = thumbView;
             gridItemView.setVisibility(View.INVISIBLE);
-            Picasso.with(activity)
+            Picasso.with(context)
                     .load(media.getPhotoUrl())
                     .into(expandedImage);
             setupDimensions();
@@ -126,7 +113,7 @@ public class MediaViewImplementation implements MediaView {
         usernameTxt.setVisibility(View.VISIBLE);
         usernameTxt.setText(media.getUsername() + " " + DateUtils.formatDate(media.getCreatedDate()));
         commentsTxt.setText(media.getComments());
-        Picasso.with(activity).load(media.getUserpic())
+        Picasso.with(context).load(media.getUserpic())
                 .transform(new CircleTransform())
                 .into(userPhoto);
         if (media.isVideo()) {
@@ -148,25 +135,21 @@ public class MediaViewImplementation implements MediaView {
         });
     }
 
-    @Override
-    public void hide() {
+    @Override public void hide() {
         Animations.moveTo(commentsTxt, true);
         Animations.moveTo(userPhoto, false);
         Animations.moveTo(usernameTxt, false, new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+            @Override public void onAnimationStart(Animation animation) {
             }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
+            @Override public void onAnimationEnd(Animation animation) {
                 userPhoto.setImageDrawable(null);
                 usernameTxt.setVisibility(View.GONE);
                 commentsTxt.setVisibility(View.GONE);
                 zoomOutImage();
             }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+            @Override public void onAnimationRepeat(Animation animation) {
             }
         });
         expandedImage.setVisibility(View.VISIBLE);
@@ -176,7 +159,7 @@ public class MediaViewImplementation implements MediaView {
 
     protected int getMarkerPhotoSize() {
         if (markerPhotoSize == 0)
-            markerPhotoSize = (int) activity.getResources().getDimension(R.dimen.map_marker_photo);
+            markerPhotoSize = (int) context.getResources().getDimension(R.dimen.map_marker_photo);
         return markerPhotoSize;
     }
 
@@ -192,7 +175,7 @@ public class MediaViewImplementation implements MediaView {
 
         // The start bounds are the global visible rectangle of the thumbnail,
         // and the final bounds are the global visible rectangle of the container
-        // view. Also set the container view's offset as the origin for the
+        // markersView. Also set the container markersView's offset as the origin for the
         // bounds, since that's the origin for the positioning animation
         // properties (X, Y).
         startBounds = thumbBounds;
@@ -219,15 +202,15 @@ public class MediaViewImplementation implements MediaView {
             startBounds.bottom += deltaHeight;
         }
 
-        // Hide the thumbnail and show the zoomed-in view. When the animation
-        // begins, it will position the zoomed-in view in the place of the
+        // Hide the thumbnail and show the zoomed-in markersView. When the animation
+        // begins, it will position the zoomed-in markersView in the place of the
         // thumbnail.
         //thumbView.setAlpha(0f);
         expandedImage.setVisibility(View.VISIBLE);
 
         // Set the pivot point for SCALE_X and SCALE_Y transformations
-        // to the top-left corner of the zoomed-in view (the default
-        // is the center of the view).
+        // to the top-left corner of the zoomed-in markersView (the default
+        // is the center of the markersView).
         expandedImage.setPivotX(0f);
         expandedImage.setPivotY(0f);
 
@@ -245,14 +228,12 @@ public class MediaViewImplementation implements MediaView {
         set.setDuration(200);
         set.setInterpolator(new AccelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
+            @Override public void onAnimationEnd(Animator animation) {
                 mCurrentAnimator = null;
                 showMediaInfo();
             }
 
-            @Override
-            public void onAnimationCancel(Animator animation) {
+            @Override public void onAnimationCancel(Animator animation) {
                 mCurrentAnimator = null;
             }
         });
@@ -293,8 +274,7 @@ public class MediaViewImplementation implements MediaView {
         set.setDuration(200);
         set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
+            @Override public void onAnimationEnd(Animator animation) {
                 container.setVisibility(View.INVISIBLE);
                 expandedImage.setVisibility(View.INVISIBLE);
                 if (gridItemView != null)
@@ -302,8 +282,7 @@ public class MediaViewImplementation implements MediaView {
                 mCurrentAnimator = null;
             }
 
-            @Override
-            public void onAnimationCancel(Animator animation) {
+            @Override public void onAnimationCancel(Animator animation) {
                 container.setVisibility(View.INVISIBLE);
                 expandedImage.setVisibility(View.INVISIBLE);
                 if (gridItemView != null)

@@ -1,17 +1,20 @@
 package com.binaryfork.onmap.network.flickr.model;
 
+import android.graphics.Bitmap;
 import android.text.Spannable;
 
 import com.binaryfork.onmap.network.Media;
 
 public class FlickrPhoto implements Media {
 
-    public String url_m;
-    public String url_q;
-    public String ownername;
-    public long dateupload;
-    public float latitude;
-    public float longitude;
+    private String url_m;
+    private String url_q;
+    private String ownername;
+    private long dateupload;
+    private float latitude;
+    private float longitude;
+
+    transient private Bitmap thumbBitmap;
 
     @Override
     public String getPhotoUrl() {
@@ -67,4 +70,13 @@ public class FlickrPhoto implements Media {
     public Spannable getComments() {
         return null;
     }
+
+    @Override public void setThumbBitmap(Bitmap bitmap) {
+        thumbBitmap = bitmap;
+    }
+
+    @Override public Bitmap getThumbBitmap() {
+        return thumbBitmap;
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.binaryfork.onmap.network;
 
+import android.graphics.Bitmap;
 import android.text.Spannable;
 
 public interface Media {
@@ -25,4 +26,8 @@ public interface Media {
     long getCreatedDate();
 
     Spannable getComments();
+
+    void setThumbBitmap(Bitmap bitmap);
+
+    Bitmap getThumbBitmap();
 }

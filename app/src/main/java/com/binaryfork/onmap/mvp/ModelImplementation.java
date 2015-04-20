@@ -6,9 +6,11 @@ import com.binaryfork.onmap.network.instagram.Instagram;
 import com.binaryfork.onmap.network.instagram.model.InstagramItems;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.Serializable;
+
 import rx.Observable;
 
-public class ModelImplementation implements Model {
+public class ModelImplementation implements Model, Serializable {
 
     private final int RESULTS_COUNT = 50;
     private final int DISTANCE = 1000; // meters

@@ -1,8 +1,10 @@
 package com.binaryfork.onmap.activities;
 
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
@@ -10,23 +12,25 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.mvp.MapMediaView;
-import com.binaryfork.onmap.mvp.MarkersViewImplementation;
-import com.binaryfork.onmap.mvp.MediaView;
 import com.binaryfork.onmap.mvp.MediaViewImplementation;
-import com.binaryfork.onmap.mvp.ModelImplementation;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
 import com.binaryfork.onmap.network.ApiSource;
+import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.ui.CalendarDialog;
 import com.binaryfork.onmap.ui.ClusterGridView;
 import com.binaryfork.onmap.ui.LocationSearchBox;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.Projection;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 
 import java.util.ArrayList;
@@ -47,15 +51,16 @@ public class MapMediaActivity extends AbstractLocationActivity implements
     @InjectView(R.id.gridView) ClusterGridView gridView;
 
     private GoogleMap map;
+    private Circle mapCircle;
     private PresenterImplementation presenter;
-    private MediaView mediaView;
+    private MediaViewImplementation mediaView;
+    private MapMediaFragment mapMediaFragment;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setUpMapIfNeeded();
         ButterKnife.inject(this);
-        drawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
+        drawerList.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,
                 getResources().getStringArray(R.array.api_sources)));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -70,36 +75,34 @@ public class MapMediaActivity extends AbstractLocationActivity implements
             }
         });
 
-        ModelImplementation model = new ModelImplementation();
-        MarkersViewImplementation view = new MarkersViewImplementation(map, this, this);
-        presenter = new PresenterImplementation(model, view, this);
         searchBox.setup(this);
-
-        mediaView = new MediaViewImplementation(mediaContainerLayout, map, this);
+        presenter = new PresenterImplementation(this);
+        mediaView = new MediaViewImplementation(mediaContainerLayout, getApplicationContext());
         gridView.mediaView = mediaView;
 
-        if (location != null) {
-            goToLocation(location);
-        }
+        setupRetainedFragment();
+
+        if (savedInstanceState == null)
+            getLocation();
     }
 
-    private void setUpMapIfNeeded() {
+    private void setupRetainedFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        mapMediaFragment = (MapMediaFragment) fm.findFragmentById(R.id.map);
+        mapMediaFragment.setMapMediaView(this);
         if (map == null) {
-            map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+            map = mapMediaFragment.getMap();
             map.setOnMapClickListener(this);
             map.setMyLocationEnabled(true);
             map.getUiSettings().setZoomControlsEnabled(true);
         }
     }
 
-    @Override protected void onDestroy() {
-        super.onDestroy();
-        presenter.onDestroy();
-    }
-
     @Override public void openPhoto(MediaClusterItem clusterTargetItem) {
-        mediaView.openFromMap(clusterTargetItem);
+        Projection projection = map.getProjection();
+        LatLng markerLocation = clusterTargetItem.getPosition();
+        Point markerPosition = projection.toScreenLocation(markerLocation);
+        mediaView.openFromMap(clusterTargetItem, markerPosition);
     }
 
     @Override public void clickPhotoCluster(Cluster<MediaClusterItem> cluster) {
@@ -135,6 +138,27 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         presenter.getMedia(location);
     }
 
+    @Override public void clearMap() {
+        mapMediaFragment.getClusterer().clearItems();
+    }
+
+    @Override public void addMarker(Media media) {
+        mapMediaFragment.getClusterer().createCluster(media);
+    }
+
+    @Override public void showCenterMarker() {
+        if (mapCircle != null)
+            mapCircle.remove();
+        mapCircle = map.addCircle(new CircleOptions()
+                .center(location)
+                .radius(1000)
+                .strokeWidth(getResources().getDimension(R.dimen.map_circle_stroke))
+                .strokeColor(0x663333ff)
+                .fillColor(0x113333ff));
+        map.addMarker(new MarkerOptions()
+                .position(location));
+    }
+
     @Override protected void onLocationReceived(LatLng location) {
         Timber.i("location %s", location);
         goToLocation(location);
@@ -152,6 +176,10 @@ public class MapMediaActivity extends AbstractLocationActivity implements
             }
         };
         calendarDialog.show(getSupportFragmentManager(), "date");
+    }
+
+    @OnClick(R.id.username) public void onClickUsername() {
+        Intents.openLink(this, mediaView.getMedia().getSiteUrl());
     }
 
     // Required by SearchBox.
@@ -177,5 +205,10 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
     }
 }

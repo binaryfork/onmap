@@ -1,6 +1,7 @@
 package com.binaryfork.onmap.network.instagram.model;
 
 
+import android.graphics.Bitmap;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 
@@ -14,18 +15,20 @@ import java.util.List;
 
 public class InstagramItem implements Media {
 
-    public String attribution;
-    public List<String> tags;
-    public String type;
-    public Long created_time;
-    public String link;
-    public String id;
-    public Location location;
-    public User user;
-    public Caption caption;
-    public Comments comments;
-    public InstagramMedia.Medias images;
-    public InstagramMedia.Medias videos;
+    private String attribution;
+    private List<String> tags;
+    private String type;
+    private Long created_time;
+    private String link;
+    private String id;
+    private Location location;
+    private User user;
+    private Caption caption;
+    private Comments comments;
+    private InstagramMedia.Medias images;
+    private InstagramMedia.Medias videos;
+
+    transient private Bitmap thumbBitmap;
 
     @Override
     public String getPhotoUrl() {
@@ -90,6 +93,14 @@ public class InstagramItem implements Media {
                         .append(" " + comment.text);
             }
         return spanny.getSpannable();
+    }
+
+    @Override public void setThumbBitmap(Bitmap bitmap) {
+        thumbBitmap = bitmap;
+    }
+
+    @Override public Bitmap getThumbBitmap() {
+        return thumbBitmap;
     }
 
     public class Location {

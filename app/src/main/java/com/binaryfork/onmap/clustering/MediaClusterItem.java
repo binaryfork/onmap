@@ -1,7 +1,6 @@
 package com.binaryfork.onmap.clustering;
 
 
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.binaryfork.onmap.network.Media;
@@ -12,11 +11,10 @@ public class MediaClusterItem implements ClusterItem {
 
     public Media media;
     public Bitmap thumbBitmap;
-    public Context context;
 
-    public MediaClusterItem(Media media, Context context) {
+    public MediaClusterItem(Media media, Bitmap bitmap) {
         this.media = media;
-        this.context = context;
+        this.thumbBitmap = bitmap;
     }
 
     @Override

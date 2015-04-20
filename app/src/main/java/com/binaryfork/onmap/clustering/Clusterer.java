@@ -1,10 +1,10 @@
 package com.binaryfork.onmap.clustering;
 
-import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,30 +22,26 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
-public class Clusterer {
+public class Clusterer implements Serializable {
 
-    private final Activity activity;
-    private final GoogleMap map;
+    private Context context;
+    public GoogleMap map;
     private ClusterManager<MediaClusterItem> clusterManager;
-    private Drawable videoIcon;
     private int markerDimension;
-    private HashSet<Target> targets = new HashSet<>();
 
-    public Clusterer(Activity activity, GoogleMap googleMap, final MapMediaView mapMediaView) {
-        this.activity = activity;
+    public Clusterer(Context context, GoogleMap googleMap) {
+        this.context = context;
         this.map = googleMap;
+        clusterManager = new ClusterManager<>(context, map);
+    }
 
-        markerDimension = (int) activity.getResources().getDimension(R.dimen.map_marker_photo);
-        videoIcon = activity.getResources().getDrawable(android.R.drawable.ic_media_play);
-
-        clusterManager = new ClusterManager<>(activity, map);
+    public void init(final MapMediaView mapMediaView) {
+        markerDimension = (int) context.getResources().getDimension(R.dimen.map_marker_photo);
         clusterManager.setRenderer(new MediaRenderer());
         clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MediaClusterItem>() {
             @Override
@@ -66,9 +62,9 @@ public class Clusterer {
                         || bounds.southwest.equals(bounds.northeast)) {
                     mapMediaView.clickPhotoCluster(cluster);
                 } else {
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), map
-                            .getCameraPosition().zoom + 1));
-                   //map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                    // map.animateCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), map
+                    //         .getCameraPosition().zoom + 1));
+                    map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
                 }
                 return true;
             }
@@ -79,62 +75,30 @@ public class Clusterer {
 
     public void clearItems() {
         clusterManager.clearItems();
-        targets.clear();
+        map.clear();
     }
 
-    public Target getClusterItemTarget(final Media media) {
-        final MediaClusterItem cluster = new MediaClusterItem(media, activity);
-        Target target = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                if (bitmap != null) {
-                    bitmap = Bitmap.createScaledBitmap(bitmap, markerDimension, markerDimension, true);
-                    if (media.isVideo()) {
-                        bitmap = drawVideoIcon(bitmap);
-                    }
-                    cluster.thumbBitmap = bitmap;
-                    clusterManager.addItem(cluster);
-                    clusterManager.cluster();
-                }
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-            }
-
-            private Bitmap drawVideoIcon(Bitmap bitmap) {
-                Canvas canvas = new Canvas(bitmap);
-                if (videoIcon == null)
-                    return null;
-                videoIcon.setBounds(canvas.getClipBounds());
-                videoIcon.draw(canvas);
-                canvas.drawBitmap(bitmap, 0, 0, null);
-                return bitmap;
-            }
-        };
-        targets.add(target);
-        return target;
+    public void createCluster(Media media) {
+        MediaClusterItem cluster = new MediaClusterItem(media, media.getThumbBitmap());
+        clusterManager.addItem(cluster);
+        clusterManager.cluster();
     }
 
 
     private class MediaRenderer extends DefaultClusterRenderer<MediaClusterItem> {
-        private final IconGenerator mIconGenerator = new IconGenerator(activity);
-        private final IconGenerator mClusterIconGenerator = new IconGenerator(activity);
+        private final IconGenerator mIconGenerator = new IconGenerator(context);
+        private final IconGenerator mClusterIconGenerator = new IconGenerator(context);
         private final ImageView mImageView;
         private final ImageView mClusterImageView;
 
         public MediaRenderer() {
-            super(activity, map, clusterManager);
+            super(context, map, clusterManager);
 
-            View multiProfile = activity.getLayoutInflater().inflate(R.layout.map_marker_cluster, null);
+            View multiProfile = LayoutInflater.from(context).inflate(R.layout.map_marker_cluster, null);
             mClusterIconGenerator.setContentView(multiProfile);
             mClusterImageView = (ImageView) multiProfile.findViewById(R.id.image);
 
-            mImageView = new ImageView(activity);
+            mImageView = new ImageView(context);
             mImageView.setLayoutParams(new ViewGroup.LayoutParams(markerDimension, markerDimension));
             mIconGenerator.setContentView(mImageView);
         }
