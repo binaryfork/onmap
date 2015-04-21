@@ -17,9 +17,9 @@ public interface Media {
 
     String getSiteUrl();
 
-    float getLatitude();
+    double getLatitude();
 
-    float getLongitude();
+    double getLongitude();
 
     boolean isVideo();
 

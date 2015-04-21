@@ -8,6 +8,7 @@
     <string-array name="api_sources">
         <item name="instagram">Instagram</item>
         <item name="flickr">Flickr</item>
+        <item name="twitter">Twitter</item>
     </string-array>
 
 </resources>

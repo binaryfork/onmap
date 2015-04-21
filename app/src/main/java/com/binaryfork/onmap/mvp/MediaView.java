@@ -6,9 +6,7 @@ import android.view.View;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.network.Media;
 
-import java.io.Serializable;
-
-public interface MediaView extends Serializable {
+public interface MediaView {
     Media getMedia();
     void openFromMap(MediaClusterItem clusterTargetItem, Point markerPoint);
     void openFromGrid(Media media, View thumbView);

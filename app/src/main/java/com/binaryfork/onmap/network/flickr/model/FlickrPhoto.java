@@ -11,8 +11,8 @@ public class FlickrPhoto implements Media {
     private String url_q;
     private String ownername;
     private long dateupload;
-    private float latitude;
-    private float longitude;
+    private double latitude;
+    private double longitude;
 
     transient private Bitmap thumbBitmap;
 
@@ -47,12 +47,12 @@ public class FlickrPhoto implements Media {
     }
 
     @Override
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
     @Override
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 

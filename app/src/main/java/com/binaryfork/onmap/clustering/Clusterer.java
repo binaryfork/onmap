@@ -23,11 +23,10 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Clusterer implements Serializable {
+public class Clusterer {
 
     private Context context;
     public GoogleMap map;

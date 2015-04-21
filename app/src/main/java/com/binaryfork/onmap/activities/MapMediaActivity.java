@@ -71,6 +71,9 @@ public class MapMediaActivity extends AbstractLocationActivity implements
                     case 1:
                         presenter.apiSource = ApiSource.FLICKR;
                         break;
+                    case 2:
+                        presenter.apiSource = ApiSource.TWITTER;
+                        break;
                 }
             }
         });

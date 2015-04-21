@@ -67,7 +67,7 @@ public class MediaViewImplementation implements MediaView {
             container.setVisibility(View.VISIBLE);
             Drawable d = new BitmapDrawable(context.getResources(), clusterTargetItem.thumbBitmap);
             Picasso.with(context)
-                    .load(media.getPhotoUrl())
+                    .load(media.getThumbnail())
                     .placeholder(d)
                     .into(expandedImage);
             setupDimensions();

@@ -61,12 +61,12 @@ public class InstagramItem implements Media {
     }
 
     @Override
-    public float getLatitude() {
+    public double getLatitude() {
         return location.latitude;
     }
 
     @Override
-    public float getLongitude() {
+    public double getLongitude() {
         return location.longitude;
     }
 
@@ -106,8 +106,8 @@ public class InstagramItem implements Media {
     public class Location {
         public String id;
         public String name;
-        public float latitude;
-        public float longitude;
+        public double latitude;
+        public double longitude;
     }
 
     public class User {
