@@ -14,7 +14,6 @@ public class TwitterInstance {
     private static TwitterApiClient instance;
 
     public static TwitterApiClient getInstance() {
-        Timber.i("Twitter instance " + instance);
         if (instance == null) {
             TwitterCore.getInstance().logInGuest(new Callback<AppSession>() {
                 @Override public void success(Result<AppSession> result) {
@@ -27,7 +26,6 @@ public class TwitterInstance {
                 }
             });
         }
-        Timber.i("Twitter instance " + instance);
         return instance;
     }
 

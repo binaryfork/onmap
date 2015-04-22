@@ -80,6 +80,7 @@ public class LocationSearchBox extends SearchBox {
                 if (query == null || query.length() < 3) {
                     return Observable.empty();
                 }
+                showLoading(true);
                 return GoogleGeo.getInstance()
                         .geo()
                         .mediaSearch(query);
@@ -103,6 +104,7 @@ public class LocationSearchBox extends SearchBox {
                             addSearchable(option);
                         }
                         updateResults();
+                        showLoading(false);
                     }
 
                 }
