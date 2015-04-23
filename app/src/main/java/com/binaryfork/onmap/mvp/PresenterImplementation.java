@@ -1,8 +1,6 @@
 package com.binaryfork.onmap.mvp;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 
 import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.network.ApiSource;
@@ -10,6 +8,7 @@ import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.network.MediaList;
 import com.binaryfork.onmap.network.twitter.TweetMedia;
 import com.binaryfork.onmap.util.DateUtils;
+import com.binaryfork.onmap.util.VideoIconTransformation;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -27,6 +26,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -65,6 +65,8 @@ public class PresenterImplementation implements Presenter {
 
     @Override
     public void getMedia(LatLng location) {
+        if (subscription != null)
+            subscription.unsubscribe();
         this.location = location;
         // Cancel all loading map photos because all markers will be cleared.
         Picasso.with(BaseApplication.get()).cancelTag(PICASSO_MAP_MARKER_TAG);
@@ -73,7 +75,7 @@ public class PresenterImplementation implements Presenter {
         long from = minTimestampSeconds;
         long to = maxTimestampSeconds;
         Observable<? extends MediaList> observable;
-        ModelImplementation model = new ModelImplementation();
+        Model model = new ModelImplementation();
         switch (apiSource) {
             default:
             case INSTAGRAM:
@@ -83,40 +85,44 @@ public class PresenterImplementation implements Presenter {
                 observable = model.flickr(location);
                 break;
             case TWITTER:
-                model.t(new Callback<Search>() {
-                    @Override public void success(Result<Search> result) {
-                        ArrayList<Media> arrayList = new ArrayList<>();
-                        for (Tweet tweet : result.data.tweets) {
-                            TweetMedia tweetMedia = new TweetMedia(tweet);
-                            arrayList.add(tweetMedia);
-                        }
-                        subscription = Observable.from(arrayList)
-                                .subscribeOn(Schedulers.newThread())
-                                .flatMap(new Func1<Media, Observable<Media>>() {
-                                    @Override public Observable<Media> call(Media media) {
-                                        return mediaWithThumbBitmap(media);
-                                    }
-                                })
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new Action1<Media>() {
-                                    @Override public void call(Media media) {
-                                        mapMediaView.addMarker(media);
-                                    }
-                                });
-                    }
-
-                    @Override public void failure(TwitterException e) {
-                        Timber.e("Twitter error %s ", e.getMessage());
-                    }
-                });
+                // Use the callback that makes observable from the list because TwitterCore's
+                // Retrofit service does not provides observables.
+                model.twitter(location, twitterApiCallback());
                 return;
         }
+        subscribe(observable.flatMap(new Func1<MediaList, Observable<Media>>() {
+            @Override public Observable<Media> call(MediaList mediaList) {
+                return Observable.from(mediaList.getList());
+            }
+        }));
+    }
+
+    private Callback<Search> twitterApiCallback() {
+        return new Callback<Search>() {
+            @Override public void success(Result<Search> result) {
+                ArrayList<Media> arrayList = new ArrayList<>();
+                for (Tweet tweet : result.data.tweets) {
+                    TweetMedia tweetMedia = new TweetMedia(tweet);
+                    arrayList.add(tweetMedia);
+                }
+                subscribe(Observable.from(arrayList)
+                        .subscribeOn(Schedulers.newThread())
+                        .filter(new Func1<Media, Boolean>() {
+                            @Override public Boolean call(Media media) {
+                                return media.getPhotoUrl() != null &&
+                                        (media.getLatitude() != 0 && media.getLongitude() != 0);
+                            }
+                        }));
+            }
+
+            @Override public void failure(TwitterException e) {
+                Timber.e("Twitter error %s ", e.getMessage());
+            }
+        };
+    }
+
+    private void subscribe(Observable<? extends Media> observable) {
         subscription = observable
-                .flatMap(new Func1<MediaList, Observable<Media>>() {
-                    @Override public Observable<Media> call(MediaList mediaList) {
-                        return Observable.from(mediaList.getList());
-                    }
-                })
                 .flatMap(new Func1<Media, Observable<Media>>() {
                     @Override public Observable<Media> call(Media media) {
                         return mediaWithThumbBitmap(media);
@@ -127,7 +133,23 @@ public class PresenterImplementation implements Presenter {
                     @Override public void call(Media media) {
                         mapMediaView.addMarker(media);
                     }
-                });
+                }, onError(), onComplete());
+    }
+
+    private Action1<Throwable> onError() {
+        return new Action1<Throwable>() {
+            @Override public void call(Throwable throwable) {
+                Timber.e("Marker subscription error %s", throwable.getMessage());
+            }
+        };
+    }
+
+    private Action0 onComplete() {
+        return new Action0() {
+            @Override public void call() {
+                mapMediaView.allMarkesLoaded();
+            }
+        };
     }
 
     private Observable<Media> mediaWithThumbBitmap(final Media media) {
@@ -158,44 +180,11 @@ public class PresenterImplementation implements Presenter {
         });
     }
 
-    private static class VideoIconTransformation implements Transformation {
-
-        private final Drawable videoIcon;
-
-        public VideoIconTransformation() {
-            videoIcon = BaseApplication.get().getResources().getDrawable(android.R.drawable.ic_media_play);
-        }
-
-        @Override
-        public String key() {
-            return "video";
-        }
-
-        @Override
-        public Bitmap transform(Bitmap bitmap) {
-            synchronized (VideoIconTransformation.class) {
-                if (bitmap == null) {
-                    return null;
-                }
-                Bitmap resultBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-                Canvas canvas = new Canvas(resultBitmap);
-                if (videoIcon == null)
-                    return null;
-                videoIcon.setBounds(canvas.getClipBounds());
-                videoIcon.draw(canvas);
-                canvas.drawBitmap(resultBitmap, 0, 0, null);
-                bitmap.recycle();
-                return resultBitmap;
-            }
-        }
-    }
-
     @Override
     public void onDestroy() {
         if (subscription != null) {
             subscription.unsubscribe();
         }
     }
-
 
 }

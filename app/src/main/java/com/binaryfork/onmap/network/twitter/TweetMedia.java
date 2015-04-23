@@ -21,10 +21,14 @@ public class TweetMedia implements Media {
     }
 
     @Override public String getPhotoUrl() {
+        if (tweet.entities.media == null)
+            return null;
         return tweet.entities.media.get(0).mediaUrl;
     }
 
     @Override public String getThumbnail() {
+        if (tweet.entities.media == null)
+            return null;
         return tweet.entities.media.get(0).mediaUrl;
     }
 
@@ -61,7 +65,7 @@ public class TweetMedia implements Media {
     }
 
     @Override public long getCreatedDate() {
-        String tweetFormat="EEE MMM dd HH:mm:ss ZZZZZ yyyy";
+        String tweetFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
         SimpleDateFormat sf = new SimpleDateFormat(tweetFormat, Locale.ENGLISH);
         sf.setLenient(true);
         long seconds = 0;

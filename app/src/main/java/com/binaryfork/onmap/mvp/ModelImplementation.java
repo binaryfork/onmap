@@ -42,9 +42,9 @@ public class ModelImplementation implements Model {
                 .searchByLocation(location.latitude, location.longitude);
     }
 
-    public void t(Callback<Search> callback) {
-        Geocode geocode = new Geocode(55.755826, 37.6173, 5, Geocode.Distance.KILOMETERS);
+    @Override public void twitter(LatLng location, Callback<Search> callback) {
+        Geocode geocode = new Geocode(location.latitude, location.longitude, DISTANCE / 1000, Geocode.Distance.KILOMETERS);
         TwitterInstance.getInstance().getSearchService()
-                .tweets("filter:images", geocode, "", "", "", 50, "", 0l, 0l, true, callback);
+                .tweets("filter:images", geocode, "", "", "", RESULTS_COUNT, "", 0l, 0l, true, callback);
     }
 }

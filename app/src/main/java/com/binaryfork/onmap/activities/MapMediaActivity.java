@@ -60,7 +60,7 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
-        drawerList.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,
+        drawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
                 getResources().getStringArray(R.array.api_sources)));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -75,6 +75,8 @@ public class MapMediaActivity extends AbstractLocationActivity implements
                         presenter.apiSource = ApiSource.TWITTER;
                         break;
                 }
+                loadMarkers();
+                drawerLayout.closeDrawer(drawerList);
             }
         });
 
@@ -138,6 +140,11 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         location = latLng;
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
         map.animateCamera(cameraUpdate);
+        loadMarkers();
+    }
+
+    private void loadMarkers() {
+        searchBox.showLoading(true);
         presenter.getMedia(location);
     }
 
@@ -147,6 +154,10 @@ public class MapMediaActivity extends AbstractLocationActivity implements
 
     @Override public void addMarker(Media media) {
         mapMediaFragment.getClusterer().createCluster(media);
+    }
+
+    @Override public void allMarkesLoaded() {
+        searchBox.showLoading(false);
     }
 
     @Override public void showCenterMarker() {

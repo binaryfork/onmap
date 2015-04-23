@@ -67,7 +67,7 @@ public class MediaViewImplementation implements MediaView {
             container.setVisibility(View.VISIBLE);
             Drawable d = new BitmapDrawable(context.getResources(), clusterTargetItem.thumbBitmap);
             Picasso.with(context)
-                    .load(media.getThumbnail())
+                    .load(media.getPhotoUrl())
                     .placeholder(d)
                     .into(expandedImage);
             setupDimensions();
@@ -113,9 +113,10 @@ public class MediaViewImplementation implements MediaView {
         usernameTxt.setVisibility(View.VISIBLE);
         usernameTxt.setText(media.getUsername() + " " + DateUtils.formatDate(media.getCreatedDate()));
         commentsTxt.setText(media.getComments());
-        Picasso.with(context).load(media.getUserpic())
-                .transform(new CircleTransform())
-                .into(userPhoto);
+        if (userPhoto != null)
+            Picasso.with(context).load(media.getUserpic())
+                    .transform(new CircleTransform())
+                    .into(userPhoto);
         if (media.isVideo()) {
             loadVideo();
         }

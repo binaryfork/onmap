@@ -15,4 +15,5 @@ public interface MapMediaView {
     void goToLocation(LatLng latLng);
     void clearMap();
     void addMarker(Media media);
+    void allMarkesLoaded();
 }
