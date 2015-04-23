@@ -12,6 +12,8 @@ import com.binaryfork.onmap.network.twitter.TweetMedia;
 import com.binaryfork.onmap.util.DateUtils;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Transformation;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
@@ -41,11 +43,12 @@ public class PresenterImplementation implements Presenter {
     private LatLng location;
     private long minTimestampSeconds;
     private long maxTimestampSeconds;
-    private Drawable videoIcon;
+    private Transformation videoIconTransformation;
 
     public PresenterImplementation(MapMediaView mapMediaView) {
         this.mapMediaView = mapMediaView;
         mapMediaView.showTime(DateUtils.getInterval(minTimestampSeconds, maxTimestampSeconds));
+        videoIconTransformation = new VideoIconTransformation();
     }
 
     @Override
@@ -53,7 +56,6 @@ public class PresenterImplementation implements Presenter {
         minTimestampSeconds = min;
         maxTimestampSeconds = max;
         mapMediaView.showTime(DateUtils.getInterval(minTimestampSeconds, maxTimestampSeconds));
-        videoIcon = BaseApplication.get().getResources().getDrawable(android.R.drawable.ic_media_play);
         getMedia(location);
     }
 
@@ -82,31 +84,31 @@ public class PresenterImplementation implements Presenter {
                 break;
             case TWITTER:
                 model.t(new Callback<Search>() {
-                            @Override public void success(Result<Search> result) {
-                                ArrayList<Media> arrayList = new ArrayList<>();
-                                for (Tweet tweet : result.data.tweets) {
-                                    TweetMedia tweetMedia = new TweetMedia(tweet);
-                                    arrayList.add(tweetMedia);
-                                }
-                                subscription = Observable.from(arrayList)
-                                        .subscribeOn(Schedulers.newThread())
-                                        .flatMap(new Func1<Media, Observable<Media>>() {
-                                            @Override public Observable<Media> call(Media media) {
-                                                return mediaWithThumbBitmap(media);
-                                            }
-                                        })
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(new Action1<Media>() {
-                                            @Override public void call(Media media) {
-                                                mapMediaView.addMarker(media);
-                                            }
-                                        });
-                            }
+                    @Override public void success(Result<Search> result) {
+                        ArrayList<Media> arrayList = new ArrayList<>();
+                        for (Tweet tweet : result.data.tweets) {
+                            TweetMedia tweetMedia = new TweetMedia(tweet);
+                            arrayList.add(tweetMedia);
+                        }
+                        subscription = Observable.from(arrayList)
+                                .subscribeOn(Schedulers.newThread())
+                                .flatMap(new Func1<Media, Observable<Media>>() {
+                                    @Override public Observable<Media> call(Media media) {
+                                        return mediaWithThumbBitmap(media);
+                                    }
+                                })
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Action1<Media>() {
+                                    @Override public void call(Media media) {
+                                        mapMediaView.addMarker(media);
+                                    }
+                                });
+                    }
 
-                            @Override public void failure(TwitterException e) {
-                                Timber.e("Twitter error %s ", e.getMessage());
-                            }
-                        });
+                    @Override public void failure(TwitterException e) {
+                        Timber.e("Twitter error %s ", e.getMessage());
+                    }
+                });
                 return;
         }
         subscription = observable
@@ -136,18 +138,19 @@ public class PresenterImplementation implements Presenter {
                     subscriber.onCompleted();
                     return;
                 }
+                RequestCreator picasso = Picasso.with(BaseApplication.get())
+                        .load(media.getThumbnail())
+                        .tag(PICASSO_MAP_MARKER_TAG);
+                if (media.isVideo()) {
+                    picasso = picasso.transform(videoIconTransformation);
+                }
                 Bitmap bitmap = null;
                 try {
-                    bitmap = Picasso.with(BaseApplication.get())
-                            .load(media.getThumbnail())
-                            .tag(PICASSO_MAP_MARKER_TAG)
-                            .get();
+                    bitmap = picasso.get();
                 } catch (IOException e) {
                     Timber.w("Picasso IO error %s", e.getMessage());
                 }
 
-                if (bitmap != null && media.isVideo())
-                    bitmap = drawVideoIcon(bitmap);
                 media.setThumbBitmap(bitmap);
                 subscriber.onNext(media);
                 subscriber.onCompleted();
@@ -155,16 +158,36 @@ public class PresenterImplementation implements Presenter {
         });
     }
 
-    private Bitmap drawVideoIcon(Bitmap bitmap) {
-        Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-        Canvas canvas = new Canvas(mutableBitmap);
-        if (videoIcon == null)
-            return null;
-        videoIcon.setBounds(canvas.getClipBounds());
-        videoIcon.draw(canvas);
-        canvas.drawBitmap(mutableBitmap, 0, 0, null);
-        bitmap.recycle();
-        return mutableBitmap;
+    private static class VideoIconTransformation implements Transformation {
+
+        private final Drawable videoIcon;
+
+        public VideoIconTransformation() {
+            videoIcon = BaseApplication.get().getResources().getDrawable(android.R.drawable.ic_media_play);
+        }
+
+        @Override
+        public String key() {
+            return "video";
+        }
+
+        @Override
+        public Bitmap transform(Bitmap bitmap) {
+            synchronized (VideoIconTransformation.class) {
+                if (bitmap == null) {
+                    return null;
+                }
+                Bitmap resultBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+                Canvas canvas = new Canvas(resultBitmap);
+                if (videoIcon == null)
+                    return null;
+                videoIcon.setBounds(canvas.getClipBounds());
+                videoIcon.draw(canvas);
+                canvas.drawBitmap(resultBitmap, 0, 0, null);
+                bitmap.recycle();
+                return resultBitmap;
+            }
+        }
     }
 
     @Override
