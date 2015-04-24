@@ -1,6 +1,7 @@
 package com.binaryfork.onmap.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -152,8 +153,8 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         mapMediaFragment.getClusterer().clearItems();
     }
 
-    @Override public void addMarker(Media media) {
-        mapMediaFragment.getClusterer().createCluster(media);
+    @Override public void addMarker(Media media, Bitmap bitmap) {
+        mapMediaFragment.getClusterer().createCluster(media, bitmap);
     }
 
     @Override public void allMarkesLoaded() {

@@ -14,8 +14,6 @@ public class FlickrPhoto implements Media {
     private double latitude;
     private double longitude;
 
-    transient private Bitmap thumbBitmap;
-
     @Override
     public String getPhotoUrl() {
         return url_m;
@@ -69,14 +67,6 @@ public class FlickrPhoto implements Media {
     @Override
     public Spannable getComments() {
         return null;
-    }
-
-    @Override public void setThumbBitmap(Bitmap bitmap) {
-        thumbBitmap = bitmap;
-    }
-
-    @Override public Bitmap getThumbBitmap() {
-        return thumbBitmap;
     }
 
 }

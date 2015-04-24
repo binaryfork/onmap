@@ -1,5 +1,7 @@
 package com.binaryfork.onmap.mvp;
 
+import android.graphics.Bitmap;
+
 import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.network.Media;
 import com.google.android.gms.maps.model.LatLng;
@@ -14,6 +16,6 @@ public interface MapMediaView {
     void showCenterMarker();
     void goToLocation(LatLng latLng);
     void clearMap();
-    void addMarker(Media media);
+    void addMarker(Media media, Bitmap bitmap);
     void allMarkesLoaded();
 }

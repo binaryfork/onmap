@@ -77,8 +77,8 @@ public class Clusterer {
         map.clear();
     }
 
-    public void createCluster(Media media) {
-        MediaClusterItem cluster = new MediaClusterItem(media, media.getThumbBitmap());
+    public void createCluster(Media media, Bitmap bitmap) {
+        MediaClusterItem cluster = new MediaClusterItem(media, bitmap);
         clusterManager.addItem(cluster);
         clusterManager.cluster();
     }

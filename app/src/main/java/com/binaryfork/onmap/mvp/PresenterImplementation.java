@@ -79,7 +79,7 @@ public class PresenterImplementation implements Presenter {
         switch (apiSource) {
             default:
             case INSTAGRAM:
-                observable = model.loadMediaByLocationAndDate(location, from, to);
+                observable = model.instagram(location, from, to);
                 break;
             case FLICKR:
                 observable = model.flickr(location);
@@ -90,11 +90,12 @@ public class PresenterImplementation implements Presenter {
                 model.twitter(location, twitterApiCallback());
                 return;
         }
-        subscribe(observable.flatMap(new Func1<MediaList, Observable<Media>>() {
-            @Override public Observable<Media> call(MediaList mediaList) {
-                return Observable.from(mediaList.getList());
-            }
-        }));
+        subscribe(observable
+                .flatMap(new Func1<MediaList, Observable<Media>>() {
+                    @Override public Observable<Media> call(MediaList mediaList) {
+                        return Observable.from(mediaList.getList());
+                    }
+                }));
     }
 
     private Callback<Search> twitterApiCallback() {
@@ -105,7 +106,8 @@ public class PresenterImplementation implements Presenter {
                     TweetMedia tweetMedia = new TweetMedia(tweet);
                     arrayList.add(tweetMedia);
                 }
-                subscribe(Observable.from(arrayList)
+                subscribe(Observable
+                        .from(arrayList)
                         .subscribeOn(Schedulers.newThread())
                         .filter(new Func1<Media, Boolean>() {
                             @Override public Boolean call(Media media) {
@@ -123,15 +125,18 @@ public class PresenterImplementation implements Presenter {
 
     private void subscribe(Observable<? extends Media> observable) {
         subscription = observable
-                .flatMap(new Func1<Media, Observable<Media>>() {
-                    @Override public Observable<Media> call(Media media) {
-                        return mediaWithThumbBitmap(media);
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(new Action1<Media>() {
-                    @Override public void call(Media media) {
-                        mapMediaView.addMarker(media);
+                    @Override public void call(final Media media) {
+                        mediaWithThumbBitmap(media)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.newThread())
+                                .subscribe(new Action1<Bitmap>() {
+                                    @Override public void call(Bitmap bitmap) {
+                                        mapMediaView.addMarker(media, bitmap);
+                                    }
+                                });
                     }
                 }, onError(), onComplete());
     }
@@ -152,10 +157,10 @@ public class PresenterImplementation implements Presenter {
         };
     }
 
-    private Observable<Media> mediaWithThumbBitmap(final Media media) {
-        return Observable.create(new Observable.OnSubscribe<Media>() {
+    private Observable<Bitmap> mediaWithThumbBitmap(final Media media) {
+        return Observable.create(new Observable.OnSubscribe<Bitmap>() {
             @Override
-            public void call(final Subscriber<? super Media> subscriber) {
+            public void call(final Subscriber<? super Bitmap> subscriber) {
                 if (subscriber.isUnsubscribed()) {
                     subscriber.onCompleted();
                     return;
@@ -173,8 +178,7 @@ public class PresenterImplementation implements Presenter {
                     Timber.w("Picasso IO error %s", e.getMessage());
                 }
 
-                media.setThumbBitmap(bitmap);
-                subscriber.onNext(media);
+                subscriber.onNext(bitmap);
                 subscriber.onCompleted();
             }
         });

@@ -1,7 +1,6 @@
 package com.binaryfork.onmap.network.instagram.model;
 
 
-import android.graphics.Bitmap;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 
@@ -27,8 +26,6 @@ public class InstagramItem implements Media {
     private Comments comments;
     private InstagramMedia.Medias images;
     private InstagramMedia.Medias videos;
-
-    transient private Bitmap thumbBitmap;
 
     @Override
     public String getPhotoUrl() {
@@ -93,14 +90,6 @@ public class InstagramItem implements Media {
                         .append(" " + comment.text);
             }
         return spanny.getSpannable();
-    }
-
-    @Override public void setThumbBitmap(Bitmap bitmap) {
-        thumbBitmap = bitmap;
-    }
-
-    @Override public Bitmap getThumbBitmap() {
-        return thumbBitmap;
     }
 
     public class Location {

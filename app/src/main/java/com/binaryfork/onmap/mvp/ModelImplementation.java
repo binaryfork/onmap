@@ -17,13 +17,7 @@ public class ModelImplementation implements Model {
     private final int RESULTS_COUNT = 50;
     private final int DISTANCE = 1000; // meters
 
-    @Override public Observable<InstagramItems> loadMediaByLocation(LatLng location) {
-        return Instagram.getInstance()
-                .mediaService()
-                .mediaSearch(location.latitude, location.longitude, RESULTS_COUNT);
-    }
-
-    @Override public Observable<InstagramItems> loadMediaByLocationAndDate(LatLng location, long from, long to) {
+    @Override public Observable<InstagramItems> instagram(LatLng location, long from, long to) {
         if (from == 0 || to == 0)
             // Load most recent media.
             return Instagram.getInstance()

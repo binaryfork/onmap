@@ -14,7 +14,6 @@ import java.util.Locale;
 public class TweetMedia implements Media {
 
     private Tweet tweet;
-    private Bitmap bitmap;
 
     public TweetMedia(Tweet tweet) {
         this.tweet = tweet;
@@ -79,13 +78,5 @@ public class TweetMedia implements Media {
 
     @Override public Spannable getComments() {
         return new SpannableString(tweet.text);
-    }
-
-    @Override public void setThumbBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
-
-    @Override public Bitmap getThumbBitmap() {
-        return bitmap;
     }
 }
