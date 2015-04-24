@@ -1,7 +1,6 @@
 package com.binaryfork.onmap.activities;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -17,10 +16,10 @@ import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.mvp.MapMediaView;
+import com.binaryfork.onmap.mvp.MediaView;
 import com.binaryfork.onmap.mvp.MediaViewImplementation;
-import com.binaryfork.onmap.mvp.PresenterImplementation;
+import com.binaryfork.onmap.mvp.Presenter;
 import com.binaryfork.onmap.network.ApiSource;
-import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.ui.CalendarDialog;
 import com.binaryfork.onmap.ui.ClusterGridView;
 import com.binaryfork.onmap.ui.LocationSearchBox;
@@ -53,9 +52,8 @@ public class MapMediaActivity extends AbstractLocationActivity implements
 
     private GoogleMap map;
     private Circle mapCircle;
-    private PresenterImplementation presenter;
-    private MediaViewImplementation mediaView;
-    private MapMediaFragment mapMediaFragment;
+    private Presenter presenter;
+    private MediaView mediaView;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,24 +63,26 @@ public class MapMediaActivity extends AbstractLocationActivity implements
                 getResources().getStringArray(R.array.api_sources)));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ApiSource apiSource;
                 switch (position) {
+                    default:
                     case 0:
-                        presenter.apiSource = ApiSource.INSTAGRAM;
+                        apiSource = ApiSource.INSTAGRAM;
                         break;
                     case 1:
-                        presenter.apiSource = ApiSource.FLICKR;
+                        apiSource = ApiSource.FLICKR;
                         break;
                     case 2:
-                        presenter.apiSource = ApiSource.TWITTER;
+                        apiSource = ApiSource.TWITTER;
                         break;
                 }
+                presenter.changeSource(apiSource);
                 loadMarkers();
                 drawerLayout.closeDrawer(drawerList);
             }
         });
 
         searchBox.setup(this);
-        presenter = new PresenterImplementation(this);
         mediaView = new MediaViewImplementation(mediaContainerLayout, getApplicationContext());
         gridView.mediaView = mediaView;
 
@@ -94,8 +94,9 @@ public class MapMediaActivity extends AbstractLocationActivity implements
 
     private void setupRetainedFragment() {
         FragmentManager fm = getSupportFragmentManager();
-        mapMediaFragment = (MapMediaFragment) fm.findFragmentById(R.id.map);
+        MapMediaFragment mapMediaFragment = (MapMediaFragment) fm.findFragmentById(R.id.map);
         mapMediaFragment.setMapMediaView(this);
+        presenter = mapMediaFragment.getPresenter();
         if (map == null) {
             map = mapMediaFragment.getMap();
             map.setOnMapClickListener(this);
@@ -147,14 +148,6 @@ public class MapMediaActivity extends AbstractLocationActivity implements
     private void loadMarkers() {
         searchBox.showLoading(true);
         presenter.getMedia(location);
-    }
-
-    @Override public void clearMap() {
-        mapMediaFragment.getClusterer().clearItems();
-    }
-
-    @Override public void addMarker(Media media, Bitmap bitmap) {
-        mapMediaFragment.getClusterer().createCluster(media, bitmap);
     }
 
     @Override public void allMarkesLoaded() {
@@ -220,10 +213,5 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override protected void onDestroy() {
-        super.onDestroy();
-        presenter.onDestroy();
     }
 }

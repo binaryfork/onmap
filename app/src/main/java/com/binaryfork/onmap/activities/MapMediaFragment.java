@@ -1,46 +1,41 @@
 package com.binaryfork.onmap.activities;
 
 import android.os.Bundle;
-import android.view.View;
 
-import com.binaryfork.onmap.clustering.Clusterer;
 import com.binaryfork.onmap.mvp.MapMediaView;
+import com.binaryfork.onmap.mvp.Presenter;
+import com.binaryfork.onmap.mvp.PresenterImplementation;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
 public class MapMediaFragment extends SupportMapFragment {
 
-    private Clusterer clusterer;
-    private MapMediaView mapMediaView;
+    private Presenter presenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+    }
+
+    public void setMapMediaView(MapMediaView mapMediaView) {
+        if (presenter == null)
+            presenter = new PresenterImplementation();
+        presenter.setMapMediaView(mapMediaView);
         getMapAsync(new OnMapReadyCallback() {
             @Override public void onMapReady(GoogleMap googleMap) {
-                clusterer = new Clusterer(getActivity().getApplicationContext(), getMap());
-                clusterer.init(mapMediaView);
+                presenter.setupClusterer(getActivity().getApplicationContext(), googleMap);
             }
         });
     }
 
-
-    @Override public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public Presenter getPresenter() {
+        return presenter;
     }
 
-    public void setMapMediaView(final MapMediaView mapMediaView) {
-        this.mapMediaView = mapMediaView;
-        getMapAsync(new OnMapReadyCallback() {
-            @Override public void onMapReady(GoogleMap googleMap) {
-                clusterer.init(mapMediaView);
-            }
-        });
-    }
-
-    public Clusterer getClusterer() {
-        return clusterer;
+    @Override public void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
     }
 }

@@ -1,14 +1,17 @@
 package com.binaryfork.onmap.mvp;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.binaryfork.onmap.BaseApplication;
+import com.binaryfork.onmap.clustering.Clusterer;
 import com.binaryfork.onmap.network.ApiSource;
 import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.network.MediaList;
 import com.binaryfork.onmap.network.twitter.TweetMedia;
 import com.binaryfork.onmap.util.DateUtils;
 import com.binaryfork.onmap.util.VideoIconTransformation;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -36,19 +39,33 @@ public class PresenterImplementation implements Presenter {
 
     private final static String PICASSO_MAP_MARKER_TAG = "marker";
 
-    public ApiSource apiSource = ApiSource.INSTAGRAM;
+    private ApiSource apiSource = ApiSource.INSTAGRAM;
 
-    private final MapMediaView mapMediaView;
+    private MapMediaView mapMediaView;
+    private Clusterer clusterer;
     private Subscription subscription;
     private LatLng location;
     private long minTimestampSeconds;
     private long maxTimestampSeconds;
     private Transformation videoIconTransformation;
 
-    public PresenterImplementation(MapMediaView mapMediaView) {
+    public PresenterImplementation() {
+        videoIconTransformation = new VideoIconTransformation();
+    }
+
+    @Override public void setMapMediaView(MapMediaView mapMediaView) {
         this.mapMediaView = mapMediaView;
         mapMediaView.showTime(DateUtils.getInterval(minTimestampSeconds, maxTimestampSeconds));
-        videoIconTransformation = new VideoIconTransformation();
+    }
+
+    @Override public void setupClusterer(Context context, GoogleMap map) {
+        if (clusterer == null)
+            clusterer = new Clusterer(context, map);
+        clusterer.init(mapMediaView);
+    }
+
+    @Override public void changeSource(ApiSource apiSource) {
+        this.apiSource = apiSource;
     }
 
     @Override
@@ -70,7 +87,7 @@ public class PresenterImplementation implements Presenter {
         this.location = location;
         // Cancel all loading map photos because all markers will be cleared.
         Picasso.with(BaseApplication.get()).cancelTag(PICASSO_MAP_MARKER_TAG);
-        mapMediaView.clearMap();
+        clusterer.clearItems();
         mapMediaView.showCenterMarker();
         long from = minTimestampSeconds;
         long to = maxTimestampSeconds;
@@ -129,12 +146,12 @@ public class PresenterImplementation implements Presenter {
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(new Action1<Media>() {
                     @Override public void call(final Media media) {
-                        mediaWithThumbBitmap(media)
+                        markerBitmapObservable(media)
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeOn(Schedulers.newThread())
                                 .subscribe(new Action1<Bitmap>() {
                                     @Override public void call(Bitmap bitmap) {
-                                        mapMediaView.addMarker(media, bitmap);
+                                        clusterer.addItem(media, bitmap);
                                     }
                                 });
                     }
@@ -157,7 +174,7 @@ public class PresenterImplementation implements Presenter {
         };
     }
 
-    private Observable<Bitmap> mediaWithThumbBitmap(final Media media) {
+    private Observable<Bitmap> markerBitmapObservable(final Media media) {
         return Observable.create(new Observable.OnSubscribe<Bitmap>() {
             @Override
             public void call(final Subscriber<? super Bitmap> subscriber) {
