@@ -156,9 +156,9 @@ public class PresenterImplementation implements Presenter {
                                     @Override public void call(Bitmap bitmap) {
                                         clusterer.addItem(media, bitmap);
                                     }
-                                });
+                                }, onError(), onComplete());
                     }
-                }, onError(), onComplete());
+                }, onError());
     }
 
     private Action1<Throwable> onError() {
@@ -187,6 +187,7 @@ public class PresenterImplementation implements Presenter {
                 }
                 RequestCreator picasso = Picasso.with(BaseApplication.get())
                         .load(media.getThumbnail())
+                        .config(Bitmap.Config.RGB_565)
                         .tag(PICASSO_MAP_MARKER_TAG);
                 if (media.isVideo()) {
                     picasso = picasso.transform(videoIconTransformation);

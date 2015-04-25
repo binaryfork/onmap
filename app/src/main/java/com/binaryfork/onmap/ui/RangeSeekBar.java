@@ -9,7 +9,7 @@ import com.google.android.gms.maps.model.Circle;
 
 public class RangeSeekBar extends SeekBar implements SeekBar.OnSeekBarChangeListener {
 
-    private final static int MIN = 200;
+    private final static int MIN = 100;
 
     private MapMediaView mapMediaView;
     private Circle circle;
@@ -50,8 +50,6 @@ public class RangeSeekBar extends SeekBar implements SeekBar.OnSeekBarChangeList
     }
 
     @Override public void onStopTrackingTouch(SeekBar seekBar) {
-        if (circle.getRadius() == getProgress())
-            return;
         mapMediaView.setDistance(getProgress());
     }
 

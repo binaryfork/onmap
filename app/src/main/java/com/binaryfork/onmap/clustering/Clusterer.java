@@ -83,7 +83,6 @@ public class Clusterer {
         clusterManager.cluster();
     }
 
-
     private class MediaRenderer extends DefaultClusterRenderer<MediaClusterItem> {
         private final IconGenerator mIconGenerator = new IconGenerator(context);
         private final IconGenerator mClusterIconGenerator = new IconGenerator(context);
