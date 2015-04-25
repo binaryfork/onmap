@@ -155,6 +155,7 @@ public class PresenterImplementation implements Presenter {
                                 .subscribe(new Action1<Bitmap>() {
                                     @Override public void call(Bitmap bitmap) {
                                         clusterer.addItem(media, bitmap);
+                                        clusterer.cluster();
                                     }
                                 }, onError(), onComplete());
                     }
@@ -188,6 +189,7 @@ public class PresenterImplementation implements Presenter {
                 RequestCreator picasso = Picasso.with(BaseApplication.get())
                         .load(media.getThumbnail())
                         .config(Bitmap.Config.RGB_565)
+                        .resize(clusterer.getMarkerDimensions(), clusterer.getMarkerDimensions())
                         .tag(PICASSO_MAP_MARKER_TAG);
                 if (media.isVideo()) {
                     picasso = picasso.transform(videoIconTransformation);
@@ -198,7 +200,6 @@ public class PresenterImplementation implements Presenter {
                 } catch (IOException e) {
                     Timber.w("Picasso IO error %s", e.getMessage());
                 }
-
                 subscriber.onNext(bitmap);
                 subscriber.onCompleted();
             }

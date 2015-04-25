@@ -2,29 +2,16 @@ package com.binaryfork.onmap.clustering;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.network.Media;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.view.DefaultClusterRenderer;
-import com.google.maps.android.ui.IconGenerator;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Clusterer {
 
@@ -41,7 +28,7 @@ public class Clusterer {
 
     public void init(final MapMediaView mapMediaView) {
         markerDimension = (int) context.getResources().getDimension(R.dimen.map_marker_photo);
-        clusterManager.setRenderer(new MediaRenderer());
+        clusterManager.setRenderer(new MediaRenderer(context, map, clusterManager, markerDimension));
         clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MediaClusterItem>() {
             @Override
             public boolean onClusterItemClick(MediaClusterItem mediaClusterItem) {
@@ -72,6 +59,10 @@ public class Clusterer {
         map.setOnMarkerClickListener(clusterManager);
     }
 
+    public int getMarkerDimensions() {
+        return markerDimension;
+    }
+
     public void clearItems() {
         clusterManager.clearItems();
         map.clear();
@@ -80,61 +71,9 @@ public class Clusterer {
     public void addItem(Media media, Bitmap bitmap) {
         MediaClusterItem cluster = new MediaClusterItem(media, bitmap);
         clusterManager.addItem(cluster);
-        clusterManager.cluster();
     }
 
-    private class MediaRenderer extends DefaultClusterRenderer<MediaClusterItem> {
-        private final IconGenerator mIconGenerator = new IconGenerator(context);
-        private final IconGenerator mClusterIconGenerator = new IconGenerator(context);
-        private final ImageView mImageView;
-        private final ImageView mClusterImageView;
-
-        public MediaRenderer() {
-            super(context, map, clusterManager);
-
-            View multiProfile = LayoutInflater.from(context).inflate(R.layout.map_marker_cluster, null);
-            mClusterIconGenerator.setContentView(multiProfile);
-            mClusterImageView = (ImageView) multiProfile.findViewById(R.id.image);
-
-            mImageView = new ImageView(context);
-            mImageView.setLayoutParams(new ViewGroup.LayoutParams(markerDimension, markerDimension));
-            mIconGenerator.setContentView(mImageView);
-        }
-
-        @Override
-        protected void onBeforeClusterItemRendered(MediaClusterItem item, MarkerOptions markerOptions) {
-            mImageView.setImageBitmap(item.thumbBitmap);
-            Bitmap icon = mIconGenerator.makeIcon();
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
-        }
-
-        @Override
-        protected void onBeforeClusterRendered(Cluster<MediaClusterItem> cluster, MarkerOptions markerOptions) {
-            List<Drawable> drawables = new ArrayList<>(Math.min(4, cluster.getSize()));
-            int width = markerDimension;
-            int height = markerDimension;
-
-            for (MediaClusterItem item : cluster.getItems()) {
-                // Draw 4 at most.
-                if (drawables.size() == 4) break;
-                BitmapDrawable drawable = new BitmapDrawable(item.thumbBitmap);
-                drawable.setBounds(0, 0, width, height);
-                drawables.add(drawable);
-            }
-
-            MultiDrawable multiDrawable = new MultiDrawable(drawables);
-            multiDrawable.setBounds(0, 0, width, height);
-
-            mClusterImageView.setImageDrawable(multiDrawable);
-
-            Bitmap icon = mClusterIconGenerator.makeIcon(String.valueOf(cluster.getSize()));
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
-        }
-
-        @Override
-        protected boolean shouldRenderAsCluster(com.google.maps.android.clustering.Cluster cluster) {
-            // Always render clusters.
-            return cluster.getSize() > 1;
-        }
+    public void cluster() {
+        clusterManager.cluster();
     }
 }

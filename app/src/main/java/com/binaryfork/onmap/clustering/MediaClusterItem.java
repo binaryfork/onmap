@@ -17,8 +17,7 @@ public class MediaClusterItem implements ClusterItem {
         this.thumbBitmap = bitmap;
     }
 
-    @Override
-    public LatLng getPosition() {
+    @Override public LatLng getPosition() {
         return new LatLng(media.getLatitude(), media.getLongitude());
     }
 
