@@ -23,6 +23,7 @@ import com.binaryfork.onmap.network.ApiSource;
 import com.binaryfork.onmap.ui.CalendarDialog;
 import com.binaryfork.onmap.ui.ClusterGridView;
 import com.binaryfork.onmap.ui.LocationSearchBox;
+import com.binaryfork.onmap.ui.RangeSeekBar;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -49,6 +50,7 @@ public class MapMediaActivity extends AbstractLocationActivity implements
     @InjectView(R.id.left_drawer) ListView drawerList;
     @InjectView(R.id.info_layout) View mediaContainerLayout;
     @InjectView(R.id.gridView) ClusterGridView gridView;
+    @InjectView(R.id.rangeSeekBar) RangeSeekBar rangeSeekBar;
 
     private GoogleMap map;
     private Circle mapCircle;
@@ -81,6 +83,7 @@ public class MapMediaActivity extends AbstractLocationActivity implements
                 drawerLayout.closeDrawer(drawerList);
             }
         });
+        rangeSeekBar.setMapMediaView(this);
 
         searchBox.setup(this);
         mediaView = new MediaViewImplementation(mediaContainerLayout, getApplicationContext());
@@ -154,15 +157,20 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         searchBox.showLoading(false);
     }
 
-    @Override public void showCenterMarker() {
+    @Override public void setDistance(int distance) {
+        presenter.setDistance(distance);
+    }
+
+    @Override public void showCenterMarker(int distance) {
         if (mapCircle != null)
             mapCircle.remove();
         mapCircle = map.addCircle(new CircleOptions()
                 .center(location)
-                .radius(1000)
+                .radius(distance)
                 .strokeWidth(getResources().getDimension(R.dimen.map_circle_stroke))
                 .strokeColor(0x663333ff)
                 .fillColor(0x113333ff));
+        rangeSeekBar.setMapCircle(mapCircle);
         map.addMarker(new MarkerOptions()
                 .position(location));
     }

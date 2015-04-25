@@ -26,5 +26,6 @@ public interface InstagramMediaService {
     rx.Observable<InstagramItems> mediaSearch(
             @Query("lat") double latitude,
             @Query("lng") double longitude,
+            @Query("distance") int distance,
             @Query("count") int count);
 }

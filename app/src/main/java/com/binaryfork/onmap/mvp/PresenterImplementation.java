@@ -45,6 +45,7 @@ public class PresenterImplementation implements Presenter {
     private Clusterer clusterer;
     private Subscription subscription;
     private LatLng location;
+    private int distance = 1000; // meters.
     private long minTimestampSeconds;
     private long maxTimestampSeconds;
     private Transformation videoIconTransformation;
@@ -78,6 +79,8 @@ public class PresenterImplementation implements Presenter {
 
     @Override
     public void setDistance(int distance) {
+        this.distance = distance;
+        getMedia(location);
     }
 
     @Override
@@ -88,7 +91,7 @@ public class PresenterImplementation implements Presenter {
         // Cancel all loading map photos because all markers will be cleared.
         Picasso.with(BaseApplication.get()).cancelTag(PICASSO_MAP_MARKER_TAG);
         clusterer.clearItems();
-        mapMediaView.showCenterMarker();
+        mapMediaView.showCenterMarker(distance);
         long from = minTimestampSeconds;
         long to = maxTimestampSeconds;
         Observable<? extends MediaList> observable;
@@ -96,7 +99,7 @@ public class PresenterImplementation implements Presenter {
         switch (apiSource) {
             default:
             case INSTAGRAM:
-                observable = model.instagram(location, from, to);
+                observable = model.instagram(location, distance, from, to);
                 break;
             case FLICKR:
                 observable = model.flickr(location);
@@ -104,7 +107,7 @@ public class PresenterImplementation implements Presenter {
             case TWITTER:
                 // Use the callback that makes observable from the list because TwitterCore's
                 // Retrofit service does not provides observables.
-                model.twitter(location, twitterApiCallback());
+                model.twitter(location, distance, twitterApiCallback());
                 return;
         }
         subscribe(observable

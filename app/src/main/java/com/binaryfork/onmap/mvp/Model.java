@@ -10,6 +10,6 @@ import rx.Observable;
 public interface Model {
 
     Observable<? extends MediaList> flickr(LatLng location);
-    Observable<? extends MediaList> instagram(LatLng location, long from, long to);
-    void twitter(LatLng location, Callback<Search> callback);
+    Observable<? extends MediaList> instagram(LatLng location, int distance, long from, long to);
+    void twitter(LatLng location, int distance, Callback<Search> callback);
 }

@@ -10,7 +10,8 @@ public interface MapMediaView {
     void onMenuClick();
     void openPhoto(MediaClusterItem clusterTargetItem);
     void clickPhotoCluster(Cluster<MediaClusterItem> cluster);
-    void showCenterMarker();
+    void showCenterMarker(int distance);
     void goToLocation(LatLng latLng);
     void allMarkesLoaded();
+    void setDistance(int distance);
 }

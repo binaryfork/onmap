@@ -14,20 +14,19 @@ import rx.Observable;
 
 public class ModelImplementation implements Model {
 
-    private final int RESULTS_COUNT = 50;
-    private final int DISTANCE = 1000; // meters
+    private final int RESULTS_COUNT = 100;
 
-    @Override public Observable<InstagramItems> instagram(LatLng location, long from, long to) {
+    @Override public Observable<InstagramItems> instagram(LatLng location, int distance, long from, long to) {
         if (from == 0 || to == 0)
             // Load most recent media.
             return Instagram.getInstance()
                     .mediaService()
-                    .mediaSearch(location.latitude, location.longitude, RESULTS_COUNT);
+                    .mediaSearch(location.latitude, location.longitude, distance, RESULTS_COUNT);
         else
             // Load media between two timestamps in seconds.
             return Instagram.getInstance()
                     .mediaService()
-                    .mediaSearch(location.latitude, location.longitude, from, to, DISTANCE, RESULTS_COUNT);
+                    .mediaSearch(location.latitude, location.longitude, from, to, distance, RESULTS_COUNT);
     }
 
     @Override public Observable<FlickrPhotos> flickr(LatLng location) {
@@ -36,8 +35,8 @@ public class ModelImplementation implements Model {
                 .searchByLocation(location.latitude, location.longitude);
     }
 
-    @Override public void twitter(LatLng location, Callback<Search> callback) {
-        Geocode geocode = new Geocode(location.latitude, location.longitude, DISTANCE / 1000, Geocode.Distance.KILOMETERS);
+    @Override public void twitter(LatLng location, int distance, Callback<Search> callback) {
+        Geocode geocode = new Geocode(location.latitude, location.longitude, distance / 1000, Geocode.Distance.KILOMETERS);
         TwitterInstance.getInstance().getSearchService()
                 .tweets("filter:images", geocode, "", "", "", RESULTS_COUNT, "", 0l, 0l, true, callback);
     }
