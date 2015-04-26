@@ -9,6 +9,7 @@
         <item name="instagram">Instagram</item>
         <item name="flickr">Flickr</item>
         <item name="twitter">Twitter</item>
+        <item name="foursquare">Foursquare</item>
     </string-array>
 
 </resources>

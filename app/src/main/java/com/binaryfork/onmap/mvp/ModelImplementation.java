@@ -1,5 +1,7 @@
 package com.binaryfork.onmap.mvp;
 
+import com.binaryfork.onmap.network.foursquare.Foursquare;
+import com.binaryfork.onmap.network.foursquare.model.FoursquareResponse;
 import com.binaryfork.onmap.network.twitter.TwitterInstance;
 import com.binaryfork.onmap.network.flickr.Flickr;
 import com.binaryfork.onmap.network.flickr.model.FlickrPhotos;
@@ -39,5 +41,11 @@ public class ModelImplementation implements Model {
         Geocode geocode = new Geocode(location.latitude, location.longitude, distance / 1000, Geocode.Distance.KILOMETERS);
         TwitterInstance.getInstance().getSearchService()
                 .tweets("filter:images", geocode, "", "", "", RESULTS_COUNT, "", 0l, 0l, true, callback);
+    }
+
+    @Override public Observable<FoursquareResponse> foursquare(LatLng location) {
+        String latLng = String.valueOf(location.latitude) + "," + String.valueOf(location.longitude);
+        return Foursquare.getInstance().venues()
+                .explore(latLng, 50, 1);
     }
 }

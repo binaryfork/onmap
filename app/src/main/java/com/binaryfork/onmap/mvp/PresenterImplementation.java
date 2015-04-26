@@ -104,6 +104,9 @@ public class PresenterImplementation implements Presenter {
             case FLICKR:
                 observable = model.flickr(location);
                 break;
+            case FOURSQUARE:
+                observable = model.foursquare(location);
+                break;
             case TWITTER:
                 // Use the callback that makes observable from the list because TwitterCore's
                 // Retrofit service does not provides observables.
@@ -116,31 +119,6 @@ public class PresenterImplementation implements Presenter {
                         return Observable.from(mediaList.getList());
                     }
                 }));
-    }
-
-    private Callback<Search> twitterApiCallback() {
-        return new Callback<Search>() {
-            @Override public void success(Result<Search> result) {
-                ArrayList<Media> arrayList = new ArrayList<>();
-                for (Tweet tweet : result.data.tweets) {
-                    TweetMedia tweetMedia = new TweetMedia(tweet);
-                    arrayList.add(tweetMedia);
-                }
-                subscribe(Observable
-                        .from(arrayList)
-                        .subscribeOn(Schedulers.newThread())
-                        .filter(new Func1<Media, Boolean>() {
-                            @Override public Boolean call(Media media) {
-                                return media.getPhotoUrl() != null &&
-                                        (media.getLatitude() != 0 && media.getLongitude() != 0);
-                            }
-                        }));
-            }
-
-            @Override public void failure(TwitterException e) {
-                Timber.e("Twitter error %s ", e.getMessage());
-            }
-        };
     }
 
     private void subscribe(Observable<? extends Media> observable) {
@@ -157,9 +135,9 @@ public class PresenterImplementation implements Presenter {
                                         clusterer.addItem(media, bitmap);
                                         clusterer.cluster();
                                     }
-                                }, onError(), onComplete());
+                                });
                     }
-                }, onError());
+                });
     }
 
     private Action1<Throwable> onError() {
@@ -204,6 +182,31 @@ public class PresenterImplementation implements Presenter {
                 subscriber.onCompleted();
             }
         });
+    }
+
+    private Callback<Search> twitterApiCallback() {
+        return new Callback<Search>() {
+            @Override public void success(Result<Search> result) {
+                ArrayList<Media> arrayList = new ArrayList<>();
+                for (Tweet tweet : result.data.tweets) {
+                    TweetMedia tweetMedia = new TweetMedia(tweet);
+                    arrayList.add(tweetMedia);
+                }
+                subscribe(Observable
+                        .from(arrayList)
+                        .subscribeOn(Schedulers.newThread())
+                        .filter(new Func1<Media, Boolean>() {
+                            @Override public Boolean call(Media media) {
+                                return media.getPhotoUrl() != null &&
+                                        (media.getLatitude() != 0 && media.getLongitude() != 0);
+                            }
+                        }));
+            }
+
+            @Override public void failure(TwitterException e) {
+                Timber.e("Twitter error %s ", e.getMessage());
+            }
+        };
     }
 
     @Override

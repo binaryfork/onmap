@@ -4,5 +4,5 @@ import java.util.ArrayList;
 
 public interface MediaList {
 
-    ArrayList<Media> getList();
+    ArrayList<? extends Media> getList();
 }

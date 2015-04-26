@@ -77,6 +77,9 @@ public class MapMediaActivity extends AbstractLocationActivity implements
                     case 2:
                         apiSource = ApiSource.TWITTER;
                         break;
+                    case 3:
+                        apiSource = ApiSource.FOURSQUARE;
+                        break;
                 }
                 presenter.changeSource(apiSource);
                 loadMarkers();

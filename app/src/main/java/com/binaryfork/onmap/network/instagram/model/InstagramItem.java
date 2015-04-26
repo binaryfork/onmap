@@ -14,12 +14,9 @@ import java.util.List;
 
 public class InstagramItem implements Media {
 
-    private String attribution;
-    private List<String> tags;
     private String type;
     private Long created_time;
     private String link;
-    private String id;
     private Location location;
     private User user;
     private Caption caption;
