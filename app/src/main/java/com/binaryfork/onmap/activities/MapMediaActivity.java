@@ -13,8 +13,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.Intents;
+import com.binaryfork.onmap.Prefs;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
+import com.binaryfork.onmap.mvp.LocationState;
 import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.mvp.MediaView;
 import com.binaryfork.onmap.mvp.MediaViewImplementation;
@@ -42,7 +44,7 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class MapMediaActivity extends AbstractLocationActivity implements
-        GoogleMap.OnMapClickListener, MapMediaView {
+        GoogleMap.OnMapClickListener, MapMediaView, LocationState {
 
     @InjectView(R.id.date) TextView dateTxt;
     @InjectView(R.id.searchbox) LocationSearchBox searchBox;
@@ -94,8 +96,14 @@ public class MapMediaActivity extends AbstractLocationActivity implements
 
         setupRetainedFragment();
 
-        if (savedInstanceState == null)
-            getLocation();
+        if (savedInstanceState == null) {
+            if (getLastLocation() == null)
+                // If no previous location was saved get current location of the user.
+                getLocation();
+            else
+                // Go to last saved location.
+                goToLocation(getLastLocation());
+        }
     }
 
     private void setupRetainedFragment() {
@@ -146,6 +154,7 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         if (latLng == null)
             return;
         location = latLng;
+        saveLastLocation(location);
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
         map.animateCamera(cameraUpdate);
         loadMarkers();
@@ -224,5 +233,13 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override public LatLng getLastLocation() {
+        return Prefs.getLastLocation();
+    }
+
+    @Override public void saveLastLocation(LatLng latLng) {
+        Prefs.putLastLocation(latLng);
     }
 }

@@ -5,8 +5,6 @@ import android.os.Bundle;
 import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.mvp.Presenter;
 import com.binaryfork.onmap.mvp.PresenterImplementation;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
 public class MapMediaFragment extends SupportMapFragment {
@@ -23,11 +21,7 @@ public class MapMediaFragment extends SupportMapFragment {
         if (presenter == null)
             presenter = new PresenterImplementation();
         presenter.setMapMediaView(mapMediaView);
-        getMapAsync(new OnMapReadyCallback() {
-            @Override public void onMapReady(GoogleMap googleMap) {
-                presenter.setupClusterer(getActivity().getApplicationContext(), googleMap);
-            }
-        });
+        presenter.setupClusterer(getActivity().getApplicationContext(), getMap());
     }
 
     public Presenter getPresenter() {

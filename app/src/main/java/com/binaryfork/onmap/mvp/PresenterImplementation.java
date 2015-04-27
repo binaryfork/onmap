@@ -120,7 +120,7 @@ public class PresenterImplementation implements Presenter {
 
     private void subscribe(Observable<? extends Media> observable) {
         subscription = observable
-                .observeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(new Action1<Media>() {
                     @Override public void call(final Media media) {
