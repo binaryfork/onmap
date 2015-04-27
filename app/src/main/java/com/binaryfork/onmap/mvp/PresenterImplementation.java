@@ -69,22 +69,19 @@ public class PresenterImplementation implements Presenter {
         this.apiSource = apiSource;
     }
 
-    @Override
-    public void setTime(long min, long max) {
+    @Override public void setTime(long min, long max) {
         minTimestampSeconds = min;
         maxTimestampSeconds = max;
         mapMediaView.showTime(DateUtils.getInterval(minTimestampSeconds, maxTimestampSeconds));
         getMedia(location);
     }
 
-    @Override
-    public void setDistance(int distance) {
+    @Override public void setDistance(int distance) {
         this.distance = distance;
         getMedia(location);
     }
 
-    @Override
-    public void getMedia(LatLng location) {
+    @Override public void getMedia(LatLng location) {
         if (subscription != null)
             subscription.unsubscribe();
         this.location = location;
@@ -135,15 +132,15 @@ public class PresenterImplementation implements Presenter {
                                         clusterer.addItem(media, bitmap);
                                         clusterer.cluster();
                                     }
-                                });
+                                }, onError());
                     }
-                });
+                }, onError(), onComplete());
     }
 
     private Action1<Throwable> onError() {
         return new Action1<Throwable>() {
             @Override public void call(Throwable throwable) {
-                Timber.e("Marker subscription error %s", throwable.getMessage());
+                Timber.e(throwable, "Marker subscription error");
             }
         };
     }
@@ -176,7 +173,7 @@ public class PresenterImplementation implements Presenter {
                 try {
                     bitmap = picasso.get();
                 } catch (IOException e) {
-                    Timber.w("Picasso IO error %s", e.getMessage());
+                    Timber.w(e, "Picasso IO error");
                 }
                 subscriber.onNext(bitmap);
                 subscriber.onCompleted();
@@ -204,13 +201,12 @@ public class PresenterImplementation implements Presenter {
             }
 
             @Override public void failure(TwitterException e) {
-                Timber.e("Twitter error %s ", e.getMessage());
+                Timber.e(e, "Twitter error");
             }
         };
     }
 
-    @Override
-    public void onDestroy() {
+    @Override public void onDestroy() {
         if (subscription != null) {
             subscription.unsubscribe();
         }

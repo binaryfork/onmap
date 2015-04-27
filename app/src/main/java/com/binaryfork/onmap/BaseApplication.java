@@ -12,11 +12,6 @@ import timber.log.Timber;
 
 public class BaseApplication extends Application {
 
-    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "mAzg8gAN1xFBst86ctjnu9jvH";
-    private static final String TWITTER_SECRET = "rS6y5gZ2IINcY6KQQEVQVYnZUlvOqQXMKrDtw6Ztb1RGIARnd5";
-
-
     private static Context instance;
 
     public static Context get() {
@@ -25,7 +20,7 @@ public class BaseApplication extends Application {
 
     @Override public void onCreate() {
         super.onCreate();
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter), getString(R.string.twitter_sec));
         Fabric.with(this, new Twitter(authConfig));
         TwitterInstance.getInstance();
         instance = getApplicationContext();

@@ -1,8 +1,12 @@
 package com.binaryfork.onmap.network.foursquare.model;
 
 import android.text.Spannable;
+import android.text.style.ForegroundColorSpan;
 
+import com.binaryfork.onmap.BaseApplication;
+import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.network.Media;
+import com.binaryfork.onmap.util.Spanny;
 
 import java.util.ArrayList;
 
@@ -100,7 +104,15 @@ public class FoursquareItem implements Media {
 
     @Override
     public Spannable getComments() {
-        return null;
+        int authorColor = BaseApplication.get().getResources().getColor(R.color.accent);
+        Spanny spanny = new Spanny();
+        if (tips != null && tips.size() > 0) {
+            for (Tip tip : tips) {
+                spanny.append(tip.user.firstName + " " + tip.user.lastName, new ForegroundColorSpan(authorColor))
+                        .append(" " + tip.text + "\n");
+            }
+        }
+        return spanny.getSpannable();
     }
 
 }
