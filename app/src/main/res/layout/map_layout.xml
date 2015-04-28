@@ -26,7 +26,7 @@
         android:layout_marginLeft="72dp"
         android:layout_marginRight="72dp"
         android:layout_alignParentBottom="true"
-        android:max="3000"
+        android:max="5000"
         android:progress="1000"/>
 
     <com.binaryfork.onmap.ui.LocationSearchBox

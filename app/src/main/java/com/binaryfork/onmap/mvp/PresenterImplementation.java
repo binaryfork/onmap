@@ -35,7 +35,8 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class PresenterImplementation implements Presenter {
+public class PresenterImplementation implements
+        Presenter {
 
     private final static String PICASSO_MAP_MARKER_TAG = "marker";
 
@@ -45,18 +46,17 @@ public class PresenterImplementation implements Presenter {
     private Clusterer clusterer;
     private Subscription subscription;
     private LatLng location;
-    private int distance = 1000; // meters.
-    private long minTimestampSeconds;
-    private long maxTimestampSeconds;
     private Transformation videoIconTransformation;
+    private ModelImplementation model;
 
     public PresenterImplementation() {
         videoIconTransformation = new VideoIconTransformation();
+        model = new ModelImplementation();
     }
 
     @Override public void setMapMediaView(MapMediaView mapMediaView) {
         this.mapMediaView = mapMediaView;
-        mapMediaView.showTime(DateUtils.getInterval(minTimestampSeconds, maxTimestampSeconds));
+        mapMediaView.showTime(DateUtils.getInterval(model.from, model.to));
     }
 
     @Override public void setupClusterer(Context context, GoogleMap map) {
@@ -70,14 +70,14 @@ public class PresenterImplementation implements Presenter {
     }
 
     @Override public void setTime(long min, long max) {
-        minTimestampSeconds = min;
-        maxTimestampSeconds = max;
-        mapMediaView.showTime(DateUtils.getInterval(minTimestampSeconds, maxTimestampSeconds));
+        model.from = min;
+        model.to = max;
+        mapMediaView.showTime(DateUtils.getInterval(min, max));
         getMedia(location);
     }
 
     @Override public void setDistance(int distance) {
-        this.distance = distance;
+        model.distance = distance;
         getMedia(location);
     }
 
@@ -88,15 +88,12 @@ public class PresenterImplementation implements Presenter {
         // Cancel all loading map photos because all markers will be cleared.
         Picasso.with(BaseApplication.get()).cancelTag(PICASSO_MAP_MARKER_TAG);
         clusterer.clearItems();
-        mapMediaView.showCenterMarker(distance);
-        long from = minTimestampSeconds;
-        long to = maxTimestampSeconds;
+        mapMediaView.showCenterMarker(model.distance);
         Observable<? extends MediaList> observable;
-        Model model = new ModelImplementation();
         switch (apiSource) {
             default:
             case INSTAGRAM:
-                observable = model.instagram(location, distance, from, to);
+                observable = model.instagram(location);
                 break;
             case FLICKR:
                 observable = model.flickr(location);
@@ -107,7 +104,7 @@ public class PresenterImplementation implements Presenter {
             case TWITTER:
                 // Use the callback that makes observable from the list because TwitterCore's
                 // Retrofit service does not provides observables.
-                model.twitter(location, distance, twitterApiCallback());
+                model.twitter(location, twitterApiCallback());
                 return;
         }
         subscribe(observable
