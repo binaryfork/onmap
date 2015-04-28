@@ -1,15 +1,16 @@
 package com.binaryfork.onmap;
 
-import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
+import com.binaryfork.onmap.activities.MainPreferenceActivity;
 import com.google.android.gms.maps.model.LatLng;
 
 public class Prefs {
 
     private static SharedPreferences prefs() {
-        return BaseApplication.get().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        return PreferenceManager.getDefaultSharedPreferences(BaseApplication.get());
     }
 
     public static void putLastLocation(LatLng latLng) {
@@ -24,5 +25,9 @@ public class Prefs {
             return null;
         else
             return new LatLng(prefs().getFloat("lat", 0), prefs().getFloat("lng", 0));
+    }
+
+    public static boolean isSaveLocation() {
+        return prefs().getBoolean(MainPreferenceActivity.SAVE_LOCATION, true);
     }
 }

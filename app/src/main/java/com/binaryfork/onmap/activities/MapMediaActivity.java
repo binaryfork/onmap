@@ -64,7 +64,7 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
         drawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                getResources().getStringArray(R.array.api_sources)));
+                getResources().getStringArray(R.array.drawer_items)));
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ApiSource apiSource;
@@ -82,6 +82,9 @@ public class MapMediaActivity extends AbstractLocationActivity implements
                     case 3:
                         apiSource = ApiSource.FOURSQUARE;
                         break;
+                    case 4:
+                        startActivity(new Intent(MapMediaActivity.this, MainPreferenceActivity.class));
+                        return;
                 }
                 presenter.changeSource(apiSource);
                 loadMarkers();
@@ -221,7 +224,9 @@ public class MapMediaActivity extends AbstractLocationActivity implements
     }
 
     @Override public void onBackPressed() {
-        if (mediaContainerLayout.isShown()) {
+        if (drawerLayout.isDrawerOpen(drawerList)) {
+            drawerLayout.closeDrawer(drawerList);
+        } else if (mediaContainerLayout.isShown()) {
             mediaView.hide();
         } else if (gridView.isShown()) {
             hidePhotoGrid();
@@ -231,7 +236,7 @@ public class MapMediaActivity extends AbstractLocationActivity implements
     }
 
     @Override public LatLng getLastLocation() {
-        return Prefs.getLastLocation();
+        return Prefs.isSaveLocation() ? Prefs.getLastLocation() : null;
     }
 
     @Override public void saveLastLocation(LatLng latLng) {

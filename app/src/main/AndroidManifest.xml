@@ -36,6 +36,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".activities.MainPreferenceActivity"/>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="5b7a5c9a1a226b44149ce512a7775cd3032c6724" />

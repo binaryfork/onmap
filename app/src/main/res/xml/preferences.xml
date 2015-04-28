@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Location">
+
+        <CheckBoxPreference
+            android:key="pref_save_location"
+            android:defaultValue="true"
+            android:summary="Load last location on start."
+            android:title="Remember location"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
