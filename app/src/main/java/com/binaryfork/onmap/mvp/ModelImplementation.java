@@ -37,11 +37,14 @@ public class ModelImplementation implements Model {
     @Override public Observable<FlickrPhotos> flickr(LatLng location) {
         return Flickr.getInstance()
                 .photos()
-                .searchByLocation(location.latitude, location.longitude);
+                .searchByLocation(from * 1000, to * 1000, kilometers(), location.latitude, location.longitude);
     }
 
+    /**
+     * https://dev.twitter.com/rest/reference/get/search/tweets
+     */
     @Override public void twitter(LatLng location, Callback<Search> callback) {
-        Geocode geocode = new Geocode(location.latitude, location.longitude, distance / 1000, Geocode.Distance.KILOMETERS);
+        Geocode geocode = new Geocode(location.latitude, location.longitude, kilometers(), Geocode.Distance.KILOMETERS);
         TwitterInstance.getInstance().getSearchService()
                 .tweets("filter:images", geocode, "", "", "", RESULTS_COUNT, "", 0l, 0l, true, callback);
     }
@@ -50,5 +53,9 @@ public class ModelImplementation implements Model {
         String latLng = String.valueOf(location.latitude) + "," + String.valueOf(location.longitude);
         return Foursquare.getInstance().venues()
                 .explore(latLng, distance, 50, 1);
+    }
+
+    private int kilometers() {
+        return distance < 1000 ? 1 : distance / 1000;
     }
 }
