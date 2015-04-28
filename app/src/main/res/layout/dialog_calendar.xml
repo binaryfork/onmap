@@ -3,65 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="@color/accent"
+        android:text="Most recent"
+        android:gravity="center"
+        android:textAppearance="@android:style/TextAppearance.Large.Inverse"/>
     <com.squareup.timessquare.CalendarPickerView
         android:id="@+id/calendar_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="0dp"
+        android:layout_marginTop="72dp"
+        android:padding="16dp"
         android:background="@android:color/transparent"
         app:dividerColor="@android:color/transparent"
         app:dayBackground="@drawable/calendar_selector"/>
-    <TextView
-        android:visibility="gone"
-        android:text="Most recent"
-        android:layout_gravity="bottom"
-        android:gravity="center"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:id="@+id/recent"/>
-    <LinearLayout
-        android:visibility="gone"
-        android:id="@+id/range"
-        android:layout_gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="16dp">
-        <TextView
-            android:text="Hour"
-            android:gravity="center"
-            android:textAppearance="@android:style/TextAppearance.Medium"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:id="@+id/hour"/>
-        <TextView
-            android:text="Day"
-            android:gravity="center"
-            android:textAppearance="@android:style/TextAppearance.Medium"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:id="@+id/day"/>
-        <TextView
-            android:text="Week"
-            android:gravity="center"
-            android:textAppearance="@android:style/TextAppearance.Medium"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:id="@+id/week"/>
-        <TextView
-            android:text="Month"
-            android:gravity="center"
-            android:textAppearance="@android:style/TextAppearance.Medium"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:id="@+id/month"/>
-    </LinearLayout>
 </FrameLayout>

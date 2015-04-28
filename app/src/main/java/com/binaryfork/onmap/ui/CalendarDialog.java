@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.View;
+import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.util.DateUtils;
@@ -27,6 +28,7 @@ public class CalendarDialog extends DialogFragment {
     public OnDateChangeListener onDateChangeListener;
 
     @InjectView(R.id.calendar_view) CalendarPickerView datePicker;
+    @InjectView(R.id.title) TextView title;
 
     @NonNull @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -41,11 +43,17 @@ public class CalendarDialog extends DialogFragment {
         today.add(Calendar.DAY_OF_YEAR, 1);
 
         datePicker.init(nextYear.getTime(), today.getTime())
-                .withSelectedDate(new Date())
                 .inMode(CalendarPickerView.SelectionMode.RANGE);
+        datePicker.scrollToDate(new Date());
         List<CalendarCellDecorator> decorators = new ArrayList<CalendarCellDecorator>();
         decorators.add(new CalendarDecorator());
         datePicker.setDecorators(decorators);
+        datePicker.setCellClickInterceptor(new CalendarPickerView.CellClickInterceptor() {
+            @Override public boolean onCellClicked(Date date) {
+                selectWeek(date);
+                return true;
+            }
+        });
 
         builder.setView(view);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -60,6 +68,19 @@ public class CalendarDialog extends DialogFragment {
                 })
                 .setNegativeButton(android.R.string.cancel, null);
         return builder.create();
+    }
+
+    private void selectWeek(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_WEEK, 1);
+        Date from = calendar.getTime();
+        calendar.set(Calendar.DAY_OF_WEEK, 7);
+        // Don't exceed current time.
+        Date to = calendar.getTime().after(new Date()) ? new Date() : calendar.getTime();
+        datePicker.selectDate(from);
+        datePicker.selectDate(to);
+        title.setText(DateUtils.getInterval(from.getTime() / 1000, to.getTime() / 1000));
     }
 
     private void setDate() {

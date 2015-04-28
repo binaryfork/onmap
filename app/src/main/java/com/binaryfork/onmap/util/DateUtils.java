@@ -13,7 +13,7 @@ public class DateUtils {
     }
 
     public static String formatDate(long seconds) {
-        SimpleDateFormat serverFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+        SimpleDateFormat serverFormat = new SimpleDateFormat("dd MMM", Locale.getDefault());
         return serverFormat.format(seconds * 1000);
     }
 
