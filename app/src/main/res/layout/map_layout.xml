@@ -15,7 +15,7 @@
         android:layout_width="72dp"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/accent_transparent"
+        android:background="@color/accent"
         android:gravity="center"
         android:textAppearance="@android:style/TextAppearance.Medium.Inverse"/>
 

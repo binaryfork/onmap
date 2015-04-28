@@ -44,7 +44,7 @@ import butterknife.OnClick;
 import timber.log.Timber;
 
 public class MapMediaActivity extends AbstractLocationActivity implements
-        GoogleMap.OnMapClickListener, MapMediaView, LocationState {
+        MapMediaView, LocationState {
 
     @InjectView(R.id.date) TextView dateTxt;
     @InjectView(R.id.searchbox) LocationSearchBox searchBox;
@@ -113,7 +113,6 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         presenter = mapMediaFragment.getPresenter();
         if (map == null) {
             map = mapMediaFragment.getMap();
-            map.setOnMapClickListener(this);
             map.setMyLocationEnabled(true);
             map.getUiSettings().setZoomControlsEnabled(true);
         }
@@ -190,10 +189,6 @@ public class MapMediaActivity extends AbstractLocationActivity implements
     @Override protected void onLocationReceived(LatLng location) {
         Timber.i("location %s", location);
         goToLocation(location);
-    }
-
-    @Override public void onMapClick(LatLng latLng) {
-        goToLocation(latLng);
     }
 
     @OnClick(R.id.date) void datePicker() {
