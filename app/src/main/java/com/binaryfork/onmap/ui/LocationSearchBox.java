@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.mvp.GeoSearchView;
 import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.network.google.GoogleGeo;
 import com.binaryfork.onmap.network.google.model.GeocodeItem;
@@ -21,7 +22,7 @@ import rx.android.widget.WidgetObservable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
-public class LocationSearchBox extends SearchBox {
+public class LocationSearchBox extends SearchBox implements GeoSearchView {
 
     public LocationSearchBox(Context context) {
         super(context);
@@ -38,23 +39,9 @@ public class LocationSearchBox extends SearchBox {
         init();
     }
 
-    public void setup(final MapMediaView mapMediaView) {
-        setOnSuggestionClickListener(new OnSuggestionClick() {
-            @Override
-            public void onSuggestionClick(SearchResult searchResult) {
-                mapMediaView.goToLocation(new LatLng(searchResult.lat, searchResult.lng));
-            }
-        });
-        setMenuListener(new MenuListener() {
-            @Override
-            public void onMenuClick() {
-                mapMediaView.onMenuClick();
-            }
-        });
-    }
-
     private void init() {
-        setLogoText(getContext().getString(R.string.search_location_hint));
+        setLogoText("");
+        getEditText().setHint(R.string.search_location_hint);
         searchTextChangedObservable()
                 .debounce(100, TimeUnit.MILLISECONDS)
                 .switchMap(geocodeResults())
@@ -108,5 +95,24 @@ public class LocationSearchBox extends SearchBox {
                 }
             }
         };
+    }
+
+    @Override public void setMapMediaView(final MapMediaView mapMediaView) {
+        setOnSuggestionClickListener(new OnSuggestionClick() {
+            @Override
+            public void onSuggestionClick(SearchResult searchResult) {
+                mapMediaView.goToLocation(new LatLng(searchResult.lat, searchResult.lng));
+            }
+        });
+        setMenuListener(new MenuListener() {
+            @Override
+            public void onMenuClick() {
+                mapMediaView.onMenuClick();
+            }
+        });
+    }
+
+    @Override public void showProgress(boolean isLoading) {
+        showLoading(isLoading);
     }
 }

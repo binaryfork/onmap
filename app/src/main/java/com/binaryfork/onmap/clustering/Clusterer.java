@@ -6,11 +6,8 @@ import android.graphics.Bitmap;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.network.Media;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 
 public class Clusterer {
@@ -39,19 +36,7 @@ public class Clusterer {
         clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MediaClusterItem>() {
             @Override
             public boolean onClusterClick(Cluster<MediaClusterItem> cluster) {
-                LatLngBounds.Builder builder = LatLngBounds.builder();
-                for (ClusterItem item : cluster.getItems()) {
-                    builder.include(item.getPosition());
-                }
-                final LatLngBounds bounds = builder.build();
-                if (map.getMaxZoomLevel() == map.getCameraPosition().zoom
-                        || bounds.southwest.equals(bounds.northeast)) {
-                    mapMediaView.clickPhotoCluster(cluster);
-                } else {
-                    // map.animateCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), map
-                    //         .getCameraPosition().zoom + 1));
-                    map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
-                }
+                mapMediaView.clickPhotoCluster(cluster);
                 return true;
             }
         });

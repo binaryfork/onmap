@@ -32,7 +32,9 @@ public class ClusterAdapter extends RecyclerView.Adapter<ClusterAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Picasso.with(context).load(data.get(position).media.getPhotoUrl()).into(holder.imageView);
+        Picasso.with(context).load(data.get(position).media.getPhotoUrl())
+                .placeholder(R.drawable.ic_launcher)
+                .into(holder.imageView);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.network.ApiSource;
+import com.google.android.gms.maps.GoogleMap;
 
 import java.util.ArrayList;
 
@@ -42,6 +43,10 @@ public class DrawerList extends ListView implements AdapterView.OnItemClickListe
         items.add(new DrawerItem(ApiSource.FOURSQUARE));
         items.add(new DrawerItem(ApiSource.TWITTER));
         items.add(new DrawerItem(ApiSource.FLICKR));
+        items.add(new DrawerItem(getContext().getString(R.string.satellite),
+                GoogleMap.MAP_TYPE_HYBRID, android.R.drawable.ic_dialog_map));
+        items.add(new DrawerItem(getContext().getString(R.string.terrain),
+                GoogleMap.MAP_TYPE_TERRAIN, android.R.drawable.ic_dialog_map));
         items.add(new DrawerItem(getContext().getString(R.string.prefs)));
         drawerAdapter = new DrawerAdapter(items);
         setAdapter(drawerAdapter);
@@ -60,6 +65,7 @@ public class DrawerList extends ListView implements AdapterView.OnItemClickListe
         @DrawableRes public int resource;
         public String title;
         public ApiSource apiSource;
+        public int mapType;
 
         public DrawerItem(String title) {
             this.title = title;
@@ -67,6 +73,11 @@ public class DrawerList extends ListView implements AdapterView.OnItemClickListe
 
         public DrawerItem(String title, @DrawableRes int drawableResource) {
             this.title = title;
+            this.resource = drawableResource;
+        }
+        public DrawerItem(String title, int mapType, @DrawableRes int drawableResource) {
+            this.title = title;
+            this.mapType = mapType;
             this.resource = drawableResource;
         }
 

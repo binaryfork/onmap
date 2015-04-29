@@ -3,7 +3,6 @@ package com.binaryfork.onmap.activities;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
@@ -13,6 +12,7 @@ import com.binaryfork.onmap.Intents;
 import com.binaryfork.onmap.Prefs;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
+import com.binaryfork.onmap.mvp.GeoSearchView;
 import com.binaryfork.onmap.mvp.LocationState;
 import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.mvp.MediaView;
@@ -33,8 +33,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 
-import java.util.ArrayList;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -44,7 +42,6 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         MapMediaView, LocationState {
 
     @InjectView(R.id.date) TextView dateTxt;
-    @InjectView(R.id.searchbox) LocationSearchBox searchBox;
     @InjectView(R.id.drawer_layout) DrawerLayout drawerLayout;
     @InjectView(R.id.left_drawer) DrawerList drawerList;
     @InjectView(R.id.info_layout) View mediaContainerLayout;
@@ -55,6 +52,7 @@ public class MapMediaActivity extends AbstractLocationActivity implements
     private Circle mapCircle;
     private Presenter presenter;
     private MediaView mediaView;
+    private GeoSearchView geoSearchView;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +63,8 @@ public class MapMediaActivity extends AbstractLocationActivity implements
                 if (drawerItem.apiSource != null) {
                     presenter.changeSource(drawerItem.apiSource);
                     loadMarkers();
+                } else if (drawerItem.mapType != 0) {
+                    map.setMapType(drawerItem.mapType);
                 } else {
                     startActivity(new Intent(MapMediaActivity.this, MainPreferenceActivity.class));
                 }
@@ -72,13 +72,11 @@ public class MapMediaActivity extends AbstractLocationActivity implements
             }
         });
         rangeSeekBar.setMapMediaView(this);
-
-        searchBox.setup(this);
+        geoSearchView = (LocationSearchBox) findViewById(R.id.searchbox);
+        geoSearchView.setMapMediaView(this);
         mediaView = new MediaViewImplementation(mediaContainerLayout, getApplicationContext());
         gridView.mediaView = mediaView;
-
         setupRetainedFragment();
-
         if (savedInstanceState == null) {
             if (getLastLocation() == null)
                 // If no previous location was saved get current location of the user.
@@ -143,12 +141,12 @@ public class MapMediaActivity extends AbstractLocationActivity implements
     }
 
     private void loadMarkers() {
-        searchBox.showLoading(true);
+        geoSearchView.showProgress(true);
         presenter.getMedia(location);
     }
 
     @Override public void allMarkesLoaded() {
-        searchBox.showLoading(false);
+        geoSearchView.showProgress(false);
     }
 
     @Override public void setDistance(int distance) {
@@ -186,21 +184,6 @@ public class MapMediaActivity extends AbstractLocationActivity implements
 
     @OnClick(R.id.username) public void onClickUsername() {
         Intents.openLink(this, mediaView.getMedia().getSiteUrl());
-    }
-
-    // Required by SearchBox.
-    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1234 && resultCode == RESULT_OK) {
-            ArrayList<String> matches = data
-                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            searchBox.populateEditText(matches);
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    // Required by SearchBox.
-    public void mic(View v) {
-        searchBox.micClick(this);
     }
 
     @Override public void onBackPressed() {
