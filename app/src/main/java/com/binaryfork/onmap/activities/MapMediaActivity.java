@@ -7,9 +7,6 @@ import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.Intents;
@@ -21,9 +18,9 @@ import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.mvp.MediaView;
 import com.binaryfork.onmap.mvp.MediaViewImplementation;
 import com.binaryfork.onmap.mvp.Presenter;
-import com.binaryfork.onmap.network.ApiSource;
 import com.binaryfork.onmap.ui.CalendarDialog;
 import com.binaryfork.onmap.ui.ClusterGridView;
+import com.binaryfork.onmap.ui.DrawerList;
 import com.binaryfork.onmap.ui.LocationSearchBox;
 import com.binaryfork.onmap.ui.RangeSeekBar;
 import com.google.android.gms.maps.CameraUpdate;
@@ -49,7 +46,7 @@ public class MapMediaActivity extends AbstractLocationActivity implements
     @InjectView(R.id.date) TextView dateTxt;
     @InjectView(R.id.searchbox) LocationSearchBox searchBox;
     @InjectView(R.id.drawer_layout) DrawerLayout drawerLayout;
-    @InjectView(R.id.left_drawer) ListView drawerList;
+    @InjectView(R.id.left_drawer) DrawerList drawerList;
     @InjectView(R.id.info_layout) View mediaContainerLayout;
     @InjectView(R.id.gridView) ClusterGridView gridView;
     @InjectView(R.id.rangeSeekBar) RangeSeekBar rangeSeekBar;
@@ -63,31 +60,14 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
-        drawerList.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                getResources().getStringArray(R.array.drawer_items)));
-        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ApiSource apiSource;
-                switch (position) {
-                    default:
-                    case 0:
-                        apiSource = ApiSource.INSTAGRAM;
-                        break;
-                    case 1:
-                        apiSource = ApiSource.FLICKR;
-                        break;
-                    case 2:
-                        apiSource = ApiSource.TWITTER;
-                        break;
-                    case 3:
-                        apiSource = ApiSource.FOURSQUARE;
-                        break;
-                    case 4:
-                        startActivity(new Intent(MapMediaActivity.this, MainPreferenceActivity.class));
-                        return;
+        drawerList.setCallback(new DrawerList.OnDrawerItemClickListener() {
+            @Override public void onClick(DrawerList.DrawerItem drawerItem) {
+                if (drawerItem.apiSource != null) {
+                    presenter.changeSource(drawerItem.apiSource);
+                    loadMarkers();
+                } else {
+                    startActivity(new Intent(MapMediaActivity.this, MainPreferenceActivity.class));
                 }
-                presenter.changeSource(apiSource);
-                loadMarkers();
                 drawerLayout.closeDrawer(drawerList);
             }
         });

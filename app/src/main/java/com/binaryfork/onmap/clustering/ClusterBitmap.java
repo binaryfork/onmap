@@ -14,7 +14,7 @@ public class ClusterBitmap {
     public final int dimensions;
 
     public ClusterBitmap(List<Bitmap> bitmaps, int dimensions) {
-         this.bitmaps = bitmaps;
+        this.bitmaps = bitmaps;
         this.dimensions = dimensions;
     }
 
@@ -76,10 +76,10 @@ public class ClusterBitmap {
         // Draw number of photos in cluster.
         Paint paint = new Paint();
         paint.setColor(Color.WHITE);
-        paint.setTextSize(25);
+        paint.setTextSize(28);
         paint.setTextAlign(Paint.Align.CENTER);
         int x = (canvas.getWidth() / 2);
-        int y = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2)) ;
+        int y = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2));
         canvas.drawText(String.valueOf(number), x, y, paint);
 
         return canvasBitmap;

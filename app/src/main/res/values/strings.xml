@@ -5,12 +5,10 @@
     <string name="title_activity_maps">OnMap</string>
     <string name="search_location_hint">Search location</string>
 
-    <string-array name="drawer_items">
-        <item name="instagram">Instagram</item>
-        <item name="flickr">Flickr</item>
-        <item name="twitter">Twitter</item>
-        <item name="foursquare">Foursquare</item>
-        <item name="prefs">Preferences</item>
-    </string-array>
+    <string name="instagram">Instagram</string>
+    <string name="flickr">Flickr</string>
+    <string name="twitter">Twitter</string>
+    <string name="foursquare">Foursquare</string>
+    <string name="prefs">Preferences</string>
 
 </resources>

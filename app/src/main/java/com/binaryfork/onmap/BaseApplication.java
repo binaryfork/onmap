@@ -20,7 +20,7 @@ public class BaseApplication extends Application {
 
     @Override public void onCreate() {
         super.onCreate();
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter), getString(R.string.twitter_sec));
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_id), getString(R.string.twitter_sec));
         Fabric.with(this, new Twitter(authConfig));
         TwitterInstance.getInstance();
         instance = getApplicationContext();
