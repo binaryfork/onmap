@@ -40,7 +40,7 @@ public class InstagramItem implements Media {
     }
 
     @Override
-    public String getUsername() {
+    public String getTitle() {
         return user.username;
     }
 
@@ -87,6 +87,10 @@ public class InstagramItem implements Media {
                         .append(" " + comment.text);
             }
         return spanny.getSpannable();
+    }
+
+    @Override public String getAdderss() {
+        return null;
     }
 
     public class Location {

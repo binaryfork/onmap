@@ -1,6 +1,5 @@
 package com.binaryfork.onmap.network.twitter;
 
-import android.graphics.Bitmap;
 import android.text.Spannable;
 import android.text.SpannableString;
 
@@ -35,7 +34,7 @@ public class TweetMedia implements Media {
         return null;
     }
 
-    @Override public String getUsername() {
+    @Override public String getTitle() {
         return tweet.user.name;
     }
 
@@ -78,5 +77,9 @@ public class TweetMedia implements Media {
 
     @Override public Spannable getComments() {
         return new SpannableString(tweet.text);
+    }
+
+    @Override public String getAdderss() {
+        return null;
     }
 }

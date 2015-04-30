@@ -6,4 +6,7 @@ public interface GeoSearchView {
 
     void showProgress(boolean isLoading);
 
+    boolean isShown();
+
+    void hide();
 }

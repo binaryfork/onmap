@@ -10,7 +10,7 @@ public interface Media {
 
     String getVideoUrl();
 
-    String getUsername();
+    String getTitle();
 
     String getUserpic();
 
@@ -25,4 +25,6 @@ public interface Media {
     long getCreatedDate();
 
     Spannable getComments();
+
+    String getAdderss();
 }

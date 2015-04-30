@@ -16,7 +16,7 @@ import rx.functions.Func1;
 
 public class GeoSearchModel {
 
-    public void subscribe(TextView input, Action1<GeocodeResults> onComplete) {
+    public static void subscribe(TextView input, Action1<GeocodeResults> onComplete) {
         textChangedObservable(input)
                 .debounce(100, TimeUnit.MILLISECONDS)
                 .switchMap(geocodeResults())
@@ -24,7 +24,7 @@ public class GeoSearchModel {
                 .subscribe(onComplete);
     }
 
-    private Observable<String> textChangedObservable(TextView input) {
+    private static Observable<String> textChangedObservable(TextView input) {
         return WidgetObservable
                 .text(input)
                 .map(new Func1<OnTextChangeEvent, String>() {
@@ -35,7 +35,7 @@ public class GeoSearchModel {
                 });
     }
 
-    private Func1<String, Observable<GeocodeResults>> geocodeResults() {
+    private static Func1<String, Observable<GeocodeResults>> geocodeResults() {
         return new Func1<String, Observable<GeocodeResults>>() {
             @Override
             public Observable<GeocodeResults> call(String query) {

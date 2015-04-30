@@ -1,6 +1,5 @@
 package com.binaryfork.onmap.network.flickr.model;
 
-import android.graphics.Bitmap;
 import android.text.Spannable;
 
 import com.binaryfork.onmap.network.Media;
@@ -30,7 +29,7 @@ public class FlickrPhoto implements Media {
     }
 
     @Override
-    public String getUsername() {
+    public String getTitle() {
         return ownername;
     }
 
@@ -66,6 +65,10 @@ public class FlickrPhoto implements Media {
 
     @Override
     public Spannable getComments() {
+        return null;
+    }
+
+    @Override public String getAdderss() {
         return null;
     }
 

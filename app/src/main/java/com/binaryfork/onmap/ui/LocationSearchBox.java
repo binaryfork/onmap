@@ -2,6 +2,7 @@ package com.binaryfork.onmap.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.mvp.GeoSearchView;
@@ -23,6 +24,8 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class LocationSearchBox extends SearchBox implements GeoSearchView {
+
+    private MapMediaView mapMediaView;
 
     public LocationSearchBox(Context context) {
         super(context);
@@ -47,6 +50,11 @@ public class LocationSearchBox extends SearchBox implements GeoSearchView {
                 .switchMap(geocodeResults())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(showSearchSuggestions());
+        logo.setOnClickListener(new OnClickListener() {
+            @Override public void onClick(View v) {
+                mapMediaView.showSearchSuggestions();
+            }
+        });
     }
 
     private Observable<String> searchTextChangedObservable() {
@@ -98,6 +106,7 @@ public class LocationSearchBox extends SearchBox implements GeoSearchView {
     }
 
     @Override public void setMapMediaView(final MapMediaView mapMediaView) {
+        this.mapMediaView = mapMediaView;
         setOnSuggestionClickListener(new OnSuggestionClick() {
             @Override
             public void onSuggestionClick(SearchResult searchResult) {
@@ -114,5 +123,9 @@ public class LocationSearchBox extends SearchBox implements GeoSearchView {
 
     @Override public void showProgress(boolean isLoading) {
         showLoading(isLoading);
+    }
+
+    @Override public void hide() {
+
     }
 }

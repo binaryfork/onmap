@@ -9,29 +9,50 @@ import android.view.animation.TranslateAnimation;
 public class Animations {
 
     public static void moveFromTop(View view) {
-        TranslateAnimation animation = new TranslateAnimation(0, 0, view.getHeight() * -1, 0);
-        animation.setDuration(300);
-        animation.setInterpolator(new DecelerateInterpolator(5));
-        view.startAnimation(animation);
+        moveFrom(view, true, false);
     }
 
     public static void moveFromBottom(View view) {
-        TranslateAnimation animation = new TranslateAnimation(0, 0, view.getHeight(), 0);
+        moveFrom(view, false, false);
+    }
+
+    public static void moveFrom(final View view, boolean top, boolean hide) {
+        TranslateAnimation animation = new TranslateAnimation(0, 0, view.getHeight() * (top ? -1 : 1), 0);
         animation.setDuration(300);
         animation.setInterpolator(new DecelerateInterpolator(5));
+        if (hide)
+            animation.setAnimationListener(hideListener(view));
         view.startAnimation(animation);
     }
 
-    public static void moveTo(View view, boolean moveToTop) {
-        moveTo(view, moveToTop, null);
+    public static void moveTo(View view, boolean top) {
+        moveTo(view, top, null);
     }
 
-    public static void moveTo(View view, boolean moveToTop, Animation.AnimationListener listener) {
-        TranslateAnimation animation = new TranslateAnimation(0, 0, 0, view.getHeight() * (moveToTop ? -1 : 1));
+    public static void moveToTopHide(View view) {
+        moveTo(view, true, hideListener(view));
+    }
+
+    public static void moveTo(View view, boolean top, Animation.AnimationListener listener) {
+        TranslateAnimation animation = new TranslateAnimation(0, 0, 0, view.getHeight() * (top ? -1 : 1));
         animation.setDuration(100);
         if (listener != null)
             animation.setAnimationListener(listener);
         animation.setInterpolator(new AccelerateInterpolator());
         view.startAnimation(animation);
+    }
+
+    public static Animation.AnimationListener hideListener(final View view) {
+        return new Animation.AnimationListener() {
+            @Override public void onAnimationStart(Animation animation) {
+            }
+
+            @Override public void onAnimationEnd(Animation animation) {
+                view.setVisibility(View.GONE);
+            }
+
+            @Override public void onAnimationRepeat(Animation animation) {
+            }
+        };
     }
 }

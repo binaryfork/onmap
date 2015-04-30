@@ -20,7 +20,7 @@ public class MediaRenderer extends DefaultClusterRenderer<MediaClusterItem> {
     public MediaRenderer(Context context, GoogleMap map, ClusterManager<MediaClusterItem> clusterManager,
                          int markerDimension) {
         super(context, map, clusterManager);
-        this. markerDimension = markerDimension;
+        this.markerDimension = markerDimension;
     }
 
     @Override protected void onBeforeClusterItemRendered(MediaClusterItem item, MarkerOptions markerOptions) {
@@ -31,7 +31,8 @@ public class MediaRenderer extends DefaultClusterRenderer<MediaClusterItem> {
         List<Bitmap> drawables = new ArrayList<>(Math.min(4, cluster.getSize()));
         for (MediaClusterItem item : cluster.getItems()) {
             if (drawables.size() == 4) break;
-            drawables.add(item.thumbBitmap);
+            if (item.thumbBitmap != null)
+                drawables.add(item.thumbBitmap);
         }
         ClusterBitmap clusterBitmap = new ClusterBitmap(drawables, markerDimension);
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(clusterBitmap.draw(cluster.getSize())));

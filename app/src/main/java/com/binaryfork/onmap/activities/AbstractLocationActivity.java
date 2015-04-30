@@ -35,7 +35,7 @@ public abstract class AbstractLocationActivity extends FragmentActivity implemen
         }
     }
 
-    protected void getLocation() {
+    protected void setupLocation() {
         googleApiClient.connect();
     }
 

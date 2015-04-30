@@ -29,11 +29,17 @@
         android:max="5000"
         android:progress="1000"/>
 
-    <com.binaryfork.onmap.ui.LocationSearchBox
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.binaryfork.onmap.activities.SearchFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+<!--    <com.binaryfork.onmap.ui.LocationSearchBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/searchbox"
-        />
+        />-->
 
     <com.binaryfork.onmap.ui.ClusterGridView
         android:layout_width="match_parent"

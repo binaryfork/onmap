@@ -18,10 +18,10 @@ import com.binaryfork.onmap.mvp.MapMediaView;
 import com.binaryfork.onmap.mvp.MediaView;
 import com.binaryfork.onmap.mvp.MediaViewImplementation;
 import com.binaryfork.onmap.mvp.Presenter;
+import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.ui.CalendarDialog;
 import com.binaryfork.onmap.ui.ClusterGridView;
 import com.binaryfork.onmap.ui.DrawerList;
-import com.binaryfork.onmap.ui.LocationSearchBox;
 import com.binaryfork.onmap.ui.RangeSeekBar;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -72,15 +72,13 @@ public class MapMediaActivity extends AbstractLocationActivity implements
             }
         });
         rangeSeekBar.setMapMediaView(this);
-        geoSearchView = (LocationSearchBox) findViewById(R.id.searchbox);
-        geoSearchView.setMapMediaView(this);
         mediaView = new MediaViewImplementation(mediaContainerLayout, getApplicationContext());
         gridView.mediaView = mediaView;
         setupRetainedFragment();
         if (savedInstanceState == null) {
             if (getLastLocation() == null)
                 // If no previous location was saved get current location of the user.
-                getLocation();
+                setupLocation();
             else
                 // Go to last saved location.
                 goToLocation(getLastLocation());
@@ -97,9 +95,12 @@ public class MapMediaActivity extends AbstractLocationActivity implements
             map.setMyLocationEnabled(true);
             map.getUiSettings().setZoomControlsEnabled(true);
         }
+        SearchFragment searchFragment = (SearchFragment) fm.findFragmentById(R.id.searchFragment);
+        geoSearchView = searchFragment;
+        geoSearchView.setMapMediaView(this);
     }
 
-    @Override public void openPhoto(MediaClusterItem clusterTargetItem) {
+    @Override public void openPhotoFromMap(MediaClusterItem clusterTargetItem) {
         Projection projection = map.getProjection();
         LatLng markerLocation = clusterTargetItem.getPosition();
         Point markerPosition = projection.toScreenLocation(markerLocation);
@@ -140,6 +141,10 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         loadMarkers();
     }
 
+    @Override public LatLng getLocation() {
+        return location;
+    }
+
     private void loadMarkers() {
         geoSearchView.showProgress(true);
         presenter.getMedia(location);
@@ -147,6 +152,9 @@ public class MapMediaActivity extends AbstractLocationActivity implements
 
     @Override public void allMarkesLoaded() {
         geoSearchView.showProgress(false);
+    }
+
+    @Override public void showSearchSuggestions() {
     }
 
     @Override public void setDistance(int distance) {
@@ -193,6 +201,8 @@ public class MapMediaActivity extends AbstractLocationActivity implements
             mediaView.hide();
         } else if (gridView.isShown()) {
             hidePhotoGrid();
+        } else if (geoSearchView.isShown()) {
+            geoSearchView.hide();
         } else {
             super.onBackPressed();
         }

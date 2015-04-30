@@ -4,6 +4,7 @@ import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.Constants;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.network.OkHttpInstance;
+import com.binaryfork.onmap.util.Utils;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -34,6 +35,15 @@ public class Foursquare {
                             request.addQueryParam("v", "20150426");
                             request.addQueryParam("client_id", BaseApplication.get().getString(R.string.fsq_id));
                             request.addQueryParam("client_secret", BaseApplication.get().getString(R.string.fsq_sec));
+                            request.addHeader("Accept", "application/json;versions=1");
+                            if (Utils.isDeviceOnline(BaseApplication.get())) {
+                                int maxAge = 60; // read from cache for 1 minute
+                                request.addHeader("Cache-Control", "public, max-age=" + maxAge);
+                            } else {
+                                int maxStale = 60 * 60 * 24 * 28; // tolerate 4-weeks stale
+                                request.addHeader("Cache-Control",
+                                        "public, only-if-cached, max-stale=" + maxStale);
+                            }
                         }
                     });
 

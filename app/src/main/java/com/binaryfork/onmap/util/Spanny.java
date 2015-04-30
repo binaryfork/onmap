@@ -13,7 +13,17 @@ public class Spanny {
     public Spanny() {}
 
     public Spanny(String text) {
+        spannable = new SpannableStringBuilder(text);
+    }
+
+    public Spanny setText(String text) {
+        spannable = new SpannableStringBuilder(text);
+        return this;
+    }
+
+    public Spanny append(String text) {
         spannable.append(text);
+        return this;
     }
 
     public SpannableStringBuilder getSpannable() {

@@ -111,7 +111,7 @@ public class MediaViewImplementation implements MediaView {
         Animations.moveFromBottom(userPhoto);
         commentsTxt.setVisibility(View.VISIBLE);
         usernameTxt.setVisibility(View.VISIBLE);
-        usernameTxt.setText(media.getUsername() + " " + DateUtils.formatDate(media.getCreatedDate()));
+        usernameTxt.setText(media.getTitle() + " " + DateUtils.formatDate(media.getCreatedDate()));
         commentsTxt.setText(media.getComments());
         if (userPhoto != null)
             Picasso.with(context).load(media.getUserpic())

@@ -47,7 +47,7 @@ import io.codetail.animation.ViewAnimationUtils;
 public class SearchBox extends RelativeLayout {
 
 	private MaterialMenuView materialMenu;
-	private TextView logo;
+	protected TextView logo;
 	private EditText search;
 	private Context context;
 	private ListView results;

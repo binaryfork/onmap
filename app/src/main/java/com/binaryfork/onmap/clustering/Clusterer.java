@@ -29,7 +29,7 @@ public class Clusterer {
         clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MediaClusterItem>() {
             @Override
             public boolean onClusterItemClick(MediaClusterItem mediaClusterItem) {
-                mapMediaView.openPhoto(mediaClusterItem);
+                mapMediaView.openPhotoFromMap(mediaClusterItem);
                 return true;
             }
         });
