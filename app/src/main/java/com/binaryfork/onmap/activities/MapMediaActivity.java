@@ -100,11 +100,15 @@ public class MapMediaActivity extends AbstractLocationActivity implements
         geoSearchView.setMapMediaView(this);
     }
 
+    @Override public void openPhoto(Media media) {
+        mediaView.openFromMap(media, null, new Point());
+    }
+
     @Override public void openPhotoFromMap(MediaClusterItem clusterTargetItem) {
         Projection projection = map.getProjection();
         LatLng markerLocation = clusterTargetItem.getPosition();
         Point markerPosition = projection.toScreenLocation(markerLocation);
-        mediaView.openFromMap(clusterTargetItem, markerPosition);
+        mediaView.openFromMap(clusterTargetItem.media, clusterTargetItem.thumbBitmap, markerPosition);
     }
 
     @Override public void clickPhotoCluster(Cluster<MediaClusterItem> cluster) {

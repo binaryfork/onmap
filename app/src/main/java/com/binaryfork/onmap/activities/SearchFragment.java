@@ -6,13 +6,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.balysv.materialmenu.MaterialMenuView;
 import com.binaryfork.onmap.R;
@@ -46,8 +49,10 @@ public class SearchFragment extends Fragment implements GeoSearchView {
     @InjectView(R.id.logo) View logo;
     @InjectView(R.id.search) EditText editText;
     @InjectView(R.id.material_menu_button) MaterialMenuView materialMenu;
+    @InjectView(R.id.clear) View clear;
 
-    private ArrayList<Media> items;
+    private ArrayList<Media> popularPlaces;
+    private ArrayList<Media> searchPlaces;
     private SearchAdapter searchAdapter;
     private LatLng location;
     private MapMediaView mapMediaView;
@@ -66,26 +71,57 @@ public class SearchFragment extends Fragment implements GeoSearchView {
         });
         GeoSearchModel.subscribe(editText, new Action1<GeocodeResults>() {
             @Override public void call(GeocodeResults geocodeResults) {
-                items.clear();
+                searchPlaces = new ArrayList<Media>();
                 for (GeocodeItem item : geocodeResults.results) {
                     SearchItem searchItem = new SearchItem(
                             item.formatted_address,
                             getResources().getDrawable(android.R.drawable.ic_menu_recent_history),
                             item.geometry.location.lat,
                             item.geometry.location.lng);
-                    items.add(searchItem);
+                    searchPlaces.add(searchItem);
                 }
-                searchAdapter.notifyDataSetChanged();
+                searchAdapter.setData(searchPlaces);
             }
         });
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    if (searchPlaces != null && searchPlaces.size() > 0)
+                        openMedia(popularPlaces.get(0));
+                    return true;
+                }
+                return false;
+            }
+        });
+        editText.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    if (searchPlaces != null && searchPlaces.size() > 0) {
+                        openMedia(popularPlaces.get(0));
+                    } else {
+                        loadPopularPlaces();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+        searchAdapter = new SearchAdapter(popularPlaces, getActivity());
+        listView.setAdapter(searchAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Media media = items.get(position);
-                if (media instanceof SearchItem)
-                    mapMediaView.goToLocation(new LatLng(media.getLatitude(), media.getLongitude()));
+                openMedia((Media) searchAdapter.getItem(position));
             }
         });
         return view;
+    }
+
+    private void openMedia(Media media) {
+        hide();
+        if (media instanceof SearchItem)
+            mapMediaView.goToLocation(new LatLng(media.getLatitude(), media.getLongitude()));
+        else
+            mapMediaView.openPhoto(media);
     }
 
     @OnClick(R.id.logo) public void openSearch() {
@@ -93,21 +129,16 @@ public class SearchFragment extends Fragment implements GeoSearchView {
         listView.setVisibility(View.VISIBLE);
         editText.setVisibility(View.VISIBLE);
         editText.requestFocus();
+        clear.setVisibility(View.VISIBLE);
         materialMenu.animateState(ARROW);
         Animations.moveFromTop(listView);
-        LatLng location = mapMediaView.getLocation();
-        if (items != null && items.size() > 0 && location.equals(this.location))
-            return;
-        this.location = location;
-        new ModelImplementation().foursquare(location)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<FoursquareResponse>() {
-                    @Override public void call(FoursquareResponse foursquareResponse) {
-                        items = (ArrayList<Media>) foursquareResponse.getList();
-                        searchAdapter = new SearchAdapter(items, getActivity());
-                        listView.setAdapter(searchAdapter);
-                    }
-                });
+        popularPlaces = new ArrayList<>();
+        searchAdapter.notifyDataSetChanged();
+        loadPopularPlaces();
+    }
+
+    @OnClick(R.id.clear) public void clear() {
+        editText.getText().clear();
     }
 
     @Override public boolean isShown() {
@@ -119,14 +150,7 @@ public class SearchFragment extends Fragment implements GeoSearchView {
         materialMenu.animateState(BURGER);
         editText.setVisibility(View.GONE);
         logo.setVisibility(View.VISIBLE);
-    }
-
-    private Action1<Throwable> onError() {
-        return new Action1<Throwable>() {
-            @Override public void call(Throwable throwable) {
-                Timber.e(throwable, "Marker subscription error");
-            }
-        };
+        clear.setVisibility(View.GONE);
     }
 
     @Override public void setMapMediaView(MapMediaView mapMediaView) {
@@ -135,6 +159,29 @@ public class SearchFragment extends Fragment implements GeoSearchView {
 
     @Override public void showProgress(boolean isLoading) {
         progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+    }
+
+    private void loadPopularPlaces() {
+        LatLng location = mapMediaView.getLocation();
+        if (popularPlaces != null && popularPlaces.size() > 0 && location.equals(this.location))
+            return;
+        this.location = location;
+        new ModelImplementation().foursquare(location)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<FoursquareResponse>() {
+                    @Override public void call(FoursquareResponse foursquareResponse) {
+                        popularPlaces = (ArrayList<Media>) foursquareResponse.getList();
+                        searchAdapter.setData(popularPlaces);
+                    }
+                }, onError());
+    }
+
+    private Action1<Throwable> onError() {
+        return new Action1<Throwable>() {
+            @Override public void call(Throwable throwable) {
+                Timber.e(throwable, "Marker subscription error");
+            }
+        };
     }
 
     public class SearchItem implements Media {

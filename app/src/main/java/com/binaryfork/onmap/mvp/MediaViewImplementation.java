@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -20,7 +21,6 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.network.Media;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.util.CircleTransform;
@@ -49,23 +49,29 @@ public class MediaViewImplementation implements MediaView {
     @InjectView(R.id.comments) TextView commentsTxt;
     @InjectView(R.id.user_photo) ImageView userPhoto;
     @InjectView(R.id.videoView) VideoView videoView;
-    private View gridItemView;
+    private View clickedGridViewItemHolder;
 
     public MediaViewImplementation(View container, Context context) {
         ButterKnife.inject(this, container);
         this.container = container;
         this.context = context;
+        expandedImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hide();
+            }
+        });
     }
 
     @Override public Media getMedia() {
         return media;
     }
 
-    @Override public void openFromMap(MediaClusterItem clusterTargetItem, Point markerPoint) {
-        this.media = clusterTargetItem.media;
+    @Override public void openFromMap(Media media, Bitmap thumbBitmap, Point markerPoint) {
+        this.media = media;
         if (media != null) {
             container.setVisibility(View.VISIBLE);
-            Drawable d = new BitmapDrawable(context.getResources(), clusterTargetItem.thumbBitmap);
+            Drawable d = new BitmapDrawable(context.getResources(), thumbBitmap);
             Picasso.with(context)
                     .load(media.getPhotoUrl())
                     .placeholder(d)
@@ -85,8 +91,8 @@ public class MediaViewImplementation implements MediaView {
         this.media = media;
         if (media != null) {
             container.setVisibility(View.VISIBLE);
-            gridItemView = thumbView;
-            gridItemView.setVisibility(View.INVISIBLE);
+            clickedGridViewItemHolder = thumbView;
+            clickedGridViewItemHolder.setVisibility(View.INVISIBLE);
             Picasso.with(context)
                     .load(media.getPhotoUrl())
                     .into(expandedImage);
@@ -156,6 +162,14 @@ public class MediaViewImplementation implements MediaView {
         expandedImage.setVisibility(View.VISIBLE);
         videoView.setVisibility(View.GONE);
         videoView.stopPlayback();
+    }
+
+    private void hideMediaInfo() {
+        container.setVisibility(View.INVISIBLE);
+        expandedImage.setVisibility(View.INVISIBLE);
+        if (clickedGridViewItemHolder != null)
+            clickedGridViewItemHolder.setVisibility(View.VISIBLE);
+        mCurrentAnimator = null;
     }
 
     protected int getMarkerPhotoSize() {
@@ -245,17 +259,15 @@ public class MediaViewImplementation implements MediaView {
         // to the original bounds and show the thumbnail instead of
         // the expanded image.
         startScaleFinal = startScale;
-        expandedImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hide();
-            }
-        });
     }
 
     private void zoomOutImage() {
         if (mCurrentAnimator != null) {
             mCurrentAnimator.cancel();
+        }
+        if (startBounds == null) {
+            hideMediaInfo();
+            return;
         }
 
         // Animate the four positioning/sizing properties in parallel,
@@ -276,19 +288,11 @@ public class MediaViewImplementation implements MediaView {
         set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
             @Override public void onAnimationEnd(Animator animation) {
-                container.setVisibility(View.INVISIBLE);
-                expandedImage.setVisibility(View.INVISIBLE);
-                if (gridItemView != null)
-                    gridItemView.setVisibility(View.VISIBLE);
-                mCurrentAnimator = null;
+                hideMediaInfo();
             }
 
             @Override public void onAnimationCancel(Animator animation) {
-                container.setVisibility(View.INVISIBLE);
-                expandedImage.setVisibility(View.INVISIBLE);
-                if (gridItemView != null)
-                    gridItemView.setVisibility(View.VISIBLE);
-                mCurrentAnimator = null;
+                hideMediaInfo();
             }
         });
         set.start();

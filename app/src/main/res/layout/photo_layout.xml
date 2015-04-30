@@ -37,6 +37,7 @@
             android:id="@+id/user_photo"
             android:layout_width="@dimen/username_bar_size"
             android:layout_height="@dimen/username_bar_size"
+            android:layout_marginTop="56dp"
             android:padding="8dp"
             android:clickable="true"
             android:adjustViewBounds="true"/>

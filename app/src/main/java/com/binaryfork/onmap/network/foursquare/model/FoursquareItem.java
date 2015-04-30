@@ -108,6 +108,8 @@ public class FoursquareItem implements Media {
 
     @Override
     public long getCreatedDate() {
+        if (venue.featuredPhotos == null || venue.featuredPhotos.items == null || venue.featuredPhotos.items.size() == 0)
+            return 0;
         return venue.featuredPhotos.items.get(0).createdAt;
     }
 

@@ -28,7 +28,14 @@ public class SearchAdapter extends BaseAdapter {
         this.activity = activity;
     }
 
+    public void setData(ArrayList<Media> data) {
+        this.data = data;
+        notifyDataSetChanged();
+    }
+
     @Override public int getCount() {
+        if (data == null)
+            return 0;
         return data.size();
     }
 

@@ -126,8 +126,10 @@ public class PresenterImplementation implements
                                 .subscribeOn(Schedulers.newThread())
                                 .subscribe(new Action1<Bitmap>() {
                                     @Override public void call(Bitmap bitmap) {
-                                        clusterer.addItem(media, bitmap);
-                                        clusterer.cluster();
+                                        if (media != null && bitmap != null) {
+                                            clusterer.addItem(media, bitmap);
+                                            clusterer.cluster();
+                                        }
                                     }
                                 }, onError());
                     }
@@ -191,8 +193,8 @@ public class PresenterImplementation implements
                         .subscribeOn(Schedulers.newThread())
                         .filter(new Func1<Media, Boolean>() {
                             @Override public Boolean call(Media media) {
-                                return media.getPhotoUrl() != null &&
-                                        (media.getLatitude() != 0 && media.getLongitude() != 0);
+                                return media.getThumbnail() != null && media.getPhotoUrl() != null &&
+                                        (media.getLatitude() != 0 || media.getLongitude() != 0);
                             }
                         }));
             }
