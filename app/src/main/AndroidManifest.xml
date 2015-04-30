@@ -28,7 +28,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".activities.MapMediaActivity"
+            android:name=".view.map.MediaMapActivity"
             android:label="@string/title_activity_maps" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,7 +37,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.MainPreferenceActivity"/>
+        <activity android:name=".MainPreferenceActivity"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"

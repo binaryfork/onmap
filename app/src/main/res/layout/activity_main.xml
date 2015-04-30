@@ -6,7 +6,7 @@
     <!-- The main content markersView -->
     <include layout="@layout/map_layout" />
     <!-- The navigation drawer -->
-    <com.binaryfork.onmap.ui.DrawerList
+    <com.binaryfork.onmap.view.map.ui.DrawerList
         android:id="@+id/left_drawer"
         android:layout_width="240dp"
         android:layout_height="match_parent"

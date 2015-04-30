@@ -3,7 +3,7 @@ package com.binaryfork.onmap;
 import android.app.Application;
 import android.content.Context;
 
-import com.binaryfork.onmap.network.twitter.TwitterInstance;
+import com.binaryfork.onmap.model.twitter.TwitterInstance;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 

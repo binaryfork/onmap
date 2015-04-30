@@ -3,7 +3,7 @@ package com.binaryfork.onmap.clustering;
 
 import android.graphics.Bitmap;
 
-import com.binaryfork.onmap.network.Media;
+import com.binaryfork.onmap.model.Media;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
