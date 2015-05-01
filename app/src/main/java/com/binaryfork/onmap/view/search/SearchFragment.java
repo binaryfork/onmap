@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 import com.balysv.materialmenu.MaterialMenuView;
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.presenter.SearchPresenterImplementation;
+import com.binaryfork.onmap.presenter.SearchPresenterImplementation.SearchItem;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.view.map.MediaMapView;
 import com.google.android.gms.maps.model.LatLng;
@@ -85,27 +85,28 @@ public class SearchFragment extends Fragment implements GeoSearchView {
         listView.setAdapter(searchAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openMedia((Media) searchAdapter.getItem(position));
+                openMedia((SearchItem) searchAdapter.getItem(position));
             }
         });
 
 
         if (searchPresenter == null) {
-            searchPresenter = new SearchPresenterImplementation(this, getActivity().getApplicationContext());
-            searchPresenter.suggestGeoLocations(editText);
-        } else if (searchVisible){
+            searchPresenter = new SearchPresenterImplementation(this);
+        } else if (searchVisible) {
             openSearch();
         }
+        searchPresenter.suggestGeoLocations(editText);
 
         return view;
     }
 
-    private void openMedia(Media media) {
+    private void openMedia(SearchItem searchItem) {
+        searchPresenter.addToHistory(searchItem);
         hide();
-        if (media instanceof SearchPresenterImplementation.SearchItem)
-            mediaMapView.goToLocation(new LatLng(media.getLatitude(), media.getLongitude()));
+        if (searchItem.media == null)
+            mediaMapView.goToLocation(new LatLng(searchItem.lat, searchItem.lng));
         else
-            mediaMapView.openPhoto(media);
+            mediaMapView.openPhoto(searchItem.media);
     }
 
     @OnClick(R.id.logo) public void openSearch() {
@@ -138,11 +139,11 @@ public class SearchFragment extends Fragment implements GeoSearchView {
         searchVisible = false;
     }
 
-    @Override public void showSuggestions(ArrayList<Media> items) {
+    @Override public void showSuggestions(ArrayList<SearchItem> items) {
         searchAdapter.setData(items);
     }
 
-    @Override public void showPopularPlaces(ArrayList<Media> items) {
+    @Override public void showPopularPlaces(ArrayList<SearchItem> items) {
         searchAdapter.setData(items);
     }
 

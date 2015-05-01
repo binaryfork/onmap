@@ -15,6 +15,7 @@ import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.presenter.MediaMapPresenter;
 import com.binaryfork.onmap.util.Intents;
 import com.binaryfork.onmap.util.Prefs;
+import com.binaryfork.onmap.util.Theme;
 import com.binaryfork.onmap.view.map.ui.CalendarDialog;
 import com.binaryfork.onmap.view.map.ui.DrawerList;
 import com.binaryfork.onmap.view.map.ui.RangeSeekBar;
@@ -27,7 +28,6 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.Cluster;
 
@@ -47,7 +47,6 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     @InjectView(R.id.rangeSeekBar) RangeSeekBar rangeSeekBar;
 
     private GoogleMap map;
-    private Circle mapCircle;
     private MediaMapPresenter mediaMapPresenter;
     private MediaView mediaView;
     private GeoSearchView geoSearchView;
@@ -56,6 +55,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Theme.updateActivity(this);
         ButterKnife.inject(this);
         drawerList.setCallback(new DrawerList.OnDrawerItemClickListener() {
             @Override public void onClick(DrawerList.DrawerItem drawerItem) {
@@ -84,6 +84,11 @@ public class MediaMapActivity extends AbstractLocationActivity implements
         }
     }
 
+    @Override protected void onDestroy() {
+        super.onDestroy();
+        Theme.clear();
+    }
+
     private void setupRetainedFragment() {
         FragmentManager fm = getSupportFragmentManager();
         mediaMapFragment = (MediaMapFragment) fm.findFragmentById(R.id.map);
@@ -94,8 +99,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
             map.setMyLocationEnabled(true);
             map.getUiSettings().setZoomControlsEnabled(true);
         }
-        if (mapCircle == null)
-            rangeSeekBar.setMapCircle(mediaMapFragment.getMapCircle());
+        rangeSeekBar.setMapCircle(mediaMapFragment.getMapCircle());
         if (location == null)
             location = mediaMapPresenter.getLocation();
         geoSearchView = (SearchFragment) fm.findFragmentById(R.id.searchFragment);

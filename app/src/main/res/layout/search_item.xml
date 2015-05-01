@@ -5,8 +5,7 @@
           android:padding="8dp"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:drawableLeft="?photoPlaceholder"
-          android:text="hello"
+          android:drawableLeft="?attr/iconPhotoPlaceholder"
           android:drawablePadding="8dp"
           android:textColor="#000"
           android:textAppearance="@android:style/TextAppearance.Small"/>

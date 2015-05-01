@@ -1,6 +1,6 @@
 package com.binaryfork.onmap.view.search;
 
-import com.binaryfork.onmap.model.Media;
+import com.binaryfork.onmap.presenter.SearchPresenterImplementation;
 import com.binaryfork.onmap.view.map.MediaMapView;
 
 import java.util.ArrayList;
@@ -22,6 +22,6 @@ public interface GeoSearchView {
     // Presenter callbacks.
     //
 
-    void showSuggestions(ArrayList<Media> items);
-    void showPopularPlaces(ArrayList<Media> items);
+    void showSuggestions(ArrayList<SearchPresenterImplementation.SearchItem> items);
+    void showPopularPlaces(ArrayList<SearchPresenterImplementation.SearchItem> items);
 }

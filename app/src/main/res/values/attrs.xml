@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="bgMainColor" format="reference" />
-    <attr name="photoPlaceholder" format="reference" />
+    <attr name="iconPhotoPlaceholder" format="reference" />
+    <attr name="iconHistory" format="reference" />
+    <attr name="iconPlaceMarker" format="reference" />
 </resources>

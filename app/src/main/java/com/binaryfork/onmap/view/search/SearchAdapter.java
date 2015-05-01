@@ -11,8 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.presenter.SearchPresenterImplementation.SearchItem;
 import com.binaryfork.onmap.util.Theme;
-import com.binaryfork.onmap.model.Media;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public class SearchAdapter extends BaseAdapter {
 
-    private ArrayList<Media> data = new ArrayList<>();
+    private ArrayList<SearchItem> data = new ArrayList<>();
     private final Activity activity;
 
     public SearchAdapter(Activity activity) {
@@ -32,7 +32,7 @@ public class SearchAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void setData(ArrayList<Media> data) {
+    public void setData(ArrayList<SearchItem> data) {
         this.data = data;
         notifyDataSetChanged();
     }
@@ -60,10 +60,11 @@ public class SearchAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag(R.layout.search_item);
         }
-        Media media = data.get(position);
-        viewHolder.text.setText(media.getComments());
-        viewHolder.text.setCompoundDrawablesWithIntrinsicBounds(Theme.getPhotoPlaceholder(activity), 0, 0, 0);
+        SearchItem searchItem = data.get(position);
+        viewHolder.text.setText(searchItem.text);
 
+        Drawable icon = Theme.getDrawable(searchItem.resId == 0 ? Theme.getPhotoPlaceholderResId() : searchItem.resId);
+        viewHolder.text.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
         Target target = new Target() {
             @Override public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 BitmapDrawable bitmapDrawable = new BitmapDrawable(activity.getResources(), bitmap);
@@ -77,9 +78,9 @@ public class SearchAdapter extends BaseAdapter {
             }
         };
         convertView.setTag(R.id.title, target);
-        if (media.getThumbnail() != null)
-            Picasso.with(activity.getApplicationContext()).load(media.getThumbnail())
-                    .placeholder(Theme.getPhotoPlaceholder(activity))
+        if (searchItem.photoUrl != null)
+            Picasso.with(activity.getApplicationContext()).load(searchItem.photoUrl)
+                    .placeholder(Theme.getPhotoPlaceholderResId())
                     .into(target);
         return convertView;
     }
