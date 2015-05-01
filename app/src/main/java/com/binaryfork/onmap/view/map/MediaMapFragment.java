@@ -10,6 +10,8 @@ import com.binaryfork.onmap.presenter.MediaMapPresenterImplementation;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -19,6 +21,7 @@ public class MediaMapFragment extends SupportMapFragment implements GoogleMap.On
     private MediaMapPresenter mediaMapPresenter;
     private MediaMapView mediaMapView;
     private Marker searchMarker;
+    private Circle mapCircle;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +63,23 @@ public class MediaMapFragment extends SupportMapFragment implements GoogleMap.On
     @Override public void onDestroy() {
         super.onDestroy();
         mediaMapPresenter.onDestroy();
+    }
+
+    public Circle getMapCircle() {
+        return mapCircle;
+    }
+
+    public void showMapCircle(int distance, LatLng location) {
+        if (mapCircle != null)
+            mapCircle.remove();
+        mapCircle = getMap().addCircle(new CircleOptions()
+                .center(location)
+                .radius(distance)
+                .strokeWidth(getResources().getDimension(R.dimen.map_circle_stroke))
+                .strokeColor(0x663333ff)
+                .fillColor(0x113333ff));
+        getMap().addMarker(new MarkerOptions()
+                .position(location));
     }
 
     @Override public void onMapClick(final LatLng latLng) {

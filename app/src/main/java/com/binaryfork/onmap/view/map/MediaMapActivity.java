@@ -8,29 +8,27 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.TextView;
 
+import com.binaryfork.onmap.MainPreferenceActivity;
+import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.clustering.MediaClusterItem;
+import com.binaryfork.onmap.model.Media;
+import com.binaryfork.onmap.presenter.MediaMapPresenter;
 import com.binaryfork.onmap.util.Intents;
 import com.binaryfork.onmap.util.Prefs;
-import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.MainPreferenceActivity;
-import com.binaryfork.onmap.clustering.MediaClusterItem;
-import com.binaryfork.onmap.presenter.MediaMapPresenter;
-import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.view.map.ui.CalendarDialog;
 import com.binaryfork.onmap.view.map.ui.DrawerList;
 import com.binaryfork.onmap.view.map.ui.RangeSeekBar;
 import com.binaryfork.onmap.view.mediaview.ClusterGridView;
-import com.binaryfork.onmap.view.search.GeoSearchView;
 import com.binaryfork.onmap.view.mediaview.MediaView;
 import com.binaryfork.onmap.view.mediaview.MediaViewImplementation;
+import com.binaryfork.onmap.view.search.GeoSearchView;
 import com.binaryfork.onmap.view.search.SearchFragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 
 import butterknife.ButterKnife;
@@ -53,6 +51,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     private MediaMapPresenter mediaMapPresenter;
     private MediaView mediaView;
     private GeoSearchView geoSearchView;
+    private MediaMapFragment mediaMapFragment;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +86,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
 
     private void setupRetainedFragment() {
         FragmentManager fm = getSupportFragmentManager();
-        MediaMapFragment mediaMapFragment = (MediaMapFragment) fm.findFragmentById(R.id.map);
+        mediaMapFragment = (MediaMapFragment) fm.findFragmentById(R.id.map);
         mediaMapFragment.setMediaMapView(this);
         mediaMapPresenter = mediaMapFragment.getMediaMapPresenter();
         if (map == null) {
@@ -95,6 +94,10 @@ public class MediaMapActivity extends AbstractLocationActivity implements
             map.setMyLocationEnabled(true);
             map.getUiSettings().setZoomControlsEnabled(true);
         }
+        if (mapCircle == null)
+            rangeSeekBar.setMapCircle(mediaMapFragment.getMapCircle());
+        if (location == null)
+            location = mediaMapPresenter.getLocation();
         geoSearchView = (SearchFragment) fm.findFragmentById(R.id.searchFragment);
         geoSearchView.setMediaMapView(this);
     }
@@ -150,7 +153,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
 
     private void loadMarkers() {
         geoSearchView.showProgress(true);
-        mediaMapPresenter.getMedia(location);
+        mediaMapPresenter.loadMedia(location);
     }
 
     @Override public void allMarkesLoaded() {
@@ -162,17 +165,8 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     }
 
     @Override public void showCenterMarker(int distance) {
-        if (mapCircle != null)
-            mapCircle.remove();
-        mapCircle = map.addCircle(new CircleOptions()
-                .center(location)
-                .radius(distance)
-                .strokeWidth(getResources().getDimension(R.dimen.map_circle_stroke))
-                .strokeColor(0x663333ff)
-                .fillColor(0x113333ff));
-        rangeSeekBar.setMapCircle(mapCircle);
-        map.addMarker(new MarkerOptions()
-                .position(location));
+        mediaMapFragment.showMapCircle(distance, location);
+        rangeSeekBar.setMapCircle(mediaMapFragment.getMapCircle());
     }
 
     @Override protected void onLocationReceived(LatLng location) {

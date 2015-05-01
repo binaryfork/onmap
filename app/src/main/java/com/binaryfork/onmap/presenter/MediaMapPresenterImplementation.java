@@ -75,15 +75,15 @@ public class MediaMapPresenterImplementation implements
         model.from = min;
         model.to = max;
         mediaMapView.showTime(DateUtils.getInterval(min, max));
-        getMedia(location);
+        loadMedia(location);
     }
 
     @Override public void setDistance(int distance) {
         model.distance = distance;
-        getMedia(location);
+        loadMedia(location);
     }
 
-    @Override public void getMedia(LatLng location) {
+    @Override public void loadMedia(LatLng location) {
         if (subscription != null)
             subscription.unsubscribe();
         this.location = location;
@@ -115,6 +115,10 @@ public class MediaMapPresenterImplementation implements
                         return Observable.from(mediaList.getList());
                     }
                 }));
+    }
+
+    @Override public LatLng getLocation() {
+        return location;
     }
 
     private void subscribe(Observable<? extends Media> observable) {

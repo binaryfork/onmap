@@ -14,6 +14,7 @@ public interface MediaMapPresenter {
     void changeSource(ApiSource apiSource);
     void setTime(long min, long max);
     void setDistance(int distance);
-    void getMedia(LatLng location);
+    void loadMedia(LatLng location);
+    LatLng getLocation();
     void onDestroy();
 }
