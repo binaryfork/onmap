@@ -63,8 +63,6 @@ public class SearchAdapter extends BaseAdapter {
         SearchItem searchItem = data.get(position);
         viewHolder.text.setText(searchItem.text);
 
-        Drawable icon = Theme.getDrawable(searchItem.resId == 0 ? Theme.getPhotoPlaceholderResId() : searchItem.resId);
-        viewHolder.text.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
         Target target = new Target() {
             @Override public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 BitmapDrawable bitmapDrawable = new BitmapDrawable(activity.getResources(), bitmap);
@@ -78,10 +76,19 @@ public class SearchAdapter extends BaseAdapter {
             }
         };
         convertView.setTag(R.id.title, target);
-        if (searchItem.photoUrl != null)
-            Picasso.with(activity.getApplicationContext()).load(searchItem.photoUrl)
+        int size = (int) activity.getResources().getDimension(R.dimen.map_marker_photo);
+        int icon = searchItem.resId == 0 ? Theme.getPhotoPlaceholderResId() : searchItem.resId;
+        Picasso.with(activity.getApplicationContext())
+                .load(icon)
+                .resize(size, size)
+                .into(target);
+        if (searchItem.photoUrl != null) {
+            Picasso.with(activity.getApplicationContext())
+                    .load(searchItem.photoUrl)
                     .placeholder(Theme.getPhotoPlaceholderResId())
+                    .resize(size, size)
                     .into(target);
+        }
         return convertView;
     }
 
