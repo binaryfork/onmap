@@ -124,6 +124,8 @@ public class SearchFragment extends Fragment implements GeoSearchView {
 
     @OnClick(R.id.clear) public void clear() {
         editText.getText().clear();
+        searchAdapter.clear();
+        searchPresenter.loadPopularPlaces(mediaMapView.getLocation());
     }
 
     @Override public boolean isShown() {
