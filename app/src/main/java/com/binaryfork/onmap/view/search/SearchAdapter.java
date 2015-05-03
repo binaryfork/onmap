@@ -11,7 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.presenter.SearchPresenterImplementation.SearchItem;
+import com.binaryfork.onmap.presenter.SearchItem;
 import com.binaryfork.onmap.util.Theme;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;

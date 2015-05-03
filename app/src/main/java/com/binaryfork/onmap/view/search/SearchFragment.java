@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 import com.balysv.materialmenu.MaterialMenuView;
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.presenter.SearchItem;
 import com.binaryfork.onmap.presenter.SearchPresenterImplementation;
-import com.binaryfork.onmap.presenter.SearchPresenterImplementation.SearchItem;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.view.map.MediaMapView;
 import com.google.android.gms.maps.model.LatLng;
