@@ -21,7 +21,7 @@ import com.binaryfork.onmap.view.map.ui.DrawerList;
 import com.binaryfork.onmap.view.map.ui.RangeSeekBar;
 import com.binaryfork.onmap.view.mediaview.ClusterGridView;
 import com.binaryfork.onmap.view.mediaview.MediaView;
-import com.binaryfork.onmap.view.mediaview.MediaViewFragment;
+import com.binaryfork.onmap.view.mediaview.MediaViewImplementation;
 import com.binaryfork.onmap.view.search.GeoSearchView;
 import com.binaryfork.onmap.view.search.SearchFragment;
 import com.google.android.gms.maps.CameraUpdate;
@@ -42,6 +42,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     @InjectView(R.id.date) TextView dateTxt;
     @InjectView(R.id.drawer_layout) DrawerLayout drawerLayout;
     @InjectView(R.id.left_drawer) DrawerList drawerList;
+    @InjectView(R.id.info_layout) View mediaContainerLayout;
     @InjectView(R.id.gridView) ClusterGridView gridView;
     @InjectView(R.id.rangeSeekBar) RangeSeekBar rangeSeekBar;
 
@@ -70,6 +71,8 @@ public class MediaMapActivity extends AbstractLocationActivity implements
             }
         });
         rangeSeekBar.setMediaMapView(this);
+        mediaView = new MediaViewImplementation(mediaContainerLayout, getApplicationContext());
+        gridView.mediaView = mediaView;
         setupRetainedFragment();
         if (savedInstanceState == null) {
             if (getLastLocation() == null)
@@ -88,10 +91,6 @@ public class MediaMapActivity extends AbstractLocationActivity implements
 
     private void setupRetainedFragment() {
         FragmentManager fm = getSupportFragmentManager();
-
-        mediaView = (MediaViewFragment) fm.findFragmentById(R.id.mediaFragment);
-        gridView.mediaView = mediaView;
-
         mediaMapFragment = (MediaMapFragment) fm.findFragmentById(R.id.map);
         mediaMapFragment.setMediaMapView(this);
         mediaMapPresenter = mediaMapFragment.getMediaMapPresenter();
@@ -196,7 +195,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     @Override public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(drawerList)) {
             drawerLayout.closeDrawer(drawerList);
-        } else if (mediaView.isShown()) {
+        } else if (mediaContainerLayout.isShown()) {
             mediaView.hide();
         } else if (gridView.isShown()) {
             hidePhotoGrid();
