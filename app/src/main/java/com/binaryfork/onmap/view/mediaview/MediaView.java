@@ -10,5 +10,6 @@ public interface MediaView {
     Media getMedia();
     void openFromMap(Media media, Bitmap bitmap, Point markerPoint);
     void openFromGrid(Media media, View thumbView);
+    boolean isShown();
     void hide();
 }

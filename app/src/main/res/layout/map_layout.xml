@@ -1,6 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/container"
+                android:id="@+id/layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -42,5 +42,9 @@
         android:background="#9000"
         android:id="@+id/gridView"/>
 
-    <include layout="@layout/photo_layout"/>
+    <fragment
+        android:id="@+id/mediaFragment"
+        android:name="com.binaryfork.onmap.view.mediaview.MediaViewFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </RelativeLayout>
