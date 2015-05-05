@@ -19,7 +19,6 @@
             android:textAppearance="@android:style/TextAppearance.Medium"
             android:background="#fff"
             android:orientation="vertical"
-            android:layout_marginTop="@dimen/username_bar_size"
             android:padding="16dp" />
 
         <TextView
@@ -47,12 +46,14 @@
             android:visibility="gone"
             android:layout_below="@+id/user_photo"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_marginTop="56dp" />
 
         <com.binaryfork.onmap.widget.SquareImageView
             android:id="@+id/expanded_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="56dp"
             android:background="#eee"
             android:adjustViewBounds="true"
             android:visibility="invisible" />

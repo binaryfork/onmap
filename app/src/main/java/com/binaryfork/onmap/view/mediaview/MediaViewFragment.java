@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -12,7 +11,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
@@ -31,9 +35,8 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import timber.log.Timber;
 
-public class MediaViewImplementation implements MediaView {
+public class MediaViewFragment extends Fragment implements MediaView {
 
-    private final Context context;
     private Media media;
 
     private Rect startBounds;
@@ -43,7 +46,7 @@ public class MediaViewImplementation implements MediaView {
     private int markerPhotoSize;
     private AnimatorSet mCurrentAnimator;
 
-    public View container;
+    public View layout;
     @InjectView(R.id.expanded_image) ImageView expandedImage;
     @InjectView(R.id.username) TextView usernameTxt;
     @InjectView(R.id.comments) TextView commentsTxt;
@@ -51,16 +54,31 @@ public class MediaViewImplementation implements MediaView {
     @InjectView(R.id.videoView) VideoView videoView;
     private View clickedGridViewItemHolder;
 
-    public MediaViewImplementation(View container, Context context) {
-        ButterKnife.inject(this, container);
-        this.container = container;
-        this.context = context;
+    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    @Nullable @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        layout = inflater.inflate(R.layout.photo_layout, container);
+        ButterKnife.inject(this, layout);
         expandedImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 hide();
             }
         });
+
+        if (media != null) {
+            expandedImage.setPadding(0, usernameTxt.getHeight(), 0, 0);
+            expandedImage.setVisibility(View.VISIBLE);
+            layout.setVisibility(View.VISIBLE);
+            Picasso.with(getActivity().getApplicationContext())
+                    .load(media.getPhotoUrl())
+                    .into(expandedImage);
+            showMediaInfo();
+        }
+        return layout;
     }
 
     @Override public Media getMedia() {
@@ -70,9 +88,9 @@ public class MediaViewImplementation implements MediaView {
     @Override public void openFromMap(Media media, Bitmap thumbBitmap, Point markerPoint) {
         this.media = media;
         if (media != null) {
-            container.setVisibility(View.VISIBLE);
-            Drawable d = new BitmapDrawable(context.getResources(), thumbBitmap);
-            Picasso.with(context)
+            layout.setVisibility(View.VISIBLE);
+            Drawable d = new BitmapDrawable(getResources(), thumbBitmap);
+            Picasso.with(getActivity().getApplicationContext())
                     .load(media.getPhotoUrl())
                     .placeholder(d)
                     .into(expandedImage);
@@ -90,10 +108,10 @@ public class MediaViewImplementation implements MediaView {
     @Override public void openFromGrid(Media media, View thumbView) {
         this.media = media;
         if (media != null) {
-            container.setVisibility(View.VISIBLE);
+            layout.setVisibility(View.VISIBLE);
             clickedGridViewItemHolder = thumbView;
             clickedGridViewItemHolder.setVisibility(View.INVISIBLE);
-            Picasso.with(context)
+            Picasso.with(getActivity().getApplicationContext())
                     .load(media.getPhotoUrl())
                     .into(expandedImage);
             setupDimensions();
@@ -104,10 +122,14 @@ public class MediaViewImplementation implements MediaView {
         }
     }
 
+    @Override public boolean isShown() {
+        return layout.isShown();
+    }
+
     private void setupDimensions() {
         finalBounds = new Rect();
         globalOffset = new Point();
-        container.getGlobalVisibleRect(finalBounds, globalOffset);
+        layout.getGlobalVisibleRect(finalBounds, globalOffset);
         finalBounds.offset(-globalOffset.x, -globalOffset.y + usernameTxt.getHeight());
     }
 
@@ -120,7 +142,7 @@ public class MediaViewImplementation implements MediaView {
         usernameTxt.setText(media.getTitle() + " " + DateUtils.formatDate(media.getCreatedDate()));
         commentsTxt.setText(media.getComments());
         if (userPhoto != null)
-            Picasso.with(context).load(media.getUserpic())
+            Picasso.with(getActivity().getApplicationContext()).load(media.getUserpic())
                     .transform(new CircleTransform())
                     .into(userPhoto);
         if (media.isVideo()) {
@@ -162,19 +184,21 @@ public class MediaViewImplementation implements MediaView {
         expandedImage.setVisibility(View.VISIBLE);
         videoView.setVisibility(View.GONE);
         videoView.stopPlayback();
+        media = null;
     }
 
     private void hideMediaInfo() {
-        container.setVisibility(View.INVISIBLE);
+        layout.setVisibility(View.INVISIBLE);
         expandedImage.setVisibility(View.INVISIBLE);
         if (clickedGridViewItemHolder != null)
             clickedGridViewItemHolder.setVisibility(View.VISIBLE);
         mCurrentAnimator = null;
+        media = null;
     }
 
     protected int getMarkerPhotoSize() {
         if (markerPhotoSize == 0)
-            markerPhotoSize = (int) context.getResources().getDimension(R.dimen.map_marker_photo);
+            markerPhotoSize = (int) getResources().getDimension(R.dimen.map_marker_photo);
         return markerPhotoSize;
     }
 
@@ -189,8 +213,8 @@ public class MediaViewImplementation implements MediaView {
         // This step involves lots of math. Yay, math.
 
         // The start bounds are the global visible rectangle of the thumbnail,
-        // and the final bounds are the global visible rectangle of the container
-        // markersView. Also set the container markersView's offset as the origin for the
+        // and the final bounds are the global visible rectangle of the layout
+        // markersView. Also set the layout markersView's offset as the origin for the
         // bounds, since that's the origin for the positioning animation
         // properties (X, Y).
         startBounds = thumbBounds;
