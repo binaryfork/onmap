@@ -65,18 +65,22 @@ public class SearchFragment extends Fragment implements GeoSearchView {
         });
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    openMedia(searchPresenter.getFirstSuggestion());
-                    return true;
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                        openMedia(searchPresenter.getFirstSuggestion());
+                        return true;
+                    }
                 }
                 return false;
             }
         });
         editText.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    openMedia(searchPresenter.getFirstSuggestion());
-                    return true;
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                        openMedia(searchPresenter.getFirstSuggestion());
+                        return true;
+                    }
                 }
                 return false;
             }
