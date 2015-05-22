@@ -10,7 +10,10 @@ import android.widget.ImageView;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.model.Media;
+import com.binaryfork.onmap.util.VideoIconSmallTransformation;
+import com.binaryfork.onmap.util.VideoIconTransformation;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import java.util.ArrayList;
 
@@ -32,9 +35,11 @@ public class ClusterAdapter extends RecyclerView.Adapter<ClusterAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Picasso.with(context).load(data.get(position).media.getPhotoUrl())
-                .placeholder(R.drawable.ic_launcher)
-                .into(holder.imageView);
+        RequestCreator builder = Picasso.with(context).load(data.get(position).media.getPhotoUrl())
+                .placeholder(R.drawable.ic_launcher);
+        if (data.get(position).media.isVideo())
+            builder = builder.transform(new VideoIconSmallTransformation());
+        builder.into(holder.imageView);
     }
 
     @Override

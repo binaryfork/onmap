@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.binaryfork.onmap.model.twitter.TwitterInstance;
+import com.squareup.leakcanary.LeakCanary;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 
@@ -20,6 +21,7 @@ public class BaseApplication extends Application {
 
     @Override public void onCreate() {
         super.onCreate();
+        LeakCanary.install(this);
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_id), getString(R.string.twitter_sec));
         Fabric.with(this, new Twitter(authConfig));
         TwitterInstance.getInstance();

@@ -4,7 +4,7 @@ import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.Constants;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.model.OkHttpInstance;
-import com.binaryfork.onmap.util.Utils;
+import com.binaryfork.onmap.util.AndroidUtils;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -36,7 +36,7 @@ public class Foursquare {
                             request.addQueryParam("client_id", BaseApplication.get().getString(R.string.fsq_id));
                             request.addQueryParam("client_secret", BaseApplication.get().getString(R.string.fsq_sec));
                             request.addHeader("Accept", "application/json;versions=1");
-                            if (Utils.isDeviceOnline(BaseApplication.get())) {
+                            if (AndroidUtils.isDeviceOnline(BaseApplication.get())) {
                                 int maxAge = 60; // read from cache for 1 minute
                                 request.addHeader("Cache-Control", "public, max-age=" + maxAge);
                             } else {
