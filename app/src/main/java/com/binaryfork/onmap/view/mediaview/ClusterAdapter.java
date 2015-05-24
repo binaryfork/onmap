@@ -11,7 +11,6 @@ import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.clustering.MediaClusterItem;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.util.VideoIconSmallTransformation;
-import com.binaryfork.onmap.util.VideoIconTransformation;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
@@ -21,8 +20,9 @@ public class ClusterAdapter extends RecyclerView.Adapter<ClusterAdapter.ViewHold
     private ArrayList<MediaClusterItem> data;
     private Context context;
 
-    public ClusterAdapter(ArrayList<MediaClusterItem> data) {
+    public void setItems(ArrayList<MediaClusterItem> data) {
         this.data = data;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -36,7 +36,7 @@ public class ClusterAdapter extends RecyclerView.Adapter<ClusterAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         RequestCreator builder = Picasso.with(context).load(data.get(position).media.getPhotoUrl())
-                .placeholder(R.drawable.ic_launcher);
+                .placeholder(R.drawable.empty_drwable);
         if (data.get(position).media.isVideo())
             builder = builder.transform(new VideoIconSmallTransformation());
         builder.into(holder.imageView);
@@ -44,6 +44,8 @@ public class ClusterAdapter extends RecyclerView.Adapter<ClusterAdapter.ViewHold
 
     @Override
     public int getItemCount() {
+        if (data == null)
+            return 0;
         return data.size();
     }
 

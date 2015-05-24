@@ -21,6 +21,7 @@ import com.binaryfork.onmap.view.map.ui.DrawerList;
 import com.binaryfork.onmap.view.map.ui.RangeSeekBar;
 import com.binaryfork.onmap.view.mediaview.ClusterGridView;
 import com.binaryfork.onmap.view.mediaview.MediaView;
+import com.binaryfork.onmap.view.mediaview.MediaViewAnimator;
 import com.binaryfork.onmap.view.mediaview.MediaViewImplementation;
 import com.binaryfork.onmap.view.search.GeoSearchView;
 import com.binaryfork.onmap.view.search.SearchFragment;
@@ -45,6 +46,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     @InjectView(R.id.info_layout) View mediaContainerLayout;
     @InjectView(R.id.gridView) ClusterGridView gridView;
     @InjectView(R.id.rangeSeekBar) RangeSeekBar rangeSeekBar;
+    @InjectView(R.id.backgroundView) View backgroundView;
 
     private GoogleMap map;
     private MediaMapPresenter mediaMapPresenter;
@@ -73,6 +75,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
         rangeSeekBar.setMediaMapView(this);
         mediaView = new MediaViewImplementation(mediaContainerLayout, getApplicationContext());
         gridView.mediaView = mediaView;
+        MediaViewAnimator.get().setBgView(backgroundView);
         setupRetainedFragment();
         if (savedInstanceState == null) {
             if (getLastLocation() == null)
@@ -122,12 +125,14 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     }
 
     private void showPhotoGrid(Cluster<MediaClusterItem> cluster) {
-        gridView.setVisibility(View.VISIBLE);
-        gridView.setupData(cluster);
+        Projection projection = map.getProjection();
+        LatLng markerLocation = cluster.getPosition();
+        Point markerPosition = projection.toScreenLocation(markerLocation);
+        gridView.setupData(cluster, markerPosition.x, markerPosition.y);
     }
 
     private void hidePhotoGrid() {
-        gridView.setVisibility(View.GONE);
+        gridView.hide();
     }
 
     @Override public void onMenuClick() {
