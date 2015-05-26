@@ -25,8 +25,8 @@ public class MediaViewAnimator {
 
     private static MediaViewAnimator instance;
 
-    public View expandedImage;
-    public View backgroundView;
+    private View expandedImage;
+    private View backgroundView;
     private int wx;
     private int wy;
 
@@ -141,15 +141,16 @@ public class MediaViewAnimator {
 
         Side side = startBounds.left < finalBounds.right / 2 ? Side.RIGHT : Side.LEFT;
         ArcAnimator arcAnimator = ArcAnimator.createArcAnimator(expandedImage,
-                finalBounds.right / 2, finalBounds.bottom / 2 + AndroidUtils.dp(56), 90, side);
+                finalBounds.right / 2, finalBounds.bottom / 2 + AndroidUtils.dp(56), 60, side);
         arcAnimator.setDuration(400);
         arcAnimator.start();
 
         AnimatorSet set = new AnimatorSet();
         set
-                .play(ObjectAnimator.ofFloat(expandedImage, "scaleX",
-                        startScale, 1f)).with(ObjectAnimator.ofFloat(expandedImage,
-                "scaleY", startScale, 1f));
+                .play(ObjectAnimator.ofFloat(expandedImage, "scaleX", startScale, 1f))
+                .with(ObjectAnimator.ofFloat(expandedImage, "scaleY", startScale, 1f));
+           //     .with(ObjectAnimator.ofFloat(expandedImage, "x", startBounds.left, finalBounds.left))
+         //       .with(ObjectAnimator.ofFloat(expandedImage, "y", startBounds.top, finalBounds.top));
         set.setDuration(400);
         set.setInterpolator(new AccelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
@@ -179,17 +180,10 @@ public class MediaViewAnimator {
         }
         MediaViewAnimator.get().whiteBgHide();
         AnimatorSet set = new AnimatorSet();
-        set.play(ObjectAnimator
-                .ofFloat(expandedImage, "x", startBounds.left))
-                .with(ObjectAnimator
-                        .ofFloat(expandedImage,
-                                "y", startBounds.top))
-                .with(ObjectAnimator
-                        .ofFloat(expandedImage,
-                                "scaleX", startScaleFinal))
-                .with(ObjectAnimator
-                        .ofFloat(expandedImage,
-                                "scaleY", startScaleFinal));
+        set.play(ObjectAnimator.ofFloat(expandedImage, "x", startBounds.left))
+                .with(ObjectAnimator.ofFloat(expandedImage, "y", startBounds.top))
+                .with(ObjectAnimator.ofFloat(expandedImage, "scaleX", startScaleFinal))
+                .with(ObjectAnimator.ofFloat(expandedImage, "scaleY", startScaleFinal));
         set.setDuration(350);
         set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {

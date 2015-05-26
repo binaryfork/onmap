@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.binaryfork.onmap.MainPreferenceActivity;
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.clustering.MediaClusterItem;
+import com.binaryfork.onmap.components.clustering.MediaClusterItem;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.presenter.MediaMapPresenter;
 import com.binaryfork.onmap.util.Intents;
@@ -23,7 +23,7 @@ import com.binaryfork.onmap.view.mediaview.ClusterGridView;
 import com.binaryfork.onmap.view.mediaview.MediaView;
 import com.binaryfork.onmap.view.mediaview.MediaViewAnimator;
 import com.binaryfork.onmap.view.mediaview.MediaViewImplementation;
-import com.binaryfork.onmap.view.search.GeoSearchView;
+import com.binaryfork.onmap.view.search.SearchView;
 import com.binaryfork.onmap.view.search.SearchFragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,6 +40,7 @@ import timber.log.Timber;
 public class MediaMapActivity extends AbstractLocationActivity implements
         MediaMapView, LocationState {
 
+    @InjectView(R.id.fab) View fab;
     @InjectView(R.id.date) TextView dateTxt;
     @InjectView(R.id.drawer_layout) DrawerLayout drawerLayout;
     @InjectView(R.id.left_drawer) DrawerList drawerList;
@@ -51,7 +52,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     private GoogleMap map;
     private MediaMapPresenter mediaMapPresenter;
     private MediaView mediaView;
-    private GeoSearchView geoSearchView;
+    private SearchView searchView;
     private MediaMapFragment mediaMapFragment;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +74,9 @@ public class MediaMapActivity extends AbstractLocationActivity implements
             }
         });
         rangeSeekBar.setMediaMapView(this);
+        MediaViewAnimator.get().setBgView(backgroundView);
         mediaView = new MediaViewImplementation(mediaContainerLayout, getApplicationContext());
         gridView.mediaView = mediaView;
-        MediaViewAnimator.get().setBgView(backgroundView);
         setupRetainedFragment();
         if (savedInstanceState == null) {
             if (getLastLocation() == null)
@@ -99,14 +100,13 @@ public class MediaMapActivity extends AbstractLocationActivity implements
         mediaMapPresenter = mediaMapFragment.getMediaMapPresenter();
         if (map == null) {
             map = mediaMapFragment.getMap();
-            map.setMyLocationEnabled(true);
-            map.getUiSettings().setZoomControlsEnabled(true);
+       //     map.setMyLocationEnabled(true);
         }
         rangeSeekBar.setMapCircle(mediaMapFragment.getMapCircle());
         if (location == null)
             location = mediaMapPresenter.getLocation();
-        geoSearchView = (SearchFragment) fm.findFragmentById(R.id.searchFragment);
-        geoSearchView.setMediaMapView(this);
+        searchView = (SearchFragment) fm.findFragmentById(R.id.searchFragment);
+        searchView.setMediaMapView(this);
     }
 
     @Override public void openPhoto(Media media) {
@@ -161,12 +161,12 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     }
 
     private void loadMarkers() {
-        geoSearchView.showProgress(true);
+        searchView.showProgress(true);
         mediaMapPresenter.loadMedia(location);
     }
 
     @Override public void allMarkesLoaded() {
-        geoSearchView.showProgress(false);
+        searchView.showProgress(false);
     }
 
     @Override public void setDistance(int distance) {
@@ -197,6 +197,10 @@ public class MediaMapActivity extends AbstractLocationActivity implements
         Intents.openLink(this, mediaView.getMedia().getSiteUrl());
     }
 
+    @OnClick(R.id.fab) public void fab() {
+        searchView.show();
+    }
+
     @Override public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(drawerList)) {
             drawerLayout.closeDrawer(drawerList);
@@ -204,8 +208,8 @@ public class MediaMapActivity extends AbstractLocationActivity implements
             mediaView.hide();
         } else if (gridView.isShown()) {
             hidePhotoGrid();
-        } else if (geoSearchView.isShown()) {
-            geoSearchView.hide();
+        } else if (searchView.isShown()) {
+            searchView.hide();
         } else {
             super.onBackPressed();
         }

@@ -63,6 +63,10 @@ public class SearchAdapter extends BaseAdapter {
         SearchItem searchItem = data.get(position);
         viewHolder.text.setText(searchItem.text);
 
+        if (searchItem.isSection) {
+            viewHolder.text.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+            return convertView;
+        }
         Target target = new Target() {
             @Override public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 BitmapDrawable bitmapDrawable = new BitmapDrawable(activity.getResources(), bitmap);

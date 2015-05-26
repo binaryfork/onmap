@@ -2,6 +2,7 @@ package com.binaryfork.onmap.view.map;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
@@ -15,6 +16,10 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.nineoldandroids.animation.IntEvaluator;
+import com.nineoldandroids.animation.ValueAnimator;
+
+import timber.log.Timber;
 
 public class MediaMapFragment extends SupportMapFragment implements GoogleMap.OnMapClickListener {
 
@@ -30,6 +35,7 @@ public class MediaMapFragment extends SupportMapFragment implements GoogleMap.On
 
     @Override public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    //    getMap().getUiSettings().setZoomControlsEnabled(true);
         getMap().setOnMapClickListener(this);
         getMap().setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override public View getInfoWindow(Marker marker) {
@@ -69,17 +75,31 @@ public class MediaMapFragment extends SupportMapFragment implements GoogleMap.On
         return mapCircle;
     }
 
-    public void showMapCircle(int distance, LatLng location) {
+    public void showMapCircle(final int distance, LatLng location) {
         if (mapCircle != null)
             mapCircle.remove();
         mapCircle = getMap().addCircle(new CircleOptions()
                 .center(location)
-                .radius(distance)
                 .strokeWidth(getResources().getDimension(R.dimen.map_circle_stroke))
                 .strokeColor(0x663333ff)
                 .fillColor(0x113333ff));
         getMap().addMarker(new MarkerOptions()
                 .position(location));
+
+        ValueAnimator vAnimator = new ValueAnimator();
+        vAnimator.setIntValues((int) mapCircle.getRadius(), distance);
+        vAnimator.setDuration(500);
+        vAnimator.setEvaluator(new IntEvaluator());
+        vAnimator.setInterpolator(new DecelerateInterpolator());
+        vAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float animatedFraction = valueAnimator.getAnimatedFraction() * distance;
+                Timber.i("af " + animatedFraction);
+                mapCircle.setRadius(animatedFraction);
+            }
+        });
+        vAnimator.start();
     }
 
     @Override public void onMapClick(final LatLng latLng) {

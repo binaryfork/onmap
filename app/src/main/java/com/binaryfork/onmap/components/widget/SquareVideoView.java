@@ -1,8 +1,7 @@
-package com.binaryfork.onmap.widget;
+package com.binaryfork.onmap.components.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 import android.widget.VideoView;
 
 public class SquareVideoView extends VideoView {

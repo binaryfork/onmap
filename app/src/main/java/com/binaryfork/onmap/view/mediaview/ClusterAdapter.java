@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.clustering.MediaClusterItem;
+import com.binaryfork.onmap.components.clustering.MediaClusterItem;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.util.VideoIconSmallTransformation;
 import com.squareup.picasso.Picasso;

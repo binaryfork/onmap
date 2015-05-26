@@ -10,7 +10,7 @@ import com.binaryfork.onmap.model.ModelImplementation;
 import com.binaryfork.onmap.model.google.model.GeocodeItem;
 import com.binaryfork.onmap.model.google.model.GeocodeResults;
 import com.binaryfork.onmap.util.Theme;
-import com.binaryfork.onmap.view.search.GeoSearchView;
+import com.binaryfork.onmap.view.search.SearchView;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -24,14 +24,14 @@ import timber.log.Timber;
 
 public class SearchPresenterImplementation implements SearchPresenter {
 
-    private GeoSearchView geoSearchView;
+    private SearchView searchView;
     private ArrayList<SearchItem> popularPlaces = new ArrayList<>();
     private ArrayList<SearchItem> searchPlaces = new ArrayList<>();
     private ArrayList<SearchItem> searchHistory = new ArrayList<>();
     private LatLng location;
 
-    public SearchPresenterImplementation(GeoSearchView geoSearchView) {
-        this.geoSearchView = geoSearchView;
+    public SearchPresenterImplementation(SearchView searchView) {
+        this.searchView = searchView;
     }
 
     @Override public void suggestGeoLocations(EditText editText) {
@@ -41,7 +41,7 @@ public class SearchPresenterImplementation implements SearchPresenter {
                 for (GeocodeItem item : geocodeResults.results) {
                     searchPlaces.add(new SearchItem(item));
                 }
-                geoSearchView.showSuggestions(searchPlaces);
+                searchView.showSuggestions(searchPlaces);
             }
         });
     }
@@ -53,10 +53,11 @@ public class SearchPresenterImplementation implements SearchPresenter {
     }
 
     @Override public void loadPopularPlaces(LatLng location) {
-        if (popularPlaces != null && popularPlaces.size() > 0 && (location == null || location.equals(this.location))) {
+        if (popularPlaces.size() > 0 && location.equals(this.location)) {
             showPlaces();
             return;
         }
+        popularPlaces = new ArrayList<>();
         this.location = location;
         new ModelImplementation().foursquare(location)
                 .flatMap(new Func1<MediaList, Observable<Media>>() {
@@ -94,20 +95,28 @@ public class SearchPresenterImplementation implements SearchPresenter {
     }
 
     public void addToHistory(SearchItem searchItem) {
+        for (int i = 0; i < searchHistory.size(); i++) {
+            if (searchHistory.get(i).text.equals(searchItem.text))
+                searchHistory.remove(i);
+        }
         searchItem.resId = Theme.getHistoryResId();
         searchHistory.add(0, searchItem);
-        if (searchPlaces.size() > Constants.HISTORY_SIZE + 1) {
+        Timber.i("searchPlaces.size() " + searchHistory.size());
+        if (searchHistory.size() > Constants.HISTORY_SIZE) {
             searchHistory.remove(searchHistory.size() - 1);
         }
     }
 
     private void showPlaces() {
         ArrayList<SearchItem> places = new ArrayList<>();
+        if (searchHistory.size() > 0)
+            places.add(new SearchItem("Last searched"));
         for (SearchItem searchItem : searchHistory) {
             places.add(searchItem);
         }
+        places.add(new SearchItem("Popular places"));
         places.addAll(popularPlaces);
-        geoSearchView.showPopularPlaces(places);
+        searchView.showPopularPlaces(places);
     }
 
 }

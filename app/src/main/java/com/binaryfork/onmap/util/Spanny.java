@@ -1,7 +1,9 @@
 package com.binaryfork.onmap.util;
 
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 
 /**
  * Spannable wrapper for simple creation of Spannable strings.
@@ -14,6 +16,17 @@ public class Spanny {
 
     public Spanny(String text) {
         spannable = new SpannableStringBuilder(text);
+    }
+
+    public Spanny(String text, Object span) {
+        spannable = new SpannableStringBuilder(text);
+        setSpan(span, 0, text.length());
+    }
+
+    public static SpannableString spanText(CharSequence text, Object span) {
+        SpannableString spannableString = new SpannableString(text);
+        spannableString.setSpan(span, 0, text.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        return spannableString;
     }
 
     public Spanny setText(String text) {

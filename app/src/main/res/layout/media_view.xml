@@ -39,14 +39,14 @@
             android:clickable="true"
             android:adjustViewBounds="true"/>
 
-        <com.binaryfork.onmap.widget.SquareVideoView
+        <com.binaryfork.onmap.components.widget.SquareVideoView
             android:id="@+id/videoView"
             android:visibility="gone"
             android:layout_below="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <com.binaryfork.onmap.widget.SquareImageView
+        <com.binaryfork.onmap.components.widget.SquareImageView
             android:id="@+id/expanded_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

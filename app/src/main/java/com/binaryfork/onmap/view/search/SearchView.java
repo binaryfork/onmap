@@ -5,7 +5,7 @@ import com.binaryfork.onmap.view.map.MediaMapView;
 
 import java.util.ArrayList;
 
-public interface GeoSearchView {
+public interface SearchView {
 
     //
     // MediaMapView callbacks.
@@ -15,6 +15,8 @@ public interface GeoSearchView {
     void showProgress(boolean isLoading);
 
     boolean isShown();
+
+    void show();
 
     void hide();
 

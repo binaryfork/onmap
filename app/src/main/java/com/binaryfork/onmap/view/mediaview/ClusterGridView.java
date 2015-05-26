@@ -8,9 +8,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
-import com.binaryfork.onmap.clustering.MediaClusterItem;
+import com.binaryfork.onmap.components.clustering.MediaClusterItem;
 import com.binaryfork.onmap.util.Animations;
-import com.binaryfork.onmap.widget.RecyclerItemClickListener;
+import com.binaryfork.onmap.components.widget.RecyclerItemClickListener;
 import com.google.maps.android.clustering.Cluster;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -78,7 +78,7 @@ public class ClusterGridView extends RecyclerView implements RecyclerItemClickLi
     public void hide() {
         int finalRadius = Math.max(getWidth(), getHeight());
         SupportAnimator animator =
-                ViewAnimationUtils.createCircularReveal(this, cx, cy - 52, finalRadius, 0);
+                ViewAnimationUtils.createCircularReveal(this, cx, cy - 48, finalRadius, 0);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.addListener(Animations.hideListenerSupAnimator(this));
         animator.setDuration(400);

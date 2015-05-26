@@ -11,6 +11,7 @@
         android:layout_height="match_parent"/>
 
     <TextView
+        android:visibility="gone"
         android:id="@+id/date"
         android:layout_width="72dp"
         android:layout_height="48dp"
@@ -29,6 +30,17 @@
         android:max="5000"
         android:progress="1000"/>
 
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/fab"
+        android:scaleType="centerInside"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="right|bottom"
+        android:background="@drawable/circle_color"
+        android:src="@drawable/abc_ic_search_api_mtrl_alpha"/>
+
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.binaryfork.onmap.view.search.SearchFragment"
@@ -38,7 +50,7 @@
     <com.binaryfork.onmap.view.mediaview.ClusterGridView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="invisible"
         android:clipChildren="false"
         android:padding="8dp"
         android:background="#c000"

@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.clustering;
+package com.binaryfork.onmap.components.clustering;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

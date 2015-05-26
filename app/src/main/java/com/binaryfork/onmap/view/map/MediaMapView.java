@@ -1,6 +1,6 @@
 package com.binaryfork.onmap.view.map;
 
-import com.binaryfork.onmap.clustering.MediaClusterItem;
+import com.binaryfork.onmap.components.clustering.MediaClusterItem;
 import com.binaryfork.onmap.model.Media;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.Cluster;

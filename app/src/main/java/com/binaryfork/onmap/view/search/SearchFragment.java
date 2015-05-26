@@ -7,6 +7,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -18,6 +19,7 @@ import com.balysv.materialmenu.MaterialMenuView;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.presenter.SearchItem;
 import com.binaryfork.onmap.presenter.SearchPresenterImplementation;
+import com.binaryfork.onmap.util.AndroidUtils;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.view.map.MediaMapView;
 import com.google.android.gms.maps.model.LatLng;
@@ -27,12 +29,15 @@ import java.util.ArrayList;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import io.codetail.animation.SupportAnimator;
+import io.codetail.animation.ViewAnimationUtils;
 
 import static com.balysv.materialmenu.MaterialMenuDrawable.IconState.ARROW;
 import static com.balysv.materialmenu.MaterialMenuDrawable.IconState.BURGER;
 
-public class SearchFragment extends Fragment implements GeoSearchView {
+public class SearchFragment extends Fragment implements SearchView {
 
+    @InjectView(R.id.search_layout) View searchLayout;
     @InjectView(R.id.results) ListView listView;
     @InjectView(R.id.pb) ProgressBar progressBar;
     @InjectView(R.id.logo) View logo;
@@ -92,15 +97,12 @@ public class SearchFragment extends Fragment implements GeoSearchView {
                 openMedia((SearchItem) searchAdapter.getItem(position));
             }
         });
-
-
         if (searchPresenter == null) {
             searchPresenter = new SearchPresenterImplementation(this);
         } else if (searchVisible) {
             openSearch();
         }
         searchPresenter.suggestGeoLocations(editText);
-
         return view;
     }
 
@@ -114,13 +116,17 @@ public class SearchFragment extends Fragment implements GeoSearchView {
     }
 
     @OnClick(R.id.logo) public void openSearch() {
+        SupportAnimator animator = ViewAnimationUtils.createCircularReveal(listView,
+                AndroidUtils.dp(128), 0, 0, AndroidUtils.screenSize());
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.setDuration(500);
+        animator.start();
         logo.setVisibility(View.GONE);
         listView.setVisibility(View.VISIBLE);
         editText.setVisibility(View.VISIBLE);
         editText.requestFocus();
         clear.setVisibility(View.VISIBLE);
         materialMenu.animateState(ARROW);
-        Animations.moveFromTop(listView);
         searchAdapter.clear();
         searchPresenter.loadPopularPlaces(mediaMapView.getLocation());
         searchVisible = true;
@@ -136,8 +142,17 @@ public class SearchFragment extends Fragment implements GeoSearchView {
         return listView.isShown();
     }
 
+    @Override public void show() {
+        openSearch();
+    }
+
     @Override public void hide() {
-        Animations.moveToTopHide(listView);
+        SupportAnimator animator = ViewAnimationUtils.createCircularReveal(listView,
+                0, 0, AndroidUtils.screenSize(), 0);
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.setDuration(500);
+        animator.addListener(Animations.hideListenerSupAnimator(listView));
+        animator.start();
         materialMenu.animateState(BURGER);
         editText.setVisibility(View.GONE);
         logo.setVisibility(View.VISIBLE);

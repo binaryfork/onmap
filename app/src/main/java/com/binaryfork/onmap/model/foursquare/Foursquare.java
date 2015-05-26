@@ -32,6 +32,7 @@ public class Foursquare {
                     .setRequestInterceptor(new RequestInterceptor() {
                         @Override
                         public void intercept(RequestFacade request) {
+                                    request.addQueryParam("locale", "ru");
                             request.addQueryParam("v", "20150426");
                             request.addQueryParam("client_id", BaseApplication.get().getString(R.string.fsq_id));
                             request.addQueryParam("client_secret", BaseApplication.get().getString(R.string.fsq_sec));

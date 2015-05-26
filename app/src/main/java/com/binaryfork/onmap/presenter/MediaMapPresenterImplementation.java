@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.binaryfork.onmap.BaseApplication;
-import com.binaryfork.onmap.clustering.Clusterer;
+import com.binaryfork.onmap.components.clustering.Clusterer;
 import com.binaryfork.onmap.model.ApiSource;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.model.MediaList;
