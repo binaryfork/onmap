@@ -83,8 +83,6 @@ public class MediaMapFragment extends SupportMapFragment implements GoogleMap.On
                 .strokeWidth(getResources().getDimension(R.dimen.map_circle_stroke))
                 .strokeColor(0x663333ff)
                 .fillColor(0x113333ff));
-        getMap().addMarker(new MarkerOptions()
-                .position(location));
 
         ValueAnimator vAnimator = new ValueAnimator();
         vAnimator.setIntValues((int) mapCircle.getRadius(), distance);

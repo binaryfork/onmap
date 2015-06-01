@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
 import com.binaryfork.onmap.components.clustering.MediaClusterItem;
+import com.binaryfork.onmap.util.AndroidUtils;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.components.widget.RecyclerItemClickListener;
 import com.google.maps.android.clustering.Cluster;
@@ -47,20 +48,14 @@ public class ClusterGridView extends RecyclerView implements RecyclerItemClickLi
         GridLayoutManager manager = new GridLayoutManager(getContext(), 2);
         setLayoutManager(manager);
         addOnItemTouchListener(new RecyclerItemClickListener(getContext(), this));
-        adapter = new ClusterAdapter();
-        setAdapter(adapter);
-        setOnClickListener(new OnClickListener() {
-            @Override public void onClick(View v) {
-                hide();
-            }
-        });
     }
 
     public void setupData(Cluster<MediaClusterItem> cluster, int x, int y) {
         cx = x;
         cy = y;
         setVisibility(View.VISIBLE);
-        adapter.setItems((ArrayList<MediaClusterItem>) cluster.getItems());
+        adapter = new ClusterAdapter((ArrayList<MediaClusterItem>) cluster.getItems());
+        setAdapter(adapter);
         animateOpenGrid();
     }
 
@@ -76,9 +71,11 @@ public class ClusterGridView extends RecyclerView implements RecyclerItemClickLi
     }
 
     public void hide() {
+        if (!isShown())
+            return;
         int finalRadius = Math.max(getWidth(), getHeight());
         SupportAnimator animator =
-                ViewAnimationUtils.createCircularReveal(this, cx, cy - 48, finalRadius, 0);
+                ViewAnimationUtils.createCircularReveal(this, cx, cy - AndroidUtils.dp(24), finalRadius, 0);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.addListener(Animations.hideListenerSupAnimator(this));
         animator.setDuration(400);
@@ -90,18 +87,15 @@ public class ClusterGridView extends RecyclerView implements RecyclerItemClickLi
         set.play(scaleDownX).with(scaleDownY);
     }
 
-    @Override
-    public void onItemClick(View childView, int position, MotionEvent event) {
-        Timber.i("click " + position);
+    @Override public void onItemClick(View childView, int position, MotionEvent event) {
         mediaView.openFromGrid(adapter.getItem(position), childView);
-      //  bringChildToFront(childView);
-       // childView.requestFocus();
-      //  childView.invalidate();
-     //   adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onItemLongPress(View childView, int position) {
+    @Override public void onItemLongPress(View childView, int position) {
 
+    }
+
+    @Override public void onOutsideClick() {
+        hide();
     }
 }

@@ -1,5 +1,6 @@
 package com.binaryfork.onmap.presenter;
 
+import android.text.SpannableString;
 import android.widget.EditText;
 
 import com.binaryfork.onmap.Constants;
@@ -25,6 +26,7 @@ import timber.log.Timber;
 public class SearchPresenterImplementation implements SearchPresenter {
 
     private SearchView searchView;
+    private ArrayList<SearchItem> popularPhotos = new ArrayList<>();
     private ArrayList<SearchItem> popularPlaces = new ArrayList<>();
     private ArrayList<SearchItem> searchPlaces = new ArrayList<>();
     private ArrayList<SearchItem> searchHistory = new ArrayList<>();
@@ -32,6 +34,7 @@ public class SearchPresenterImplementation implements SearchPresenter {
 
     public SearchPresenterImplementation(SearchView searchView) {
         this.searchView = searchView;
+        loadPopularPhotos();
     }
 
     @Override public void suggestGeoLocations(EditText editText) {
@@ -67,7 +70,9 @@ public class SearchPresenterImplementation implements SearchPresenter {
                 })
                 .map(new Func1<Media, SearchItem>() {
                     @Override public SearchItem call(Media media) {
-                        return new SearchItem(media);
+                        SearchItem searchItem = new SearchItem(media);
+                        searchItem.text = new SpannableString(media.getComments());
+                        return searchItem;
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -89,7 +94,7 @@ public class SearchPresenterImplementation implements SearchPresenter {
     private Action1<Throwable> onError() {
         return new Action1<Throwable>() {
             @Override public void call(Throwable throwable) {
-                Timber.e(throwable, "Marker subscription error");
+                Timber.e(throwable, "SearchPresenterImplementation");
             }
         };
     }
@@ -101,7 +106,6 @@ public class SearchPresenterImplementation implements SearchPresenter {
         }
         searchItem.resId = Theme.getHistoryResId();
         searchHistory.add(0, searchItem);
-        Timber.i("searchPlaces.size() " + searchHistory.size());
         if (searchHistory.size() > Constants.HISTORY_SIZE) {
             searchHistory.remove(searchHistory.size() - 1);
         }
@@ -109,14 +113,45 @@ public class SearchPresenterImplementation implements SearchPresenter {
 
     private void showPlaces() {
         ArrayList<SearchItem> places = new ArrayList<>();
-        if (searchHistory.size() > 0)
+/*        if (searchHistory.size() > 0)
             places.add(new SearchItem("Last searched"));
         for (SearchItem searchItem : searchHistory) {
             places.add(searchItem);
+        }*/
+        if (popularPlaces.size() > 0) {
+            places.add(new SearchItem("Popular places nearby"));
+            places.addAll(popularPlaces);
+        } else if (popularPhotos.size() > 0) {
+            places.add(new SearchItem("Interesting photos"));
+            for (SearchItem searchItem : popularPhotos) {
+                places.add(searchItem);
+            }
         }
-        places.add(new SearchItem("Popular places"));
-        places.addAll(popularPlaces);
         searchView.showPopularPlaces(places);
     }
 
+    @Override public void loadPopularPhotos() {
+        popularPhotos = new ArrayList<>();
+        new ModelImplementation().flickrPopular()
+                .flatMap(new Func1<MediaList, Observable<Media>>() {
+                    @Override public Observable<Media> call(MediaList mediaList) {
+                        Timber.i("list " + mediaList.getList().size());
+                        return Observable.from(mediaList.getList());
+                    }
+                })
+                .map(new Func1<Media, SearchItem>() {
+                    @Override public SearchItem call(Media media) {
+                        SearchItem searchItem = new SearchItem(media);
+                        searchItem.text = new SpannableString(media.getTitle());
+                        return searchItem;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<SearchItem>() {
+                    @Override public void call(SearchItem searchItem) {
+                        if (searchItem.lat != 0 && popularPhotos.size() < 6)
+                            popularPhotos.add(searchItem);
+                    }
+                });
+    }
 }

@@ -26,11 +26,12 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/pb"
             android:layout_marginLeft="56dp"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:text="Search locations"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Search a location"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/darker_gray"/>
 
         <EditText
@@ -43,6 +44,7 @@
             android:layout_marginLeft="64dp"
             android:background="@null"
             android:ems="10"
+            android:hint="Search a location"
             android:imeOptions="actionSearch"
             android:inputType="textAutoComplete"
             android:singleLine="true"

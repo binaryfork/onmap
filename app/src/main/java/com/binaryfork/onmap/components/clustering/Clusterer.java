@@ -4,8 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.binaryfork.onmap.R;
-import com.binaryfork.onmap.view.map.MediaMapView;
 import com.binaryfork.onmap.model.Media;
+import com.binaryfork.onmap.view.map.MediaMapView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;

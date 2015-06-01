@@ -71,6 +71,10 @@ public class MediaMapPresenterImplementation implements
         this.apiSource = apiSource;
     }
 
+    @Override public ApiSource getSource() {
+        return apiSource;
+    }
+
     @Override public void setTime(long min, long max) {
         model.from = min;
         model.to = max;
@@ -137,9 +141,9 @@ public class MediaMapPresenterImplementation implements
                                             clusterer.cluster();
                                         }
                                     }
-                                }, onError());
+                                }, onError(), onComplete());
                     }
-                }, onError(), onComplete());
+                }, onError());
     }
 
     private Action1<Throwable> onError() {

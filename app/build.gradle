@@ -46,6 +46,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:7.+'
     compile 'com.google.android.gms:play-services-location:7.+'
     compile 'com.google.maps.android:android-maps-utils:0.3+'
+    compile 'com.android.support:design:22.2.0'
     // Network
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
@@ -66,4 +67,8 @@ dependencies {
     compile 'com.balysv.materialmenu:material-menu:1.5.1'
     compile 'com.github.ozodrukh:CircularReveal:1.0.6@aar'
     compile 'com.github.asyl.animation:arcanimator:1.0.0'
+    compile('mateuszklimek.framevideoview:framevideoview:1.1.0@aar')
+
+    compile 'org.slf4j:slf4j-simple:1.7.12'
+
 }

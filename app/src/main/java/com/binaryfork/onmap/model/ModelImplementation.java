@@ -21,6 +21,8 @@ public class ModelImplementation implements Model {
     public long from; // minimum timestamp in seconds
     public long to; // maximum timestamp in seconds
 
+    private static final String POPULAR_TAG = "adventure";
+
     @Override public Observable<InstagramItems> instagram(LatLng location) {
         if (from == 0 || to == 0)
             // Load most recent media.
@@ -34,10 +36,22 @@ public class ModelImplementation implements Model {
                     .mediaSearch(location.latitude, location.longitude, from, to, distance, RESULTS_COUNT);
     }
 
+    @Override public Observable<InstagramItems> instagramPopular(int count) {
+        return Instagram.getInstance()
+                .mediaService()
+                .tagged(POPULAR_TAG, count);
+    }
+
     @Override public Observable<FlickrPhotos> flickr(LatLng location) {
         return Flickr.getInstance()
                 .photos()
-                .searchByLocation(from * 1000, to * 1000, kilometers(), location.latitude, location.longitude);
+                .searchByLocation(1, from * 1000, to * 1000, kilometers(), location.latitude, location.longitude);
+    }
+
+    @Override public Observable<FlickrPhotos> flickrPopular() {
+        return Flickr.getInstance()
+                .photos()
+                .searchRecent(1);
     }
 
     /**

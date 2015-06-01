@@ -1,20 +1,17 @@
 package com.binaryfork.onmap.view.search;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.presenter.SearchItem;
 import com.binaryfork.onmap.util.Theme;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 
@@ -64,43 +61,33 @@ public class SearchAdapter extends BaseAdapter {
         viewHolder.text.setText(searchItem.text);
 
         if (searchItem.isSection) {
-            viewHolder.text.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+            viewHolder.image.setVisibility(View.GONE);
             return convertView;
         }
-        Target target = new Target() {
-            @Override public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                BitmapDrawable bitmapDrawable = new BitmapDrawable(activity.getResources(), bitmap);
-                viewHolder.text.setCompoundDrawablesWithIntrinsicBounds(bitmapDrawable, null, null, null);
-            }
-
-            @Override public void onBitmapFailed(Drawable errorDrawable) {
-            }
-
-            @Override public void onPrepareLoad(Drawable placeHolderDrawable) {
-            }
-        };
-        convertView.setTag(R.id.title, target);
-        int size = (int) activity.getResources().getDimension(R.dimen.map_marker_photo);
+        if (searchItem.isList) { // TODO horizontal list of photos ?
+            return convertView;
+        }
+        viewHolder.image.setVisibility(View.VISIBLE);
+        int size = (int) activity.getResources().getDimension(R.dimen.search_item_size);
         int icon = searchItem.resId == 0 ? Theme.getPhotoPlaceholderResId() : searchItem.resId;
-        Picasso.with(activity.getApplicationContext())
-                .load(icon)
-                .resize(size, size)
-                .into(target);
+        viewHolder.image.setImageResource(icon);
         if (searchItem.photoUrl != null) {
             Picasso.with(activity.getApplicationContext())
                     .load(searchItem.photoUrl)
                     .placeholder(Theme.getPhotoPlaceholderResId())
                     .resize(size, size)
-                    .into(target);
+                    .into(viewHolder.image);
         }
         return convertView;
     }
 
     private class ViewHolder {
+        public ImageView image;
         public TextView text;
 
         public ViewHolder(View v) {
-            text = (TextView) v;
+            image = (ImageView) v.findViewById(R.id.image);
+            text = (TextView) v.findViewById(R.id.title);
         }
     }
 }

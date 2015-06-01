@@ -15,9 +15,14 @@ public interface FlickrService {
 
     @GET("/rest/?method=flickr.photos.search")
     rx.Observable<FlickrPhotos> searchByLocation(
+            @Query("has_geo") int geo,
             @Query("min_taken_date") long min,
             @Query("max_upload_date") long max,
             @Query("radius") int radius,
             @Query("lat") double latitude,
             @Query("lon") double longitude);
+
+    @GET("/rest/?method=flickr.interestingness.getList")
+    rx.Observable<FlickrPhotos> searchRecent(
+            @Query("has_geo") int geo);
 }

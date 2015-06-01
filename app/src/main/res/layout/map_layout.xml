@@ -52,7 +52,6 @@
         android:layout_height="match_parent"
         android:visibility="invisible"
         android:clipChildren="false"
-        android:padding="8dp"
         android:background="#c000"
         android:id="@+id/gridView"/>
 

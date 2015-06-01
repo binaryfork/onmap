@@ -10,4 +10,5 @@ public interface SearchPresenter {
     SearchItem getFirstSuggestion();
     void loadPopularPlaces(LatLng location);
     void addToHistory(SearchItem searchItem);
+    void loadPopularPhotos();
 }

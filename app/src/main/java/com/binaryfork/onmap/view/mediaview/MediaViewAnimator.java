@@ -23,8 +23,6 @@ import timber.log.Timber;
 
 public class MediaViewAnimator {
 
-    private static MediaViewAnimator instance;
-
     private View expandedImage;
     private View backgroundView;
     private int wx;
@@ -41,8 +39,10 @@ public class MediaViewAnimator {
     }
 
     public static MediaViewAnimator get() {
+        MediaViewAnimator instance = BaseApplication.animator;
         if (instance == null) {
             instance = new MediaViewAnimator();
+            BaseApplication.animator = instance;
         }
         return instance;
     }
@@ -62,22 +62,19 @@ public class MediaViewAnimator {
         SupportAnimator animator =
                 ViewAnimationUtils.createCircularReveal(backgroundView, wx, wy, AndroidUtils.screenSize(), 0);
         animator.setInterpolator(new DecelerateInterpolator());
-        animator.setDuration(250);
+        animator.setDuration(200);
         animator.addListener(Animations.hideListenerSupAnimator(backgroundView));
         animator.start();
     }
 
     public void setup(AnimatorListener animatorListener, final View expandedImage) {
-        Timber.i("expandedImage " + expandedImage);
-        Timber.i("expandedImage " + expandedImage.getGlobalVisibleRect(finalBounds));
         this.expandedImage = expandedImage;
         this.animatorListener = animatorListener;
         if (finalBounds == null) {
             expandedImage.post(new Runnable() {
                 @Override public void run() {
                     finalBounds = new Rect();
-                    Point globalOffset = new Point();
-                    expandedImage.getGlobalVisibleRect(finalBounds, globalOffset);
+                    expandedImage.getLocalVisibleRect(finalBounds);
                 }
             });
         }
@@ -143,15 +140,15 @@ public class MediaViewAnimator {
         ArcAnimator arcAnimator = ArcAnimator.createArcAnimator(expandedImage,
                 finalBounds.right / 2, finalBounds.bottom / 2 + AndroidUtils.dp(56), 60, side);
         arcAnimator.setDuration(400);
-        arcAnimator.start();
+        //arcAnimator.start();
 
         AnimatorSet set = new AnimatorSet();
         set
                 .play(ObjectAnimator.ofFloat(expandedImage, "scaleX", startScale, 1f))
-                .with(ObjectAnimator.ofFloat(expandedImage, "scaleY", startScale, 1f));
-           //     .with(ObjectAnimator.ofFloat(expandedImage, "x", startBounds.left, finalBounds.left))
-         //       .with(ObjectAnimator.ofFloat(expandedImage, "y", startBounds.top, finalBounds.top));
-        set.setDuration(400);
+                .with(ObjectAnimator.ofFloat(expandedImage, "scaleY", startScale, 1f))
+                .with(ObjectAnimator.ofFloat(expandedImage, "x", startBounds.left, finalBounds.left))
+                .with(ObjectAnimator.ofFloat(expandedImage, "y", startBounds.top, finalBounds.top + AndroidUtils.dp(56)));
+        set.setDuration(200);
         set.setInterpolator(new AccelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
             @Override public void onAnimationEnd(Animator animation) {
@@ -184,7 +181,7 @@ public class MediaViewAnimator {
                 .with(ObjectAnimator.ofFloat(expandedImage, "y", startBounds.top))
                 .with(ObjectAnimator.ofFloat(expandedImage, "scaleX", startScaleFinal))
                 .with(ObjectAnimator.ofFloat(expandedImage, "scaleY", startScaleFinal));
-        set.setDuration(350);
+        set.setDuration(200);
         set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
             @Override public void onAnimationEnd(Animator animation) {
@@ -216,10 +213,10 @@ public class MediaViewAnimator {
     public void zoomImageFromView(View view) {
         Rect thumbBounds = new Rect();
         view.getGlobalVisibleRect(thumbBounds);
+        thumbBounds.offset(0, -AndroidUtils.dp(24));
         zoomImageFromThumb(thumbBounds);
         int radius = view.getWidth() / 2;
-        int padding = view.getPaddingTop();
-        MediaViewAnimator.get().whiteBgReveal(view.getX() + radius - padding, view.getY() + radius - padding, radius);
+        MediaViewAnimator.get().whiteBgReveal(thumbBounds.right-radius, thumbBounds.bottom-radius, radius);
     }
 
     public interface AnimatorListener {

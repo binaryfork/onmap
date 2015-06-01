@@ -23,6 +23,7 @@ public class InstagramItem implements Media {
     private Comments comments;
     private InstagramMedia.Medias images;
     private InstagramMedia.Medias videos;
+    private Likes likes;
 
     @Override
     public String getPhotoUrl() {
@@ -56,11 +57,15 @@ public class InstagramItem implements Media {
 
     @Override
     public double getLatitude() {
+        if (location == null)
+            return 0;
         return location.latitude;
     }
 
     @Override
     public double getLongitude() {
+        if (location == null)
+            return 0;
         return location.longitude;
     }
 
@@ -76,13 +81,17 @@ public class InstagramItem implements Media {
 
     @Override
     public Spannable getComments() {
+
         int authorColor = BaseApplication.get().getResources().getColor(R.color.accent);
         Spanny spanny = new Spanny();
+        if (likes.count > 0)
+            spanny.append(BaseApplication.get().getResources().getString(R.string.heart) + " " + likes.count + " likes\n",
+                    new ForegroundColorSpan(authorColor));
         if (caption != null)
             spanny.append(caption.from.username, new ForegroundColorSpan(authorColor))
                     .append(" " + caption.text);
         if (comments.count > 0)
-            for (InstagramItem.Comments.Comment comment : comments.data) {
+            for (Comments.Comment comment : comments.data) {
                 spanny.append("\n" + comment.from.username, new ForegroundColorSpan(authorColor))
                         .append(" " + comment.text);
             }
@@ -103,6 +112,10 @@ public class InstagramItem implements Media {
     public class User {
         public String username;
         public String profile_picture;
+    }
+
+    public class Likes {
+        public int count;
     }
 
     public class Caption {

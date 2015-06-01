@@ -14,10 +14,6 @@ public class SquareVideoView extends VideoView {
         super(context, attrs);
     }
 
-    public SquareVideoView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int size = Math.min(getMeasuredWidth(), getMeasuredHeight());

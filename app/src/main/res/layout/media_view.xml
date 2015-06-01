@@ -1,57 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/info_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:visibility="invisible">
+<ScrollView android:id="@+id/info_layout"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:visibility="invisible">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <LinearLayout
+            android:id="@+id/buttons"
+            android:layout_below="@+id/expanded_image"
+            android:layout_marginTop="@dimen/username_bar_size"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="56dp">
+
+            <Button
+                android:id="@+id/navigate"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Show on map"
+                android:textColor="#000"/>
+        </LinearLayout>
+
         <TextView
             android:id="@+id/comments"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/expanded_image"
             android:layout_alignParentBottom="true"
-            android:textAppearance="@android:style/TextAppearance.Medium"
+            android:layout_below="@+id/buttons"
+            android:lineSpacingExtra="3dp"
             android:orientation="vertical"
-            android:layout_marginTop="@dimen/username_bar_size"
-            android:padding="16dp" />
+            android:paddingBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textColor="#000"
+            android:textAppearance="@android:style/TextAppearance.Small"/>
 
         <TextView
             android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="@dimen/username_bar_size"
+            android:clickable="true"
             android:gravity="center_vertical"
             android:paddingLeft="@dimen/username_bar_size"
             android:paddingRight="8dp"
-            android:clickable="true"
             android:textAppearance="@android:style/TextAppearance.Medium"/>
 
         <ImageView
             android:id="@+id/user_photo"
             android:layout_width="@dimen/username_bar_size"
             android:layout_height="@dimen/username_bar_size"
-            android:padding="8dp"
+            android:adjustViewBounds="true"
             android:clickable="true"
-            android:adjustViewBounds="true"/>
+            android:padding="8dp"/>
 
         <com.binaryfork.onmap.components.widget.SquareVideoView
             android:id="@+id/videoView"
-            android:visibility="gone"
-            android:layout_below="@+id/username"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_below="@+id/username"
+            android:visibility="gone"/>
 
         <com.binaryfork.onmap.components.widget.SquareImageView
             android:id="@+id/expanded_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#eee"
             android:adjustViewBounds="true"
-            android:visibility="invisible" />
+            android:background="#eee"
+            android:visibility="invisible"/>
     </RelativeLayout>
 </ScrollView>

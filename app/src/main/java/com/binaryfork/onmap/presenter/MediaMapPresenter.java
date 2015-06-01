@@ -12,6 +12,7 @@ public interface MediaMapPresenter {
     void setMediaMapView(MediaMapView view);
     void setupClusterer(Context context, GoogleMap map);
     void changeSource(ApiSource apiSource);
+    ApiSource getSource();
     void setTime(long min, long max);
     void setDistance(int distance);
     void loadMedia(LatLng location);

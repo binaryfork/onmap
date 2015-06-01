@@ -4,4 +4,9 @@
     <color name="accent_transparent">#6603A9F4</color>
     <item name="separator" type="color">#eee</item>
 
+    <item name="flickr" type="color">#FF0084</item>
+    <item name="instagram" type="color">#3f729b</item>
+    <item name="twitter" type="color">#55acee</item>
+    <item name="foursquare" type="color">#0732a2</item>
+
 </resources>

@@ -7,6 +7,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import timber.log.Timber;
+
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
 
     protected OnItemClickListener listener;
@@ -27,12 +29,18 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
     public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent event) {
         childView = view.findChildViewUnder(event.getX(), event.getY());
         childViewPosition = view.getChildAdapterPosition(childView);
+        if(childView == null && event.getAction() == MotionEvent.ACTION_UP)
+            listener.onOutsideClick();
         return childView != null && gestureDetector.onTouchEvent(event);
     }
 
     @Override
     public void onTouchEvent(RecyclerView view, MotionEvent event) {
         // Not needed.
+    }
+
+    @Override public void onRequestDisallowInterceptTouchEvent(boolean b) {
+
     }
 
     /**
@@ -46,7 +54,7 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
          * @param childView View of the item that was clicked.
          * @param position  Position of the item that was clicked.
          */
-        public void onItemClick(View childView, int position, MotionEvent event);
+        void onItemClick(View childView, int position, MotionEvent event);
 
         /**
          * Called when an item is long pressed.
@@ -54,7 +62,9 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
          * @param childView View of the item that was long pressed.
          * @param position  Position of the item that was long pressed.
          */
-        public void onItemLongPress(View childView, int position);
+        void onItemLongPress(View childView, int position);
+
+        void onOutsideClick();
 
     }
 
@@ -64,7 +74,9 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
         public boolean onSingleTapUp(MotionEvent event) {
             if (childView != null) {
                 listener.onItemClick(childView, childViewPosition, event);
-            }
+            } else
+
+                Timber.i("click ");
 
             return true;
         }

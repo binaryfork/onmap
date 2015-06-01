@@ -31,4 +31,13 @@ public interface InstagramMediaService {
             @Query("lng") double longitude,
             @Query("distance") int distance,
             @Query("count") int count);
+
+    @GET("/media/popular")
+    rx.Observable<InstagramItems> popular(
+            @Query("count") int count);
+
+    @GET("/tags/{tag}/media/recent")
+    rx.Observable<InstagramItems> tagged(
+            @Path("tag") String tag,
+            @Query("count") int count);
 }

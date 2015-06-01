@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.binaryfork.onmap.model.twitter.TwitterInstance;
+import com.binaryfork.onmap.view.mediaview.MediaViewAnimator;
 import com.squareup.leakcanary.LeakCanary;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -14,6 +15,7 @@ import timber.log.Timber;
 public class BaseApplication extends Application {
 
     private static Context instance;
+    public static MediaViewAnimator animator;
 
     public static Context get() {
         return instance;

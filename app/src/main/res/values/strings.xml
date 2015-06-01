@@ -13,4 +13,6 @@
     <string name="terrain">Terrain</string>
     <string name="prefs">Preferences</string>
 
+    <string name="heart">♥</string>
+
 </resources>

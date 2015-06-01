@@ -21,6 +21,7 @@ public class SearchItem {
     public double lng;
     public Media media;
     public boolean isSection;
+    public boolean isList;
 
     public SearchItem(String text) {
         this.text = Spanny.spanText(text, new ForegroundColorSpan(Color.GRAY));
@@ -28,7 +29,6 @@ public class SearchItem {
     }
 
     public SearchItem(Media media) {
-        this.text = media.getComments();
         this.media = media;
         this.photoUrl = media.getThumbnail();
         this.lat = media.getLatitude();

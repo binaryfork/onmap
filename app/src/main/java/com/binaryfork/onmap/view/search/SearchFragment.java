@@ -3,6 +3,8 @@ package com.binaryfork.onmap.view.search;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +19,14 @@ import android.widget.TextView;
 
 import com.balysv.materialmenu.MaterialMenuView;
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.model.ApiSource;
+import com.binaryfork.onmap.model.GeoSearchModel;
+import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.presenter.SearchItem;
 import com.binaryfork.onmap.presenter.SearchPresenterImplementation;
 import com.binaryfork.onmap.util.AndroidUtils;
 import com.binaryfork.onmap.util.Animations;
+import com.binaryfork.onmap.util.Spanny;
 import com.binaryfork.onmap.view.map.MediaMapView;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -31,16 +37,16 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
+import rx.functions.Action1;
 
 import static com.balysv.materialmenu.MaterialMenuDrawable.IconState.ARROW;
 import static com.balysv.materialmenu.MaterialMenuDrawable.IconState.BURGER;
 
 public class SearchFragment extends Fragment implements SearchView {
 
-    @InjectView(R.id.search_layout) View searchLayout;
     @InjectView(R.id.results) ListView listView;
     @InjectView(R.id.pb) ProgressBar progressBar;
-    @InjectView(R.id.logo) View logo;
+    @InjectView(R.id.logo) TextView logo;
     @InjectView(R.id.search) EditText editText;
     @InjectView(R.id.material_menu_button) MaterialMenuView materialMenu;
     @InjectView(R.id.clear) View clear;
@@ -94,7 +100,9 @@ public class SearchFragment extends Fragment implements SearchView {
         listView.setAdapter(searchAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openMedia((SearchItem) searchAdapter.getItem(position));
+                Media media = ((SearchItem) searchAdapter.getItem(position)).media;
+                mediaMapView.openPhoto(media, view.findViewById(R.id.image));
+                //openMedia((SearchItem) searchAdapter.getItem(position));
             }
         });
         if (searchPresenter == null) {
@@ -108,16 +116,15 @@ public class SearchFragment extends Fragment implements SearchView {
 
     private void openMedia(SearchItem searchItem) {
         searchPresenter.addToHistory(searchItem);
-        hide();
         if (searchItem.media == null)
             mediaMapView.goToLocation(new LatLng(searchItem.lat, searchItem.lng));
-        else
-            mediaMapView.openPhoto(searchItem.media);
+    //    else
+  //          mediaMapView.openPhoto(searchItem.media);
     }
 
     @OnClick(R.id.logo) public void openSearch() {
         SupportAnimator animator = ViewAnimationUtils.createCircularReveal(listView,
-                AndroidUtils.dp(128), 0, 0, AndroidUtils.screenSize());
+                editText.getWidth()/2, 0, 0, AndroidUtils.screenSize());
         animator.setInterpolator(new DecelerateInterpolator());
         animator.setDuration(500);
         animator.start();
@@ -147,6 +154,8 @@ public class SearchFragment extends Fragment implements SearchView {
     }
 
     @Override public void hide() {
+        if (!isShown())
+            return;
         SupportAnimator animator = ViewAnimationUtils.createCircularReveal(listView,
                 0, 0, AndroidUtils.screenSize(), 0);
         animator.setInterpolator(new DecelerateInterpolator());
@@ -174,6 +183,17 @@ public class SearchFragment extends Fragment implements SearchView {
 
     @Override public void showProgress(boolean isLoading) {
         progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+    }
+
+    @Override public void setHint(ApiSource source, LatLng location) {
+        SpannableString title = Spanny.spanText(source.getString(getActivity().getApplicationContext()),
+                new ForegroundColorSpan(source.getColor(getActivity().getApplicationContext())));
+        logo.setText(title);
+        GeoSearchModel.addressByLocation(location).subscribe(new Action1<String>() {
+            @Override public void call(String s) {
+                logo.append(" " + s);
+            }
+        });
     }
 
 }

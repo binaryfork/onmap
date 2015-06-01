@@ -13,6 +13,7 @@ import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.components.clustering.MediaClusterItem;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.presenter.MediaMapPresenter;
+import com.binaryfork.onmap.rx.Events;
 import com.binaryfork.onmap.util.Intents;
 import com.binaryfork.onmap.util.Prefs;
 import com.binaryfork.onmap.util.Theme;
@@ -35,12 +36,12 @@ import com.google.maps.android.clustering.Cluster;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import rx.functions.Action1;
 import timber.log.Timber;
 
 public class MediaMapActivity extends AbstractLocationActivity implements
         MediaMapView, LocationState {
 
-    @InjectView(R.id.fab) View fab;
     @InjectView(R.id.date) TextView dateTxt;
     @InjectView(R.id.drawer_layout) DrawerLayout drawerLayout;
     @InjectView(R.id.left_drawer) DrawerList drawerList;
@@ -54,6 +55,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     private MediaView mediaView;
     private SearchView searchView;
     private MediaMapFragment mediaMapFragment;
+    private int zoom = 14;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +88,16 @@ public class MediaMapActivity extends AbstractLocationActivity implements
                 // Go to last saved location.
                 goToLocation(getLastLocation());
         }
+
+        Events.toObservable().subscribe(new Action1<Object>() {
+            @Override public void call(Object o) {
+                if (o instanceof Events.NavigateToMedia) {
+                    zoom = 18;
+                    Media media = ((Events.NavigateToMedia) o).media;
+                    goToLocation(new LatLng(media.getLatitude(), media.getLongitude()));
+                }
+            }
+        });
     }
 
     @Override protected void onDestroy() {
@@ -109,8 +121,8 @@ public class MediaMapActivity extends AbstractLocationActivity implements
         searchView.setMediaMapView(this);
     }
 
-    @Override public void openPhoto(Media media) {
-        mediaView.openFromMap(media, null, new Point());
+    @Override public void openPhoto(Media media, View view) {
+        mediaView.openFromGrid(media, view);
     }
 
     @Override public void openPhotoFromMap(MediaClusterItem clusterTargetItem) {
@@ -131,10 +143,6 @@ public class MediaMapActivity extends AbstractLocationActivity implements
         gridView.setupData(cluster, markerPosition.x, markerPosition.y);
     }
 
-    private void hidePhotoGrid() {
-        gridView.hide();
-    }
-
     @Override public void onMenuClick() {
         if (drawerLayout.isDrawerOpen(drawerList))
             drawerLayout.closeDrawer(drawerList);
@@ -151,9 +159,13 @@ public class MediaMapActivity extends AbstractLocationActivity implements
             return;
         location = latLng;
         saveLastLocation(location);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, 14);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(location, zoom);
         map.animateCamera(cameraUpdate);
         loadMarkers();
+        searchView.hide();
+        gridView.hide();
+        mediaView.hide();
+        zoom = 14;
     }
 
     @Override public LatLng getLocation() {
@@ -161,6 +173,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
     }
 
     private void loadMarkers() {
+        searchView.setHint(mediaMapPresenter.getSource(), location);
         searchView.showProgress(true);
         mediaMapPresenter.loadMedia(location);
     }
@@ -207,7 +220,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
         } else if (mediaContainerLayout.isShown()) {
             mediaView.hide();
         } else if (gridView.isShown()) {
-            hidePhotoGrid();
+            gridView.hide();
         } else if (searchView.isShown()) {
             searchView.hide();
         } else {

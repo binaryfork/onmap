@@ -23,12 +23,6 @@ public class Spanny {
         setSpan(span, 0, text.length());
     }
 
-    public static SpannableString spanText(CharSequence text, Object span) {
-        SpannableString spannableString = new SpannableString(text);
-        spannableString.setSpan(span, 0, text.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-        return spannableString;
-    }
-
     public Spanny setText(String text) {
         spannable = new SpannableStringBuilder(text);
         return this;
@@ -39,16 +33,6 @@ public class Spanny {
         return this;
     }
 
-    public SpannableStringBuilder getSpannable() {
-        return spannable;
-    }
-
-    /**
-     * Sets a span to last appended string.
-     *
-     * @param spans Span or multiple spans.
-     * @return {@code Spanny}.
-     */
     public Spanny append(String text, Object... spans) {
         spannable.append(text);
         for (Object span : spans) {
@@ -57,10 +41,14 @@ public class Spanny {
         return this;
     }
 
+    private void setSpan(Object span, int start, int end) {
+        spannable.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+
     /**
-     * Sets a span to all appearances of specified text in the spannable.
-     * A new instance of a span must provided for each iteration
-     * because a span can't be reused.
+     * Sets a span object to all appearances of specified text in the spannable.
+     * A new instance of a span object must be provided for each iteration
+     * because it can't be reused.
      *
      * @param textToSpan Case-sensitive text to span in the current spannable.
      * @param getSpan Interface to get a span for each spanned string.
@@ -84,13 +72,18 @@ public class Spanny {
     public interface GetSpan {
 
         /**
-         * @return A new span object. Never reuse a span object here, otherwise
-         * only the last text part will be spanned.
+         * @return A new span object should be returned.
          */
         Object getSpan();
     }
 
-    private void setSpan(Object span, int start, int end) {
-        spannable.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    public SpannableStringBuilder getSpannable() {
+        return spannable;
+    }
+
+    public static SpannableString spanText(CharSequence text, Object span) {
+        SpannableString spannableString = new SpannableString(text);
+        spannableString.setSpan(span, 0, text.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        return spannableString;
     }
 }
