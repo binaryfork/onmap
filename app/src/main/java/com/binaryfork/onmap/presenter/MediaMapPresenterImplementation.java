@@ -150,6 +150,7 @@ public class MediaMapPresenterImplementation implements
         return new Action1<Throwable>() {
             @Override public void call(Throwable throwable) {
                 Timber.e(throwable, "Marker subscription error");
+                mediaMapView.allMarkesLoaded();
             }
         };
     }
@@ -211,6 +212,7 @@ public class MediaMapPresenterImplementation implements
 
             @Override public void failure(TwitterException e) {
                 Timber.e(e, "Twitter error");
+                mediaMapView.allMarkesLoaded();
             }
         };
     }

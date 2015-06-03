@@ -2,6 +2,7 @@ package com.binaryfork.onmap.model.flickr.model;
 
 import android.text.Spannable;
 
+import com.binaryfork.onmap.model.ApiSource;
 import com.binaryfork.onmap.model.Media;
 
 public class FlickrPhoto implements Media {
@@ -70,6 +71,10 @@ public class FlickrPhoto implements Media {
 
     @Override public String getAdderss() {
         return null;
+    }
+
+    @Override public ApiSource getApiSource() {
+        return ApiSource.FLICKR;
     }
 
 }

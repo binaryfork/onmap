@@ -94,6 +94,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
                 if (o instanceof Events.NavigateToMedia) {
                     zoom = 18;
                     Media media = ((Events.NavigateToMedia) o).media;
+                    mediaMapPresenter.changeSource(media.getApiSource());
                     goToLocation(new LatLng(media.getLatitude(), media.getLongitude()));
                 }
             }
@@ -212,6 +213,12 @@ public class MediaMapActivity extends AbstractLocationActivity implements
 
     @OnClick(R.id.fab) public void fab() {
         searchView.show();
+    }
+    @OnClick(R.id.zoomIn) public void zoomIn() {
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(map.getCameraPosition().target, map.getCameraPosition().zoom + 1), 200, null);
+    }
+    @OnClick(R.id.zoomOut) public void zoomOut() {
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(map.getCameraPosition().target, map.getCameraPosition().zoom - 1), 200, null);
     }
 
     @Override public void onBackPressed() {

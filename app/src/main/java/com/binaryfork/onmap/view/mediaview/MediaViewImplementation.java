@@ -2,11 +2,13 @@ package com.binaryfork.onmap.view.mediaview;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.text.style.RelativeSizeSpan;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -16,9 +18,13 @@ import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.components.widget.SquareVideoView;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.rx.Events;
+import com.binaryfork.onmap.util.AndroidUtils;
 import com.binaryfork.onmap.util.Animations;
 import com.binaryfork.onmap.util.CircleTransform;
 import com.binaryfork.onmap.util.DateUtils;
+import com.binaryfork.onmap.util.Intents;
+import com.binaryfork.onmap.util.Spanny;
+import com.binaryfork.onmap.view.map.ui.CustomAlignmentSpan;
 import com.squareup.picasso.Picasso;
 
 import butterknife.ButterKnife;
@@ -104,7 +110,9 @@ public class MediaViewImplementation implements MediaView {
         buttonsLayout.setVisibility(View.VISIBLE);
         commentsTxt.setVisibility(View.VISIBLE);
         usernameTxt.setVisibility(View.VISIBLE);
-        usernameTxt.setText(media.getTitle() + " " + DateUtils.formatDate(media.getCreatedDate()));
+        Spanny titleSpan = new Spanny(media.getTitle()).append(DateUtils.formatDate(media.getCreatedDate()),
+                new CustomAlignmentSpan(Color.LTGRAY, usernameTxt.getWidth(), usernameTxt.getHeight(), AndroidUtils.dp(4)), new RelativeSizeSpan(.8f));
+        usernameTxt.setText(titleSpan);
         commentsTxt.setText(media.getComments());
         if (userPhoto != null)
             Picasso.with(context).load(media.getUserpic())
@@ -119,61 +127,18 @@ public class MediaViewImplementation implements MediaView {
         Uri uri = Uri.parse(media.getVideoUrl());
         Timber.i("video url %s", uri);
         videoView.setVisibility(View.VISIBLE);
-/*        videoView.setup(uri, Color.RED);
-        videoView.setFrameVideoViewListener(new FrameVideoViewListener() {
-            @Override public void mediaPlayerPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-                mp.start();
-                Timber.i("video prepared " + mp.isPlaying());
-            }
-        });*/
         videoView.setVideoURI(uri);
-     //   videoView.start();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 mp.setLooping(true);
-                Timber.i("video prepared " + mp.isPlaying());
                 mp.start();
-                mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override public void onCompletion(MediaPlayer mp) {
-                        Timber.i("video prepared44 " + mp.isPlaying());
-
-                    }
-                });
                 mp.setOnInfoListener(new MediaPlayer.OnInfoListener() {
                     @Override public boolean onInfo(MediaPlayer mp, int what, int extra) {
                         expandedImage.setVisibility(View.INVISIBLE);
-                        Timber.i("video prepared44 " + mp.isPlaying());
                         return false;
                     }
                 });
-                mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-                    @Override public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                        Timber.i("video prepared22 " + mp.isPlaying());
-                    }
-                });
-                mp.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
-                    @Override public void onBufferingUpdate(MediaPlayer mp, int percent) {
-                        Timber.i("video prepared333 " + mp.isPlaying());
-                    }
-                });
-            }
-        });
-        videoView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-            @Override public void onSystemUiVisibilityChange(int visibility) {
-                Timber.i("video prepared55");
-            }
-        });
-        videoView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override public void onFocusChange(View v, boolean hasFocus) {
-                Timber.i("video prepared66");
-            }
-        });
-        videoView.post(new Runnable() {
-            @Override public void run() {
-
-                Timber.i("video prepared77");
             }
         });
     }
@@ -213,5 +178,9 @@ public class MediaViewImplementation implements MediaView {
     @OnClick(R.id.navigate) public void navigate() {
         hide();
         Events.send(new Events.NavigateToMedia(media));
+    }
+
+    @OnClick(R.id.googlemaps) public void googleMaps() {
+        Intents.openGoogleMaps(context, media.getLatitude(), media.getLongitude());
     }
 }

@@ -3,6 +3,7 @@ package com.binaryfork.onmap.model.twitter;
 import android.text.Spannable;
 import android.text.SpannableString;
 
+import com.binaryfork.onmap.model.ApiSource;
 import com.binaryfork.onmap.model.Media;
 import com.twitter.sdk.android.core.models.Tweet;
 
@@ -81,5 +82,9 @@ public class TweetMedia implements Media {
 
     @Override public String getAdderss() {
         return null;
+    }
+
+    @Override public ApiSource getApiSource() {
+        return ApiSource.TWITTER;
     }
 }

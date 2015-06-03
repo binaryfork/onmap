@@ -69,7 +69,7 @@ public class ClusterBitmap {
         // Draw text background.
         Paint paintOval = new Paint();
         paintOval.setStyle(Paint.Style.FILL);
-        paintOval.setColor(Color.RED);
+        paintOval.setColor(Color.BLACK);
         RectF oval1 = new RectF(dimensions / 3, dimensions / 3, dimensions * 2 / 3, dimensions * 2 / 3);
         canvas.drawOval(oval1, paintOval);
 

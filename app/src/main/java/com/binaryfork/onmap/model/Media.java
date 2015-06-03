@@ -27,4 +27,6 @@ public interface Media {
     Spannable getComments();
 
     String getAdderss();
+
+    ApiSource getApiSource();
 }

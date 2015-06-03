@@ -4,7 +4,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true"
-            android:visibility="invisible">
+            android:visibility="visible">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -14,16 +14,29 @@
             android:id="@+id/buttons"
             android:layout_below="@+id/expanded_image"
             android:layout_marginTop="@dimen/username_bar_size"
-            android:gravity="center_vertical"
-            android:padding="8dp"
+            android:gravity="center"
+            android:background="@drawable/bottom_line"
             android:layout_width="match_parent"
             android:layout_height="56dp">
-
-            <Button
+            <TextView
                 android:id="@+id/navigate"
+                android:drawableTop="@drawable/ic_place_black_48dp"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_white"
+                android:drawablePadding="2dp"
+                android:padding="8dp"
                 android:text="Show on map"
+                android:textColor="#000"/>
+            <TextView
+                android:id="@+id/googlemaps"
+                android:drawableTop="@drawable/googlemaps"
+                android:padding="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_white"
+                android:drawablePadding="2dp"
+                android:text="Google Maps"
                 android:textColor="#000"/>
         </LinearLayout>
 
@@ -35,9 +48,7 @@
             android:layout_below="@+id/buttons"
             android:lineSpacingExtra="3dp"
             android:orientation="vertical"
-            android:paddingBottom="16dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
+            android:padding="16dp"
             android:textColor="#000"
             android:textAppearance="@android:style/TextAppearance.Small"/>
 

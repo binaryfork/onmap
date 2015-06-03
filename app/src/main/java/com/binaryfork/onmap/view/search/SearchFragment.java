@@ -78,7 +78,7 @@ public class SearchFragment extends Fragment implements SearchView {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                        openMedia(searchPresenter.getFirstSuggestion());
+                        openMedia(searchPresenter.getFirstSuggestion(), null);
                         return true;
                     }
                 }
@@ -89,7 +89,7 @@ public class SearchFragment extends Fragment implements SearchView {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                        openMedia(searchPresenter.getFirstSuggestion());
+                        openMedia(searchPresenter.getFirstSuggestion(), null);
                         return true;
                     }
                 }
@@ -100,9 +100,7 @@ public class SearchFragment extends Fragment implements SearchView {
         listView.setAdapter(searchAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Media media = ((SearchItem) searchAdapter.getItem(position)).media;
-                mediaMapView.openPhoto(media, view.findViewById(R.id.image));
-                //openMedia((SearchItem) searchAdapter.getItem(position));
+                openMedia((SearchItem) searchAdapter.getItem(position), view);
             }
         });
         if (searchPresenter == null) {
@@ -114,12 +112,14 @@ public class SearchFragment extends Fragment implements SearchView {
         return view;
     }
 
-    private void openMedia(SearchItem searchItem) {
-        searchPresenter.addToHistory(searchItem);
+    private void openMedia(SearchItem searchItem, View view) {
+      //  searchPresenter.addToHistory(searchItem);
         if (searchItem.media == null)
             mediaMapView.goToLocation(new LatLng(searchItem.lat, searchItem.lng));
-    //    else
-  //          mediaMapView.openPhoto(searchItem.media);
+        else {
+            Media media = searchItem.media;
+            mediaMapView.openPhoto(media, view.findViewById(R.id.image));
+        }
     }
 
     @OnClick(R.id.logo) public void openSearch() {

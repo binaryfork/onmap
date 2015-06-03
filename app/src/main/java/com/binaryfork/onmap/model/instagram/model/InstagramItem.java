@@ -6,6 +6,7 @@ import android.text.style.ForegroundColorSpan;
 
 import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.R;
+import com.binaryfork.onmap.model.ApiSource;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.model.instagram.MediaTypes;
 import com.binaryfork.onmap.util.Spanny;
@@ -95,11 +96,15 @@ public class InstagramItem implements Media {
                 spanny.append("\n" + comment.from.username, new ForegroundColorSpan(authorColor))
                         .append(" " + comment.text);
             }
-        return spanny.getSpannable();
+        return spanny;
     }
 
     @Override public String getAdderss() {
         return null;
+    }
+
+    @Override public ApiSource getApiSource() {
+        return ApiSource.INSTAGRAM;
     }
 
     public class Location {

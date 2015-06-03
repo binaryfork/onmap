@@ -5,44 +5,41 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 
+
 /**
  * Spannable wrapper for simple creation of Spannable strings.
  */
-public class Spanny {
+public class Spanny extends SpannableStringBuilder {
 
-    private SpannableStringBuilder spannable = new SpannableStringBuilder();
+    private int flag = Spannable.SPAN_EXCLUSIVE_EXCLUSIVE;
 
-    public Spanny() {}
+    public Spanny() {
+        super("");
+    }
 
     public Spanny(String text) {
-        spannable = new SpannableStringBuilder(text);
+        super(text);
     }
 
     public Spanny(String text, Object span) {
-        spannable = new SpannableStringBuilder(text);
+        super(text);
         setSpan(span, 0, text.length());
     }
 
-    public Spanny setText(String text) {
-        spannable = new SpannableStringBuilder(text);
-        return this;
-    }
-
-    public Spanny append(String text) {
-        spannable.append(text);
-        return this;
-    }
-
     public Spanny append(String text, Object... spans) {
-        spannable.append(text);
+        append(text);
         for (Object span : spans) {
-            setSpan(span, spannable.length() - text.length(), spannable.length());
+            setSpan(span, length() - text.length(), length());
         }
         return this;
     }
 
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
+
     private void setSpan(Object span, int start, int end) {
-        spannable.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        setSpan(span, start, end, flag);
     }
 
     /**
@@ -51,16 +48,16 @@ public class Spanny {
      * because it can't be reused.
      *
      * @param textToSpan Case-sensitive text to span in the current spannable.
-     * @param getSpan Interface to get a span for each spanned string.
+     * @param getSpan    Interface to get a span for each spanned string.
      * @return {@code Spanny}.
      */
     public Spanny findAll(String textToSpan, GetSpan getSpan) {
         int lastIndex = 0;
-        while(lastIndex != -1) {
-            lastIndex = spannable.toString().indexOf(textToSpan, lastIndex);
-            if(lastIndex != -1) {
+        while (lastIndex != -1) {
+            lastIndex = toString().indexOf(textToSpan, lastIndex);
+            if (lastIndex != -1) {
                 setSpan(getSpan.getSpan(), lastIndex, lastIndex + textToSpan.length());
-                lastIndex+=textToSpan.length();
+                lastIndex += textToSpan.length();
             }
         }
         return this;
@@ -77,13 +74,9 @@ public class Spanny {
         Object getSpan();
     }
 
-    public SpannableStringBuilder getSpannable() {
-        return spannable;
-    }
-
     public static SpannableString spanText(CharSequence text, Object span) {
         SpannableString spannableString = new SpannableString(text);
-        spannableString.setSpan(span, 0, text.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(span, 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return spannableString;
     }
 }

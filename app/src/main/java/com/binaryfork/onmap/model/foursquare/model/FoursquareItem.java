@@ -5,6 +5,7 @@ import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 
+import com.binaryfork.onmap.model.ApiSource;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.util.Spanny;
 
@@ -122,11 +123,15 @@ public class FoursquareItem implements Media {
                 spanny.append(tip.text, new ForegroundColorSpan(Color.GRAY), new RelativeSizeSpan(0.8f));
             }
         }
-        return spanny.getSpannable();
+        return spanny;
     }
 
     @Override public String getAdderss() {
         return venue.location.address;
+    }
+
+    @Override public ApiSource getApiSource() {
+        return ApiSource.FOURSQUARE;
     }
 
 }
