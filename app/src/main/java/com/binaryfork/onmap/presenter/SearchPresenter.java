@@ -11,4 +11,5 @@ public interface SearchPresenter {
     void loadPopularPlaces(LatLng location);
     void addToHistory(SearchItem searchItem);
     void loadPopularPhotos();
+    void loadRecentPhotos();
 }

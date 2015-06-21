@@ -1,8 +1,8 @@
-<io.codetail.widget.RevealFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<io.codetail.widget.RevealFrameLayout android:id="@+id/container"
+                                      xmlns:android="http://schemas.android.com/apk/res/android"
+                                      xmlns:tools="http://schemas.android.com/tools"
+                                      android:layout_width="match_parent"
+                                      android:layout_height="match_parent">
 
     <fragment
         android:id="@+id/map"
@@ -11,22 +11,22 @@
         android:layout_height="match_parent"/>
 
     <TextView
-        android:visibility="gone"
         android:id="@+id/date"
         android:layout_width="72dp"
         android:layout_height="48dp"
         android:layout_gravity="bottom"
         android:background="@color/accent"
         android:gravity="center"
-        android:textAppearance="@android:style/TextAppearance.Medium.Inverse"/>
+        android:textAppearance="@android:style/TextAppearance.Medium.Inverse"
+        android:visibility="gone"/>
 
     <com.binaryfork.onmap.view.map.ui.RangeSeekBar
         android:id="@+id/rangeSeekBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:layout_marginLeft="72dp"
         android:layout_marginRight="72dp"
-        android:layout_gravity="bottom"
         android:max="5000"
         android:progress="1000"/>
 
@@ -34,38 +34,38 @@
         android:id="@+id/zoomIn"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_gravity="center_vertical|right"
+        android:layout_marginBottom="24dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/button_circle"
         android:clickable="true"
-        android:src="@drawable/plus"
         android:padding="12dp"
         android:scaleType="centerInside"
-        android:background="@drawable/button_circle"
-        android:layout_gravity="center_vertical|right"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="24dp"/>
+        android:src="@drawable/plus"/>
 
     <ImageView
         android:id="@+id/zoomOut"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_gravity="center_vertical|right"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/button_circle"
         android:clickable="true"
         android:padding="12dp"
         android:scaleType="centerInside"
-        android:background="@drawable/button_circle"
-        android:layout_gravity="center_vertical|right"
-        android:src="@drawable/minus"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="24dp"/>
+        android:src="@drawable/minus"/>
 
     <ImageView
-        android:visibility="gone"
         android:id="@+id/fab"
-        android:scaleType="centerInside"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:layout_margin="16dp"
         android:layout_gravity="right|bottom"
+        android:layout_margin="16dp"
         android:background="@drawable/circle_color"
-        android:src="@drawable/abc_ic_search_api_mtrl_alpha"/>
+        android:scaleType="centerInside"
+        android:src="@drawable/abc_ic_search_api_mtrl_alpha"
+        android:visibility="visible"/>
 
     <fragment
         android:id="@+id/searchFragment"
@@ -74,18 +74,55 @@
         android:layout_height="wrap_content"/>
 
     <com.binaryfork.onmap.view.mediaview.ClusterGridView
+        android:id="@+id/gridView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible"
-        android:clipChildren="false"
         android:background="#c000"
-        android:id="@+id/gridView"/>
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:visibility="invisible"/>
 
-    <View android:id="@+id/backgroundView"
-          android:visibility="gone"
-          android:background="#fff"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:id="@+id/backgroundView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#fff"
+        android:visibility="gone">
+
+        <com.binaryfork.onmap.components.widget.StatusBarBackView
+            android:background="@color/accent"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"/>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/username_bar_size"
+            android:gravity="center"
+            android:background="@color/accent">
+
+            <ImageView
+                android:id="@+id/user_photo"
+                android:layout_width="@dimen/username_bar_size"
+                android:layout_height="@dimen/username_bar_size"
+                android:adjustViewBounds="true"
+                android:clickable="true"
+                android:padding="8dp"/>
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/username_bar_size"
+                android:layout_marginRight="16dp"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:textAppearance="@android:style/TextAppearance.Medium.Inverse"/>
+
+        </android.support.v7.widget.Toolbar>
+    </LinearLayout>
 
     <include layout="@layout/media_view"/>
+
 </io.codetail.widget.RevealFrameLayout>

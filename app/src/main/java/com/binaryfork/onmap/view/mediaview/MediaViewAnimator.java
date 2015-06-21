@@ -10,6 +10,7 @@ import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.util.AndroidUtils;
 import com.binaryfork.onmap.util.Animations;
+import com.binaryfork.onmap.util.Theme;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.animation.AnimatorSet;
@@ -138,7 +139,7 @@ public class MediaViewAnimator {
 
         Side side = startBounds.left < finalBounds.right / 2 ? Side.RIGHT : Side.LEFT;
         ArcAnimator arcAnimator = ArcAnimator.createArcAnimator(expandedImage,
-                finalBounds.right / 2, finalBounds.bottom / 2 + AndroidUtils.dp(56), 60, side);
+                finalBounds.right / 2, finalBounds.bottom / 2 + AndroidUtils.dp(56) + Theme.getStatusBarHeight(), 60, side);
         arcAnimator.setDuration(400);
         //arcAnimator.start();
 
@@ -205,7 +206,7 @@ public class MediaViewAnimator {
         thumbBounds.right = markerPoint.x + markerRadius;
         thumbBounds.top = markerPoint.y - markerRadius;
         thumbBounds.bottom = markerPoint.y + markerRadius;
-        thumbBounds.offset(0, -AndroidUtils.dp(28));
+        thumbBounds.offset(0, -AndroidUtils.dp(56));
         zoomImageFromThumb(thumbBounds);
         whiteBgReveal(markerPoint.x, markerPoint.y - AndroidUtils.dp(28), AndroidUtils.dp(28));
     }

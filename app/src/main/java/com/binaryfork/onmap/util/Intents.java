@@ -1,16 +1,16 @@
 package com.binaryfork.onmap.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
 public class Intents {
 
-    public static void openLink(Activity activity, String link) {
-        Intent newIntent = new Intent(Intent.ACTION_VIEW,
+    public static void openLink(Context context, String link) {
+        Intent intent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse(link));
-        activity.startActivity(newIntent);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     public static void openGoogleMaps(Context context, double latitude, double longitude) {

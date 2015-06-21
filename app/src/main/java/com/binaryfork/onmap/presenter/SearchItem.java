@@ -9,8 +9,8 @@ import android.text.style.ForegroundColorSpan;
 
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.model.google.model.GeocodeItem;
-import com.binaryfork.onmap.util.Spanny;
 import com.binaryfork.onmap.util.Theme;
+import com.binaryfork.spanny.Spanny;
 
 public class SearchItem {
 

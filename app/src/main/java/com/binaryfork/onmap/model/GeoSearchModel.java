@@ -1,10 +1,16 @@
 package com.binaryfork.onmap.model;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.widget.TextView;
 
+import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.model.google.GoogleGeo;
 import com.binaryfork.onmap.model.google.model.GeocodeResults;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.io.IOException;
+import java.util.Locale;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -50,7 +56,7 @@ public class GeoSearchModel {
         };
     }
 
-    public static Observable<String> addressByLocation(LatLng latLng) {
+    public static Observable<String> addressByLocationObservable(LatLng latLng) {
         String ll = latLng.latitude + "," + latLng.longitude;
         Timber.i("geo " + ll);
         return GoogleGeo.getInstance()
@@ -68,5 +74,20 @@ public class GeoSearchModel {
                         });
                     }
                 });
+    }
+
+    public static String addressByLocation(LatLng location) {
+        Geocoder geocoder = new Geocoder(BaseApplication.get(), Locale.getDefault());
+        try {
+            if (geocoder.getFromLocation(location.latitude, location.longitude, 1) == null || geocoder.getFromLocation(location.latitude, location.longitude, 1).size() ==0)
+                return "";
+            Address geoAddress = geocoder.getFromLocation(location.latitude, location.longitude, 1).get(0);
+            String locality = geoAddress.getLocality() != null ? geoAddress.getLocality() : geoAddress.getAdminArea();
+            locality = locality == null ? geoAddress.getCountryName() : locality + ", " + geoAddress.getCountryName();
+            return locality;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 }

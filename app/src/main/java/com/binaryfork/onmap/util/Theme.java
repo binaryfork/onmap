@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.util.TypedValue;
 
+import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.R;
 
 import java.lang.ref.WeakReference;
@@ -45,5 +46,9 @@ public class Theme {
         final TypedValue typedValue = new TypedValue();
         activity.getTheme().resolveAttribute(attr, typedValue, true);
         return typedValue.resourceId;
+    }
+
+    public static int getStatusBarHeight() {
+        return (int) Math.ceil(25 * BaseApplication.get().getResources().getDisplayMetrics().density);
     }
 }

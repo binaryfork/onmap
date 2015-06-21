@@ -3,7 +3,6 @@ package com.binaryfork.onmap.view.search;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -26,8 +25,9 @@ import com.binaryfork.onmap.presenter.SearchItem;
 import com.binaryfork.onmap.presenter.SearchPresenterImplementation;
 import com.binaryfork.onmap.util.AndroidUtils;
 import com.binaryfork.onmap.util.Animations;
-import com.binaryfork.onmap.util.Spanny;
+import com.binaryfork.onmap.util.Theme;
 import com.binaryfork.onmap.view.map.MediaMapView;
+import com.binaryfork.spanny.Spanny;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -37,7 +37,6 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
-import rx.functions.Action1;
 
 import static com.balysv.materialmenu.MaterialMenuDrawable.IconState.ARROW;
 import static com.balysv.materialmenu.MaterialMenuDrawable.IconState.BURGER;
@@ -64,7 +63,7 @@ public class SearchFragment extends Fragment implements SearchView {
     @Nullable @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.search_layout, container);
         ButterKnife.inject(this, view);
-
+        view.setPadding(0, Theme.getStatusBarHeight(), 0, 0);
         materialMenu.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 if (materialMenu.getState() == BURGER)
@@ -124,7 +123,7 @@ public class SearchFragment extends Fragment implements SearchView {
 
     @OnClick(R.id.logo) public void openSearch() {
         SupportAnimator animator = ViewAnimationUtils.createCircularReveal(listView,
-                editText.getWidth()/2, 0, 0, AndroidUtils.screenSize());
+                AndroidUtils.getWidth()/2, 0, 0, AndroidUtils.screenSize());
         animator.setInterpolator(new DecelerateInterpolator());
         animator.setDuration(500);
         animator.start();
@@ -157,7 +156,7 @@ public class SearchFragment extends Fragment implements SearchView {
         if (!isShown())
             return;
         SupportAnimator animator = ViewAnimationUtils.createCircularReveal(listView,
-                0, 0, AndroidUtils.screenSize(), 0);
+                AndroidUtils.getWidth()/2, 0, AndroidUtils.screenSize(), 0);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.setDuration(500);
         animator.addListener(Animations.hideListenerSupAnimator(listView));
@@ -186,14 +185,10 @@ public class SearchFragment extends Fragment implements SearchView {
     }
 
     @Override public void setHint(ApiSource source, LatLng location) {
-        SpannableString title = Spanny.spanText(source.getString(getActivity().getApplicationContext()),
+        Spanny title = new Spanny(source.getString(getActivity().getApplicationContext()),
                 new ForegroundColorSpan(source.getColor(getActivity().getApplicationContext())));
+        title.append(" ").append(GeoSearchModel.addressByLocation(location));
         logo.setText(title);
-        GeoSearchModel.addressByLocation(location).subscribe(new Action1<String>() {
-            @Override public void call(String s) {
-                logo.append(" " + s);
-            }
-        });
     }
 
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorPrimaryDark">@color/accentDark</item>
+        <item name="bgMainColor">@android:color/white</item>
+        <item name="iconPhotoPlaceholder">@drawable/ic_launcher</item>
+        <item name="iconHistory">@android:drawable/ic_menu_recent_history</item>
+        <item name="iconPlaceMarker">@android:drawable/ic_dialog_map</item>
+    </style>
+</resources>

@@ -2,12 +2,12 @@ package com.binaryfork.onmap.view.mediaview;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.support.v7.widget.Toolbar;
 import android.text.style.RelativeSizeSpan;
 import android.view.View;
 import android.view.animation.Animation;
@@ -16,15 +16,16 @@ import android.widget.TextView;
 
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.components.widget.SquareVideoView;
+import com.binaryfork.onmap.model.ApiSource;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.rx.Events;
-import com.binaryfork.onmap.util.AndroidUtils;
 import com.binaryfork.onmap.util.Animations;
+import com.binaryfork.onmap.util.BorderTransformation;
 import com.binaryfork.onmap.util.CircleTransform;
 import com.binaryfork.onmap.util.DateUtils;
 import com.binaryfork.onmap.util.Intents;
-import com.binaryfork.onmap.util.Spanny;
 import com.binaryfork.onmap.view.map.ui.CustomAlignmentSpan;
+import com.binaryfork.spanny.Spanny;
 import com.squareup.picasso.Picasso;
 
 import butterknife.ButterKnife;
@@ -37,17 +38,24 @@ public class MediaViewImplementation implements MediaView {
     private final Context context;
     private Media media;
 
-    public View container;
+    private View container;
+    private ImageView userPhoto;
+    private TextView usernameTxt;
+    private Toolbar toolbar;
     @InjectView(R.id.expanded_image) ImageView expandedImage;
-    @InjectView(R.id.username) TextView usernameTxt;
     @InjectView(R.id.comments) TextView commentsTxt;
-    @InjectView(R.id.user_photo) ImageView userPhoto;
     @InjectView(R.id.videoView) SquareVideoView videoView;
     @InjectView(R.id.buttons) View buttonsLayout;
+    @InjectView(R.id.foursquare) View buttonFoursquare;
+    @InjectView(R.id.instagram) View buttonInstagram;
+    @InjectView(R.id.flickr) View buttonFlickr;
 
     public MediaViewImplementation(View container, Context context) {
-        ButterKnife.inject(this, container);
-        this.container = container;
+        this.container = container.findViewById(R.id.info_layout);
+        ButterKnife.inject(this, this.container);
+        userPhoto = (ImageView) container.findViewById(R.id.user_photo);
+        usernameTxt = (TextView) container.findViewById(R.id.username);
+        toolbar = (Toolbar) container.findViewById(R.id.toolbar);
         this.context = context;
         expandedImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +72,13 @@ public class MediaViewImplementation implements MediaView {
                 hideMediaInfo();
             }
         }, expandedImage);
+        toolbar.setNavigationIcon(context.getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha));
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hide();
+            }
+        });
     }
 
     @Override public Media getMedia() {
@@ -75,7 +90,11 @@ public class MediaViewImplementation implements MediaView {
         if (media != null) {
             container.setVisibility(View.VISIBLE);
             expandedImage.setVisibility(View.VISIBLE);
-            Drawable d = new BitmapDrawable(context.getResources(), thumbBitmap);
+            // Crop image without white borders.
+            Drawable d = new BitmapDrawable(context.getResources(),
+                    Bitmap.createBitmap(thumbBitmap, BorderTransformation.dp(), BorderTransformation.dp(),
+                            thumbBitmap.getWidth() - BorderTransformation.dp() * 2,
+                            thumbBitmap.getWidth() - BorderTransformation.dp() * 2));
             Picasso.with(context)
                     .load(media.getPhotoUrl())
                     .placeholder(d)
@@ -110,8 +129,15 @@ public class MediaViewImplementation implements MediaView {
         buttonsLayout.setVisibility(View.VISIBLE);
         commentsTxt.setVisibility(View.VISIBLE);
         usernameTxt.setVisibility(View.VISIBLE);
+        if (media.getApiSource() == ApiSource.INSTAGRAM) {
+            buttonInstagram.setVisibility(View.VISIBLE);
+        } else if (media.getApiSource() == ApiSource.FLICKR) {
+            buttonFlickr.setVisibility(View.VISIBLE);
+        } else if (media.getApiSource() == ApiSource.FOURSQUARE) {
+            buttonFoursquare.setVisibility(View.VISIBLE);
+        }
         Spanny titleSpan = new Spanny(media.getTitle()).append(DateUtils.formatDate(media.getCreatedDate()),
-                new CustomAlignmentSpan(Color.LTGRAY, usernameTxt.getWidth(), usernameTxt.getHeight(), AndroidUtils.dp(4)), new RelativeSizeSpan(.8f));
+                new CustomAlignmentSpan(), new RelativeSizeSpan(.8f));
         usernameTxt.setText(titleSpan);
         commentsTxt.setText(media.getComments());
         if (userPhoto != null)
@@ -139,6 +165,11 @@ public class MediaViewImplementation implements MediaView {
                         return false;
                     }
                 });
+                int current = 0;
+                do {
+                    Timber.i("dur " + current);
+                    current += videoView.getCurrentPosition();
+                } while (current <= 100);
             }
         });
     }
@@ -159,6 +190,9 @@ public class MediaViewImplementation implements MediaView {
                 usernameTxt.setVisibility(View.GONE);
                 commentsTxt.setVisibility(View.GONE);
                 buttonsLayout.setVisibility(View.GONE);
+                buttonInstagram.setVisibility(View.GONE);
+                buttonFlickr.setVisibility(View.GONE);
+                buttonFoursquare.setVisibility(View.GONE);
                 MediaViewAnimator.get().zoomOutImage();
             }
 
@@ -182,5 +216,9 @@ public class MediaViewImplementation implements MediaView {
 
     @OnClick(R.id.googlemaps) public void googleMaps() {
         Intents.openGoogleMaps(context, media.getLatitude(), media.getLongitude());
+    }
+
+    @OnClick({R.id.instagram, R.id.flickr, R.id.foursquare}) public void openSite() {
+        Intents.openLink(context, media.getSiteUrl());
     }
 }

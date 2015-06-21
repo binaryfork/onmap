@@ -20,7 +20,7 @@ public class Animations {
 
     public static void moveFrom(final View view, boolean top, boolean hide) {
         TranslateAnimation animation = new TranslateAnimation(0, 0, view.getHeight() * (top ? -1 : 1), 0);
-        animation.setDuration(300);
+        animation.setDuration(400);
         animation.setInterpolator(new DecelerateInterpolator());
         if (hide)
             animation.setAnimationListener(hideListener(view));

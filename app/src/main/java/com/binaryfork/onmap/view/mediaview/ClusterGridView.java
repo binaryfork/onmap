@@ -9,9 +9,10 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
 import com.binaryfork.onmap.components.clustering.MediaClusterItem;
+import com.binaryfork.onmap.components.widget.RecyclerItemClickListener;
 import com.binaryfork.onmap.util.AndroidUtils;
 import com.binaryfork.onmap.util.Animations;
-import com.binaryfork.onmap.components.widget.RecyclerItemClickListener;
+import com.binaryfork.onmap.util.Theme;
 import com.google.maps.android.clustering.Cluster;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
-import timber.log.Timber;
 
 public class ClusterGridView extends RecyclerView implements RecyclerItemClickListener.OnItemClickListener {
 
@@ -60,11 +60,9 @@ public class ClusterGridView extends RecyclerView implements RecyclerItemClickLi
     }
 
     public void animateOpenGrid() {
-        Timber.i("ani " + getWidth());
-        Timber.i("ani " + getHeight());
         int finalRadius = Math.max(getWidth(), getHeight());
         SupportAnimator animator =
-                ViewAnimationUtils.createCircularReveal(this, cx, cy, 0, finalRadius);
+                ViewAnimationUtils.createCircularReveal(this, cx, cy - AndroidUtils.dp(26), 0, finalRadius);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.setDuration(300);
         animator.start();
@@ -75,7 +73,7 @@ public class ClusterGridView extends RecyclerView implements RecyclerItemClickLi
             return;
         int finalRadius = Math.max(getWidth(), getHeight());
         SupportAnimator animator =
-                ViewAnimationUtils.createCircularReveal(this, cx, cy - AndroidUtils.dp(24), finalRadius, 0);
+                ViewAnimationUtils.createCircularReveal(this, cx, cy - AndroidUtils.dp(26), finalRadius, 0);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.addListener(Animations.hideListenerSupAnimator(this));
         animator.setDuration(400);

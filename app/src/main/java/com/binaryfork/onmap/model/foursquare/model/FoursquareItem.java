@@ -7,7 +7,7 @@ import android.text.style.RelativeSizeSpan;
 
 import com.binaryfork.onmap.model.ApiSource;
 import com.binaryfork.onmap.model.Media;
-import com.binaryfork.onmap.util.Spanny;
+import com.binaryfork.spanny.Spanny;
 
 import java.util.ArrayList;
 

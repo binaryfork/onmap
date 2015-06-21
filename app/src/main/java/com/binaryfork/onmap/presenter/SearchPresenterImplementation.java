@@ -34,7 +34,7 @@ public class SearchPresenterImplementation implements SearchPresenter {
 
     public SearchPresenterImplementation(SearchView searchView) {
         this.searchView = searchView;
-        loadPopularPhotos();
+//        loadRecentPhotos();
     }
 
     @Override public void suggestGeoLocations(EditText editText) {
@@ -55,12 +55,42 @@ public class SearchPresenterImplementation implements SearchPresenter {
         return null;
     }
 
+    public void addToHistory(SearchItem searchItem) {
+        for (int i = 0; i < searchHistory.size(); i++) {
+            if (searchHistory.get(i).text.equals(searchItem.text))
+                searchHistory.remove(i);
+        }
+        searchItem.resId = Theme.getHistoryResId();
+        searchHistory.add(0, searchItem);
+        if (searchHistory.size() > Constants.HISTORY_SIZE) {
+            searchHistory.remove(searchHistory.size() - 1);
+        }
+    }
+
+    private void showPlaces() {
+        ArrayList<SearchItem> places = new ArrayList<>();
+/*        if (searchHistory.size() > 0)
+            places.add(new SearchItem("Last searched"));
+        for (SearchItem searchItem : searchHistory) {
+            places.add(searchItem);
+        }*/
+        if (popularPlaces.size() > 0) {
+            places.add(new SearchItem("Popular places nearby"));
+            places.addAll(popularPlaces);
+        } else if (popularPhotos.size() > 0) {
+            places.add(new SearchItem("Interesting photos"));
+            for (SearchItem searchItem : popularPhotos) {
+                places.add(searchItem);
+            }
+        }
+        searchView.showPopularPlaces(places);
+    }
+
     @Override public void loadPopularPlaces(LatLng location) {
         if (popularPlaces.size() > 0 && location.equals(this.location)) {
             showPlaces();
             return;
         }
-        popularPlaces = new ArrayList<>();
         this.location = location;
         new ModelImplementation().foursquare(location)
                 .flatMap(new Func1<MediaList, Observable<Media>>() {
@@ -99,40 +129,34 @@ public class SearchPresenterImplementation implements SearchPresenter {
         };
     }
 
-    public void addToHistory(SearchItem searchItem) {
-        for (int i = 0; i < searchHistory.size(); i++) {
-            if (searchHistory.get(i).text.equals(searchItem.text))
-                searchHistory.remove(i);
-        }
-        searchItem.resId = Theme.getHistoryResId();
-        searchHistory.add(0, searchItem);
-        if (searchHistory.size() > Constants.HISTORY_SIZE) {
-            searchHistory.remove(searchHistory.size() - 1);
-        }
-    }
-
-    private void showPlaces() {
-        ArrayList<SearchItem> places = new ArrayList<>();
-/*        if (searchHistory.size() > 0)
-            places.add(new SearchItem("Last searched"));
-        for (SearchItem searchItem : searchHistory) {
-            places.add(searchItem);
-        }*/
-        if (popularPlaces.size() > 0) {
-            places.add(new SearchItem("Popular places nearby"));
-            places.addAll(popularPlaces);
-        } else if (popularPhotos.size() > 0) {
-            places.add(new SearchItem("Interesting photos"));
-            for (SearchItem searchItem : popularPhotos) {
-                places.add(searchItem);
-            }
-        }
-        searchView.showPopularPlaces(places);
-    }
-
     @Override public void loadPopularPhotos() {
         popularPhotos = new ArrayList<>();
         new ModelImplementation().flickrPopular()
+                .flatMap(new Func1<MediaList, Observable<Media>>() {
+                    @Override public Observable<Media> call(MediaList mediaList) {
+                        Timber.i("list " + mediaList.getList().size());
+                        return Observable.from(mediaList.getList());
+                    }
+                })
+                .map(new Func1<Media, SearchItem>() {
+                    @Override public SearchItem call(Media media) {
+                        SearchItem searchItem = new SearchItem(media);
+                        searchItem.text = new SpannableString(media.getTitle());
+                        return searchItem;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<SearchItem>() {
+                    @Override public void call(SearchItem searchItem) {
+                        if (searchItem.lat != 0 && popularPhotos.size() < 6)
+                            popularPhotos.add(searchItem);
+                    }
+                });
+    }
+
+    @Override public void loadRecentPhotos() {
+        popularPhotos = new ArrayList<>();
+        new ModelImplementation().instagram(location)
                 .flatMap(new Func1<MediaList, Observable<Media>>() {
                     @Override public Observable<Media> call(MediaList mediaList) {
                         Timber.i("list " + mediaList.getList().size());

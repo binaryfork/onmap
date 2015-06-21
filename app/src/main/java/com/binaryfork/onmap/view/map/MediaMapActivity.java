@@ -13,8 +13,8 @@ import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.components.clustering.MediaClusterItem;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.presenter.MediaMapPresenter;
+import com.binaryfork.onmap.presenter.SearchItem;
 import com.binaryfork.onmap.rx.Events;
-import com.binaryfork.onmap.util.Intents;
 import com.binaryfork.onmap.util.Prefs;
 import com.binaryfork.onmap.util.Theme;
 import com.binaryfork.onmap.view.map.ui.CalendarDialog;
@@ -24,14 +24,16 @@ import com.binaryfork.onmap.view.mediaview.ClusterGridView;
 import com.binaryfork.onmap.view.mediaview.MediaView;
 import com.binaryfork.onmap.view.mediaview.MediaViewAnimator;
 import com.binaryfork.onmap.view.mediaview.MediaViewImplementation;
-import com.binaryfork.onmap.view.search.SearchView;
 import com.binaryfork.onmap.view.search.SearchFragment;
+import com.binaryfork.onmap.view.search.SearchView;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.Cluster;
+
+import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -62,6 +64,8 @@ public class MediaMapActivity extends AbstractLocationActivity implements
         setContentView(R.layout.activity_main);
         Theme.updateActivity(this);
         ButterKnife.inject(this);
+        mediaContainerLayout.setPadding(0, Theme.getStatusBarHeight(), 0, 0);
+        gridView.setPadding(0, Theme.getStatusBarHeight(), 0, 0);
         drawerList.setCallback(new DrawerList.OnDrawerItemClickListener() {
             @Override public void onClick(DrawerList.DrawerItem drawerItem) {
                 if (drawerItem.apiSource != null) {
@@ -77,7 +81,7 @@ public class MediaMapActivity extends AbstractLocationActivity implements
         });
         rangeSeekBar.setMediaMapView(this);
         MediaViewAnimator.get().setBgView(backgroundView);
-        mediaView = new MediaViewImplementation(mediaContainerLayout, getApplicationContext());
+        mediaView = new MediaViewImplementation(findViewById(R.id.container), getApplicationContext());
         gridView.mediaView = mediaView;
         setupRetainedFragment();
         if (savedInstanceState == null) {
@@ -187,6 +191,10 @@ public class MediaMapActivity extends AbstractLocationActivity implements
         mediaMapPresenter.setDistance(distance);
     }
 
+    @Override public void provideMediaList(ArrayList<SearchItem> loadedMedia) {
+        searchView.showPopularPlaces(loadedMedia);
+    }
+
     @Override public void showCenterMarker(int distance) {
         mediaMapFragment.showMapCircle(distance, location);
         rangeSeekBar.setMapCircle(mediaMapFragment.getMapCircle());
@@ -205,10 +213,6 @@ public class MediaMapActivity extends AbstractLocationActivity implements
             }
         };
         calendarDialog.show(getSupportFragmentManager(), "date");
-    }
-
-    @OnClick(R.id.username) public void onClickUsername() {
-        Intents.openLink(this, mediaView.getMedia().getSiteUrl());
     }
 
     @OnClick(R.id.fab) public void fab() {

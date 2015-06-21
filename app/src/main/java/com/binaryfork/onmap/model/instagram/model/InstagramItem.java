@@ -9,7 +9,7 @@ import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.model.ApiSource;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.model.instagram.MediaTypes;
-import com.binaryfork.onmap.util.Spanny;
+import com.binaryfork.spanny.Spanny;
 
 import java.util.List;
 
@@ -84,12 +84,12 @@ public class InstagramItem implements Media {
     public Spannable getComments() {
 
         int authorColor = BaseApplication.get().getResources().getColor(R.color.accent);
-        Spanny spanny = new Spanny();
+        Spanny spanny = new Spanny("");
         if (likes.count > 0)
-            spanny.append(BaseApplication.get().getResources().getString(R.string.heart) + " " + likes.count + " likes\n",
+            spanny.append(BaseApplication.get().getResources().getString(R.string.heart) + " " + likes.count + " likes",
                     new ForegroundColorSpan(authorColor));
         if (caption != null)
-            spanny.append(caption.from.username, new ForegroundColorSpan(authorColor))
+            spanny.append("\n" + caption.from.username, new ForegroundColorSpan(authorColor))
                     .append(" " + caption.text);
         if (comments.count > 0)
             for (Comments.Comment comment : comments.data) {

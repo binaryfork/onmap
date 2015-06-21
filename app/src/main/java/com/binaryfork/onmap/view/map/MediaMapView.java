@@ -4,8 +4,11 @@ import android.view.View;
 
 import com.binaryfork.onmap.components.clustering.MediaClusterItem;
 import com.binaryfork.onmap.model.Media;
+import com.binaryfork.onmap.presenter.SearchItem;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.Cluster;
+
+import java.util.ArrayList;
 
 public interface MediaMapView {
 
@@ -19,4 +22,6 @@ public interface MediaMapView {
     LatLng getLocation();
     void allMarkesLoaded();
     void setDistance(int distance);
+
+    void provideMediaList(ArrayList<SearchItem> loadedMedia);
 }

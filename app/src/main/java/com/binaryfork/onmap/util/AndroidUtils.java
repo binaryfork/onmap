@@ -12,16 +12,17 @@ import com.binaryfork.onmap.BaseApplication;
 public class AndroidUtils {
 
     public static float density = 1;
-    private static int scrrenSize;
+    private static int width;
+    private static int height;
 
     static {
         density = BaseApplication.get().getResources().getDisplayMetrics().density;
-
         WindowManager wm = (WindowManager) BaseApplication.get().getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        scrrenSize = Math.max(size.x, size.y);
+        width = size.x;
+        height = size.y;
     }
 
     public static int dp(float value) {
@@ -29,7 +30,15 @@ public class AndroidUtils {
     }
 
     public static int screenSize() {
-        return scrrenSize;
+        return Math.max(width, height);
+    }
+
+    public static int getHeight() {
+        return height;
+    }
+
+    public static int getWidth() {
+        return width;
     }
 
     public static boolean isDeviceOnline(Context context) {

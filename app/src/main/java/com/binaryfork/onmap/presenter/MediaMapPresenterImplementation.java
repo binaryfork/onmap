@@ -2,6 +2,7 @@ package com.binaryfork.onmap.presenter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.text.SpannableString;
 
 import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.components.clustering.Clusterer;
@@ -10,6 +11,7 @@ import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.model.MediaList;
 import com.binaryfork.onmap.model.ModelImplementation;
 import com.binaryfork.onmap.model.twitter.TweetMedia;
+import com.binaryfork.onmap.util.BorderTransformation;
 import com.binaryfork.onmap.view.map.MediaMapView;
 import com.binaryfork.onmap.util.DateUtils;
 import com.binaryfork.onmap.util.VideoIconTransformation;
@@ -114,8 +116,10 @@ public class MediaMapPresenterImplementation implements
                 return;
         }
         subscribe(observable
+                .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(new Func1<MediaList, Observable<Media>>() {
                     @Override public Observable<Media> call(MediaList mediaList) {
+                        provideMediaListToSearchView(mediaList);
                         return Observable.from(mediaList.getList());
                     }
                 }));
@@ -141,9 +145,9 @@ public class MediaMapPresenterImplementation implements
                                             clusterer.cluster();
                                         }
                                     }
-                                }, onError(), onComplete());
+                                }, onError());
                     }
-                }, onError());
+                }, onError(), onComplete());
     }
 
     private Action1<Throwable> onError() {
@@ -178,6 +182,8 @@ public class MediaMapPresenterImplementation implements
                         .tag(PICASSO_MAP_MARKER_TAG);
                 if (media.isVideo()) {
                     picasso = picasso.transform(videoIconTransformation);
+                } else {
+                    picasso = picasso.transform(new BorderTransformation());
                 }
                 Bitmap bitmap = null;
                 try {
@@ -223,4 +229,13 @@ public class MediaMapPresenterImplementation implements
         }
     }
 
+    private void provideMediaListToSearchView(MediaList mediaList) {
+        ArrayList<SearchItem> loadedMedia = new ArrayList<>();
+        for (Media media : mediaList.getList()) {
+            SearchItem searchItem = new SearchItem(media);
+            searchItem.text = new SpannableString(media.getTitle());
+            loadedMedia.add(searchItem);
+        }
+        mediaMapView.provideMediaList(loadedMedia);
+    }
 }
