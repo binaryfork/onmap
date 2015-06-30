@@ -77,17 +77,47 @@ public class GeoSearchModel {
     }
 
     public static String addressByLocation(LatLng location) {
+        String address = "";
         Geocoder geocoder = new Geocoder(BaseApplication.get(), Locale.getDefault());
         try {
             if (geocoder.getFromLocation(location.latitude, location.longitude, 1) == null || geocoder.getFromLocation(location.latitude, location.longitude, 1).size() ==0)
-                return "";
+                return address;
             Address geoAddress = geocoder.getFromLocation(location.latitude, location.longitude, 1).get(0);
-            String locality = geoAddress.getLocality() != null ? geoAddress.getLocality() : geoAddress.getAdminArea();
-            locality = locality == null ? geoAddress.getCountryName() : locality + ", " + geoAddress.getCountryName();
-            return locality;
+            address = geoAddress.getLocality() != null ? geoAddress.getLocality() : geoAddress.getAdminArea();
+            address = address == null ? geoAddress.getCountryName() : address + ", " + geoAddress.getCountryName();
+            return address;
         } catch (IOException e) {
             e.printStackTrace();
-            return "";
+            return address;
+        }
+    }
+
+    public static String fullAddressByLocation(LatLng location) {
+        String address = "";
+        Geocoder geocoder = new Geocoder(BaseApplication.get(), Locale.getDefault());
+        try {
+            if (geocoder.getFromLocation(location.latitude, location.longitude, 1) == null || geocoder.getFromLocation(location.latitude, location.longitude, 1).size() ==0)
+                return address;
+            Address geoAddress = geocoder.getFromLocation(location.latitude, location.longitude, 1).get(0);
+            for (int i = 0; i < geoAddress.getMaxAddressLineIndex(); i++) {
+                address += geoAddress.getAddressLine(i) + " ";
+            }
+            return address;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return address;
+        }
+    }
+
+    public static Address geoAddressByLocation(LatLng location) {
+        Geocoder geocoder = new Geocoder(BaseApplication.get(), Locale.getDefault());
+        try {
+            if (geocoder.getFromLocation(location.latitude, location.longitude, 1) == null || geocoder.getFromLocation(location.latitude, location.longitude, 1).size() ==0)
+                return null;
+            return geocoder.getFromLocation(location.latitude, location.longitude, 1).get(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

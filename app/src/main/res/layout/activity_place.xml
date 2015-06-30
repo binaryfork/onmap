@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+    <com.binaryfork.onmap.view.mediaview.ClusterGridView
+        android:id="@+id/gridView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
+
+    <com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader
+        android:id="@+id/header"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="16dp"
+            android:gravity="center"
+            android:text="Medium Text"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="18dp"
+            android:layout_below="@+id/title"
+            android:layout_centerHorizontal="true"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_launcher"/>
+
+        <Button
+            android:id="@+id/add"
+            android:layout_width="128dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/imageView"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="16dp"
+            android:layout_marginLeft="16dp"
+            android:background="@drawable/button_accent"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="Watch"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/white"/>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:layout_below="@+id/add"
+            android:layout_width="match_parent"
+            android:layout_height="48dp">
+            <TextView
+                android:id="@+id/instagram"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_white"
+                android:drawablePadding="4dp"
+                android:gravity="center"
+                android:drawableTop="@drawable/instagram_icon"
+                android:textAppearance="@android:style/TextAppearance.Small"
+                android:paddingTop="8dp"
+                android:text="Instagram"/>
+            <TextView
+                android:id="@+id/flickr"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_white"
+                android:drawablePadding="4dp"
+                android:gravity="center"
+                android:drawableTop="@drawable/flickr"
+                android:textAppearance="@android:style/TextAppearance.Small"
+                android:paddingTop="8dp"
+                android:text="flickr"/>
+            <TextView
+                android:id="@+id/foursquare"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_white"
+                android:drawablePadding="4dp"
+                android:gravity="center"
+                android:drawableTop="@drawable/foursquare"
+                android:textAppearance="@android:style/TextAppearance.Small"
+                android:paddingTop="8dp"
+                android:text="Foursquare"/>
+
+            <TextView
+                android:id="@+id/navigate"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_white"
+                android:drawablePadding="4dp"
+                android:gravity="center"
+                android:drawableTop="@drawable/ic_place_black_48dp"
+                android:textAppearance="@android:style/TextAppearance.Small"
+                android:paddingTop="8dp"
+                android:text="Map"/>
+
+        </LinearLayout>
+    </com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader>
+</RelativeLayout>

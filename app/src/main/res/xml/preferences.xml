@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
-        android:title="Location">
+        android:title="Map">
 
         <CheckBoxPreference
             android:key="pref_save_location"
             android:defaultValue="true"
             android:summary="Load last location on start."
             android:title="Remember location"/>
+
+        <com.pavelsikun.seekbarpreference.SeekBarPreference
+            android:key="your_pref_key"
+            android:title="Seek Radius"
+            android:summary="Load media in radius"
+            android:defaultValue="1000"
+            app:minValue="100"
+            app:maxValue="5000"
+            app:interval="100"
+            app:measurementUnit="m"/>
 
     </PreferenceCategory>
 

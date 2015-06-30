@@ -10,9 +10,9 @@ import android.view.animation.DecelerateInterpolator;
 
 import com.binaryfork.onmap.components.clustering.MediaClusterItem;
 import com.binaryfork.onmap.components.widget.RecyclerItemClickListener;
+import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.util.AndroidUtils;
 import com.binaryfork.onmap.util.Animations;
-import com.binaryfork.onmap.util.Theme;
 import com.google.maps.android.clustering.Cluster;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -28,6 +28,7 @@ public class ClusterGridView extends RecyclerView implements RecyclerItemClickLi
     private ClusterAdapter adapter;
     private int cx;
     private int cy;
+    private GridLayoutManager manager;
 
     public ClusterGridView(Context context) {
         super(context);
@@ -45,7 +46,7 @@ public class ClusterGridView extends RecyclerView implements RecyclerItemClickLi
     }
 
     private void init() {
-        GridLayoutManager manager = new GridLayoutManager(getContext(), 2);
+        manager = new GridLayoutManager(getContext(), 2);
         setLayoutManager(manager);
         addOnItemTouchListener(new RecyclerItemClickListener(getContext(), this));
     }
@@ -54,9 +55,23 @@ public class ClusterGridView extends RecyclerView implements RecyclerItemClickLi
         cx = x;
         cy = y;
         setVisibility(View.VISIBLE);
-        adapter = new ClusterAdapter((ArrayList<MediaClusterItem>) cluster.getItems());
+        ArrayList<Media> items = new ArrayList<>();
+        for (MediaClusterItem clusterItem : cluster.getItems()) {
+            items.add(clusterItem.media);
+        }
+        adapter = new ClusterAdapter(items);
         setAdapter(adapter);
         animateOpenGrid();
+    }
+
+    public void setupData(ArrayList<Media> items) {
+        setVisibility(View.VISIBLE);
+        adapter = new ClusterAdapter(items);
+        setAdapter(adapter);
+    }
+
+    public void setColumns(int num) {
+        manager.setSpanCount(num);
     }
 
     public void animateOpenGrid() {

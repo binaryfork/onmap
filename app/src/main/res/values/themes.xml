@@ -9,4 +9,11 @@
         <item name="iconHistory">@android:drawable/ic_menu_recent_history</item>
         <item name="iconPlaceMarker">@android:drawable/ic_dialog_map</item>
     </style>
+
+    <style name="AppTheme.ActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorPrimaryDark">@color/accentDark</item>
+        <item name="bgMainColor">@android:color/white</item>
+    </style>
 </resources>

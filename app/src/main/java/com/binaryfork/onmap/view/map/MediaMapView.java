@@ -24,4 +24,6 @@ public interface MediaMapView {
     void setDistance(int distance);
 
     void provideMediaList(ArrayList<SearchItem> loadedMedia);
+
+    void onRandomLocation(LatLng latLng);
 }

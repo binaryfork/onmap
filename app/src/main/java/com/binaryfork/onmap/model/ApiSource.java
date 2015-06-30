@@ -10,7 +10,8 @@ public enum ApiSource {
     INSTAGRAM(R.string.instagram, R.color.instagram),
     FLICKR(R.string.flickr, R.color.flickr),
     TWITTER(R.string.twitter, R.color.twitter),
-    FOURSQUARE(R.string.foursquare, R.color.foursquare);
+    FOURSQUARE(R.string.foursquare, R.color.foursquare),
+    YOUTUBE(R.string.youtube, R.color.foursquare);
 
     @StringRes private int string;
     @ColorRes private int color;

@@ -37,7 +37,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainPreferenceActivity"/>
+        <activity android:name=".MainPreferenceActivity"
+                  android:theme="@style/Theme.AppCompat.Light"/>
+
+        <activity android:name=".view.place.PlaceActivity"
+                  android:theme="@style/AppTheme.ActionBar"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"

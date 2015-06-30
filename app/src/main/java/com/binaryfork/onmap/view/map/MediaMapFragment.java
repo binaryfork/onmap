@@ -9,6 +9,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 
+import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.R;
 import com.binaryfork.onmap.model.GeoSearchModel;
 import com.binaryfork.onmap.presenter.MediaMapPresenter;
@@ -48,6 +49,7 @@ public class MediaMapFragment extends SupportMapFragment implements GoogleMap.On
             mediaMapPresenter = new MediaMapPresenterImplementation();
         mediaMapPresenter.setMediaMapView(mediaMapView);
         mediaMapPresenter.setupClusterer(getActivity().getApplicationContext(), getMap());
+        BaseApplication.setMediaMapPresenter(mediaMapPresenter);
     }
 
     public MediaMapPresenter getMediaMapPresenter() {

@@ -3,9 +3,12 @@ package com.binaryfork.onmap.presenter;
 import android.content.Context;
 
 import com.binaryfork.onmap.model.ApiSource;
+import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.view.map.MediaMapView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
 
 public interface MediaMapPresenter {
 
@@ -18,4 +21,6 @@ public interface MediaMapPresenter {
     void loadMedia(LatLng location);
     LatLng getLocation();
     void onDestroy();
+    void randomLocation();
+    ArrayList<Media> getLoadedMedia();
 }

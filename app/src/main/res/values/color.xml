@@ -10,4 +10,5 @@
     <item name="twitter" type="color">#55acee</item>
     <item name="foursquare" type="color">#00B551</item>
 
+    <item name="transparent_white" type="color">#efff</item>
 </resources>

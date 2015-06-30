@@ -55,7 +55,7 @@ public class MediaViewAnimator {
         SupportAnimator animator =
                 ViewAnimationUtils.createCircularReveal(backgroundView, wx, wy, startRadius, AndroidUtils.screenSize());
         animator.setInterpolator(new DecelerateInterpolator());
-        animator.setDuration(500);
+        animator.setDuration(350);
         animator.start();
     }
 

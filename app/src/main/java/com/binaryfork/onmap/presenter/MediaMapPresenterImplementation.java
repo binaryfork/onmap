@@ -2,7 +2,6 @@ package com.binaryfork.onmap.presenter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.text.SpannableString;
 
 import com.binaryfork.onmap.BaseApplication;
 import com.binaryfork.onmap.components.clustering.Clusterer;
@@ -10,11 +9,12 @@ import com.binaryfork.onmap.model.ApiSource;
 import com.binaryfork.onmap.model.Media;
 import com.binaryfork.onmap.model.MediaList;
 import com.binaryfork.onmap.model.ModelImplementation;
+import com.binaryfork.onmap.model.instagram.model.InstagramItems;
 import com.binaryfork.onmap.model.twitter.TweetMedia;
-import com.binaryfork.onmap.util.BorderTransformation;
-import com.binaryfork.onmap.view.map.MediaMapView;
+import com.binaryfork.onmap.components.transform.BorderTransformation;
 import com.binaryfork.onmap.util.DateUtils;
-import com.binaryfork.onmap.util.VideoIconTransformation;
+import com.binaryfork.onmap.components.transform.VideoIconTransformation;
+import com.binaryfork.onmap.view.map.MediaMapView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
@@ -52,6 +52,7 @@ public class MediaMapPresenterImplementation implements
     private LatLng location;
     private Transformation videoIconTransformation;
     private ModelImplementation model;
+    private ArrayList<Media> loadedMedia;
 
     public MediaMapPresenterImplementation() {
         videoIconTransformation = new VideoIconTransformation();
@@ -90,14 +91,17 @@ public class MediaMapPresenterImplementation implements
     }
 
     @Override public void loadMedia(LatLng location) {
+        Timber.i("", "what");
         if (subscription != null)
             subscription.unsubscribe();
         this.location = location;
+        Timber.i("", "what");
         // Cancel all loading map photos because all markers will be cleared.
         Picasso.with(BaseApplication.get()).cancelTag(PICASSO_MAP_MARKER_TAG);
         clusterer.clearItems();
         mediaMapView.showCenterMarker(model.distance);
         Observable<? extends MediaList> observable;
+        Timber.i("", "what");
         switch (apiSource) {
             default:
             case INSTAGRAM:
@@ -229,13 +233,32 @@ public class MediaMapPresenterImplementation implements
         }
     }
 
+    public ArrayList<Media> getLoadedMedia() {
+        return loadedMedia;
+    }
+
     private void provideMediaListToSearchView(MediaList mediaList) {
-        ArrayList<SearchItem> loadedMedia = new ArrayList<>();
-        for (Media media : mediaList.getList()) {
-            SearchItem searchItem = new SearchItem(media);
-            searchItem.text = new SpannableString(media.getTitle());
-            loadedMedia.add(searchItem);
-        }
-        mediaMapView.provideMediaList(loadedMedia);
+        loadedMedia = (ArrayList<Media>) mediaList.getList();
+        Timber.i("wwwwwwwws " + loadedMedia.size());
+        // TODO remove this
+    //    mediaMapView.provideMediaList(loadedMedia);
+    }
+
+    @Override public void randomLocation() {
+        model.instagramPopular(15).subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<InstagramItems>() {
+            @Override public void call(InstagramItems instagramItems) {
+                for (Media media : instagramItems.getList()) {
+                    if (media.getLatitude() == 0 && media.getLongitude() == 0) {
+                    } else {
+                        LatLng loc = new LatLng(media.getLatitude(), media.getLongitude());
+                        if (loc.equals(location))
+                            continue;
+                        mediaMapView.onRandomLocation(loc);
+                        break;
+                    }
+                }
+            }
+        });
     }
 }

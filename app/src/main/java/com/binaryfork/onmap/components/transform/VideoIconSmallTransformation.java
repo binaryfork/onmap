@@ -1,4 +1,4 @@
-package com.binaryfork.onmap.util;
+package com.binaryfork.onmap.components.transform;
 
 
 import android.graphics.Bitmap;
@@ -6,14 +6,17 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 
 import com.binaryfork.onmap.BaseApplication;
+import com.binaryfork.onmap.util.AndroidUtils;
 import com.squareup.picasso.Transformation;
 
-public class VideoIconTransformation implements Transformation {
+public class VideoIconSmallTransformation implements Transformation {
 
     private final Drawable videoIcon;
 
-    public VideoIconTransformation() {
+    public VideoIconSmallTransformation() {
         videoIcon = BaseApplication.get().getResources().getDrawable(android.R.drawable.ic_media_play);
+        if (videoIcon == null)
+            return;
     }
 
     @Override
@@ -23,7 +26,7 @@ public class VideoIconTransformation implements Transformation {
 
     @Override
     public Bitmap transform(Bitmap bitmap) {
-        synchronized (VideoIconTransformation.class) {
+        synchronized (VideoIconSmallTransformation.class) {
             if (bitmap == null) {
                 return null;
             }
@@ -31,9 +34,10 @@ public class VideoIconTransformation implements Transformation {
             Canvas canvas = new Canvas(resultBitmap);
             if (videoIcon == null)
                 return null;
-            videoIcon.setBounds(canvas.getClipBounds());
+            int bounds = AndroidUtils.dp(24);
+            videoIcon.setBounds(canvas.getWidth() - bounds, 0, canvas.getWidth(), bounds);
             videoIcon.draw(canvas);
-            canvas.drawBitmap(resultBitmap, 0, 0, null);
+          //  canvas.drawBitmap(resultBitmap, canvas.getWidth() - videoIcon.getIntrinsicWidth(), 0, null);
             bitmap.recycle();
             return resultBitmap;
         }

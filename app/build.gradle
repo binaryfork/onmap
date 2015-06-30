@@ -53,6 +53,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'io.reactivex:rxandroid:0.24.0'
+    compile 'com.google.apis:google-api-services-youtube:v3-rev141-1.20.0'
     compile('com.twitter.sdk.android:twitter:1.4.0@aar') {
         transitive = true;
     }
@@ -70,4 +71,7 @@ dependencies {
     compile 'mateuszklimek.framevideoview:framevideoview:1.1.0@aar'
     compile 'com.binaryfork:spanny:1.0.2'
     compile 'org.slf4j:slf4j-simple:1.7.12'
+    compile 'com.github.clans:fab:1.5.2'
+    compile 'com.pavelsikun:material-seekbar-preference:0.7+'
+    compile 'com.bartoszlipinski.recyclerviewheader:library:1.2.0'
 }

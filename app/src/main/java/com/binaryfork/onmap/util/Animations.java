@@ -20,7 +20,7 @@ public class Animations {
 
     public static void moveFrom(final View view, boolean top, boolean hide) {
         TranslateAnimation animation = new TranslateAnimation(0, 0, view.getHeight() * (top ? -1 : 1), 0);
-        animation.setDuration(400);
+        animation.setDuration(300);
         animation.setInterpolator(new DecelerateInterpolator());
         if (hide)
             animation.setAnimationListener(hideListener(view));
@@ -66,7 +66,6 @@ public class Animations {
     public static SupportAnimator.AnimatorListener hideListenerSupAnimator(final View view) {
         return new SupportAnimator.AnimatorListener() {
             @Override public void onAnimationStart() {
-
             }
 
             @Override public void onAnimationEnd() {
@@ -74,11 +73,9 @@ public class Animations {
             }
 
             @Override public void onAnimationCancel() {
-
             }
 
             @Override public void onAnimationRepeat() {
-
             }
         };
     }

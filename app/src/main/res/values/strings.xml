@@ -9,6 +9,8 @@
     <string name="flickr">Flickr</string>
     <string name="twitter">Twitter</string>
     <string name="foursquare">Foursquare</string>
+    <string name="youtube">YouTube</string>
+
     <string name="satellite">Satellite</string>
     <string name="terrain">Terrain</string>
     <string name="prefs">Preferences</string>

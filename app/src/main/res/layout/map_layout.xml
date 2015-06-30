@@ -1,34 +1,16 @@
-<io.codetail.widget.RevealFrameLayout android:id="@+id/container"
-                                      xmlns:android="http://schemas.android.com/apk/res/android"
-                                      xmlns:tools="http://schemas.android.com/tools"
-                                      android:layout_width="match_parent"
-                                      android:layout_height="match_parent">
+<io.codetail.widget.RevealFrameLayout
+    android:id="@+id/container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <fragment
         android:id="@+id/map"
         android:name="com.binaryfork.onmap.view.map.MediaMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="72dp"
-        android:layout_height="48dp"
-        android:layout_gravity="bottom"
-        android:background="@color/accent"
-        android:gravity="center"
-        android:textAppearance="@android:style/TextAppearance.Medium.Inverse"
-        android:visibility="gone"/>
-
-    <com.binaryfork.onmap.view.map.ui.RangeSeekBar
-        android:id="@+id/rangeSeekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginLeft="72dp"
-        android:layout_marginRight="72dp"
-        android:max="5000"
-        android:progress="1000"/>
 
     <ImageView
         android:id="@+id/zoomIn"
@@ -56,16 +38,80 @@
         android:scaleType="centerInside"
         android:src="@drawable/minus"/>
 
-    <ImageView
+    <com.github.clans.fab.FloatingActionButton
         android:id="@+id/fab"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_gravity="right|bottom"
-        android:layout_margin="16dp"
-        android:background="@drawable/circle_color"
-        android:scaleType="centerInside"
-        android:src="@drawable/abc_ic_search_api_mtrl_alpha"
-        android:visibility="visible"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:padding="8dp"
+        android:layout_margin="8dp"
+        android:src="@drawable/fab_icon"
+        fab:fab_colorNormal="@color/accent"/>
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        fab:menu_icon="@drawable/fab_icon"
+        fab:menu_backgroundColor="@color/transparent_white"
+        fab:menu_colorNormal="@color/accent">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/menu_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/foursquare"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_label="My location"
+            fab:fab_size="mini"/>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/menu_random"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/foursquare"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_label="Random place"
+            fab:fab_size="mini"/>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/menu_foursquare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/foursquare"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_label="Foursquare"
+            fab:fab_size="mini"/>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/menu_flickr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/flickr"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_label="Flickr"
+            fab:fab_size="mini"/>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/menu_instagram"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/instagram_icon"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_label="Instagram"
+            fab:fab_size="mini"/>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/menu_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/instagram_icon"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_label="Choose date"
+            fab:fab_size="mini"/>
+
+    </com.github.clans.fab.FloatingActionMenu>
 
     <fragment
         android:id="@+id/searchFragment"
@@ -82,26 +128,25 @@
         android:clipToPadding="false"
         android:visibility="invisible"/>
 
-
     <LinearLayout
         android:id="@+id/backgroundView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="#fff"
+        android:orientation="vertical"
         android:visibility="gone">
 
         <com.binaryfork.onmap.components.widget.StatusBarBackView
-            android:background="@color/accent"
             android:layout_width="match_parent"
-            android:layout_height="25dp"/>
+            android:layout_height="25dp"
+            android:background="@color/accent"/>
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/username_bar_size"
-            android:gravity="center"
-            android:background="@color/accent">
+            android:background="@color/accent"
+            android:gravity="center">
 
             <ImageView
                 android:id="@+id/user_photo"
